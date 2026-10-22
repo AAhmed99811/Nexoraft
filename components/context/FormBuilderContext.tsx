@@ -6,6 +6,8 @@ import React, {
   useState,
   useCallback,
   useMemo,
+  useEffect,
+  useRef,
   ReactNode,
 } from "react";
 import {
@@ -15,6 +17,12 @@ import {
   PageState,
   NavbarMode,
   WebsiteSite,
+  BlogPost,
+  MediaAsset,
+  FormSubmission,
+  Revision,
+  WebsiteTheme,
+  SubmissionStatus,
 } from "../types";
 import { TEMPLATES } from "../../lib/templates";
 
@@ -31,16 +39,39 @@ export interface FormBuilderStoreState {
   pages: Record<string, PageConfig>;
   navbarMode: NavbarMode;
   themeCode: string;
+  secondaryColor: string;
+  accentColor: string;
   fontFamily: string;
+  headingFont: string;
+  borderRadius: "none" | "sm" | "md" | "lg" | "full";
   variables: Record<string, unknown>;
+  posts: BlogPost[];
+  media: MediaAsset[];
+  submissions: FormSubmission[];
+  revisions: Revision[];
+  saveStatus: "saved" | "saving" | "published";
+  canUndo: boolean;
+  canRedo: boolean;
 }
 
 export type ActionType =
   | { type: "element/removeElement"; payload?: { id?: string } }
-  | { type: "element/addElement"; payload: { parentId: string; element: ElementNode } }
-  | { type: "element/updateElement"; payload: { id: string; changes: Partial<ElementNode> } }
-  | { type: "element/reorderElement"; payload: { parentId: string; startIndex: number; endIndex: number } }
-  | { type: "variables/addMultipleVariables"; payload: { allVariablesList: Record<string, unknown> } }
+  | {
+      type: "element/addElement";
+      payload: { parentId: string; element: ElementNode };
+    }
+  | {
+      type: "element/updateElement";
+      payload: { id: string; changes: Partial<ElementNode> };
+    }
+  | {
+      type: "element/reorderElement";
+      payload: { parentId: string; startIndex: number; endIndex: number };
+    }
+  | {
+      type: "variables/addMultipleVariables";
+      payload: { allVariablesList: Record<string, unknown> };
+    }
   | { type: "navbar/setMode"; payload: NavbarMode }
   | { type: string; payload?: unknown };
 
@@ -53,7 +84,32 @@ export interface FormBuilderContextValue extends FormBuilderStoreState {
   setWebsiteName: (name: string) => void;
   setThemeCode: (color: string) => void;
   setFontFamily: (font: string) => void;
+  updateTheme: (theme: Partial<WebsiteTheme>) => void;
   eventDispatcher: (eventName: string, payload: unknown) => void;
+  // History / Undo / Redo
+  undo: () => void;
+  redo: () => void;
+  // CMS Pages
+  addPage: (page: { name: string; slug: string; templateType?: string }) => void;
+  updatePage: (pageId: string, changes: Partial<PageConfig>) => void;
+  deletePage: (pageId: string) => void;
+  // CMS Posts
+  addPost: (post: Omit<BlogPost, "id" | "publishedAt">) => void;
+  updatePost: (id: string, changes: Partial<BlogPost>) => void;
+  deletePost: (id: string) => void;
+  // CMS Media
+  addMedia: (asset: Omit<MediaAsset, "id" | "createdAt">) => void;
+  deleteMedia: (id: string) => void;
+  // Lead Submissions
+  addSubmission: (
+    submission: Omit<FormSubmission, "id" | "submittedAt" | "status">
+  ) => void;
+  updateSubmissionStatus: (id: string, status: SubmissionStatus) => void;
+  deleteSubmission: (id: string) => void;
+  // Revisions & Publishing
+  publishSite: (summary?: string) => Revision;
+  restoreRevision: (revisionId: string) => boolean;
+  setSaveStatus: (status: "saved" | "saving" | "published") => void;
 }
 
 const defaultTemplate = TEMPLATES["saas-landing"];
@@ -69,8 +125,16 @@ export interface FormBuilderProviderProps {
   initialPages?: Record<string, PageConfig>;
   initialActivePage?: string;
   initialThemeCode?: string;
+  initialSecondaryColor?: string;
+  initialAccentColor?: string;
   initialFontFamily?: string;
+  initialHeadingFont?: string;
+  initialBorderRadius?: "none" | "sm" | "md" | "lg" | "full";
   initialNavbarMode?: NavbarMode;
+  initialPosts?: BlogPost[];
+  initialMedia?: MediaAsset[];
+  initialSubmissions?: FormSubmission[];
+  initialRevisions?: Revision[];
   onSave?: (site: WebsiteSite) => void;
 }
 
@@ -83,8 +147,16 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
   initialPages = defaultTemplate.pages,
   initialActivePage = defaultTemplate.activePage,
   initialThemeCode = defaultTemplate.theme.primaryColor,
+  initialSecondaryColor = defaultTemplate.theme.secondaryColor || "#6366f1",
+  initialAccentColor = defaultTemplate.theme.accentColor || "#10b981",
   initialFontFamily = defaultTemplate.theme.fontFamily,
+  initialHeadingFont = defaultTemplate.theme.headingFont || "Inter, sans-serif",
+  initialBorderRadius = defaultTemplate.theme.borderRadius || "lg",
   initialNavbarMode = "horizontal",
+  initialPosts = defaultTemplate.posts || [],
+  initialMedia = defaultTemplate.media || [],
+  initialSubmissions = defaultTemplate.submissions || [],
+  initialRevisions = defaultTemplate.revisions || [],
 }) => {
   const [websiteId] = useState<string>(initialWebsiteId);
   const [websiteName, setWebsiteName] = useState<string>(initialWebsiteName);
@@ -94,17 +166,136 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [hoveredElement] = useState<string | null>(null);
   const [activePage, setActivePage] = useState<string>(initialActivePage);
-  const [pages] = useState<Record<string, PageConfig>>(initialPages);
+  const [pages, setPages] =
+    useState<Record<string, PageConfig>>(initialPages);
   const [navbarMode, setNavbarMode] = useState<NavbarMode>(initialNavbarMode);
   const [themeCode, setThemeCode] = useState<string>(initialThemeCode);
+  const [secondaryColor, setSecondaryColor] =
+    useState<string>(initialSecondaryColor);
+  const [accentColor, setAccentColor] = useState<string>(initialAccentColor);
   const [fontFamily, setFontFamily] = useState<string>(initialFontFamily);
+  const [headingFont, setHeadingFont] = useState<string>(initialHeadingFont);
+  const [borderRadius, setBorderRadius] = useState<
+    "none" | "sm" | "md" | "lg" | "full"
+  >(initialBorderRadius);
   const [variables, setVariables] = useState<Record<string, unknown>>({});
+  const [posts, setPosts] = useState<BlogPost[]>(initialPosts);
+  const [media, setMedia] = useState<MediaAsset[]>(initialMedia);
+  const [submissions, setSubmissions] =
+    useState<FormSubmission[]>(initialSubmissions);
+  const [revisions, setRevisions] = useState<Revision[]>(initialRevisions);
+  const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "published">(
+    "saved"
+  );
 
-  const eventDispatcher = useCallback((eventName: string, payload: unknown) => {
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent(`website-event:${eventName}`, { detail: payload }));
+  // Undo / Redo history stacks
+  const [history, setHistory] = useState<ElementObjectMap[]>([initialElements]);
+  const [historyIndex, setHistoryIndex] = useState<number>(0);
+  const isUndoingOrRedoing = useRef(false);
+
+  const pushToHistory = useCallback((nextElements: ElementObjectMap) => {
+    if (isUndoingOrRedoing.current) return;
+    setHistory((prev) => {
+      const sliced = prev.slice(0, historyIndex + 1);
+      return [...sliced, nextElements].slice(-30); // max 30 history states
+    });
+    setHistoryIndex((prev) => Math.min(prev + 1, 29));
+  }, [historyIndex]);
+
+  const undo = useCallback(() => {
+    if (historyIndex > 0) {
+      isUndoingOrRedoing.current = true;
+      const targetState = history[historyIndex - 1];
+      setHistoryIndex((prev) => prev - 1);
+      setElements(targetState);
+      setTimeout(() => {
+        isUndoingOrRedoing.current = false;
+      }, 50);
     }
+  }, [history, historyIndex]);
+
+  const redo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      isUndoingOrRedoing.current = true;
+      const targetState = history[historyIndex + 1];
+      setHistoryIndex((prev) => prev + 1);
+      setElements(targetState);
+      setTimeout(() => {
+        isUndoingOrRedoing.current = false;
+      }, 50);
+    }
+  }, [history, historyIndex]);
+
+  const canUndo = historyIndex > 0;
+  const canRedo = historyIndex < history.length - 1;
+
+  const eventDispatcher = useCallback(
+    (eventName: string, payload: unknown) => {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent(`website-event:${eventName}`, { detail: payload })
+        );
+      }
+    },
+    []
+  );
+
+  // Handle lead submission from preview forms
+  const addSubmission = useCallback(
+    (submission: Omit<FormSubmission, "id" | "submittedAt" | "status">) => {
+      const newLead: FormSubmission = {
+        ...submission,
+        id: `sub-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 5)}`,
+        submittedAt: Date.now(),
+        status: "new",
+      };
+      setSubmissions((prev) => [newLead, ...prev]);
+    },
+    []
+  );
+
+  const updateSubmissionStatus = useCallback(
+    (id: string, status: SubmissionStatus) => {
+      setSubmissions((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, status } : s))
+      );
+    },
+    []
+  );
+
+  const deleteSubmission = useCallback((id: string) => {
+    setSubmissions((prev) => prev.filter((s) => s.id !== id));
   }, []);
+
+  // Listen for lead submissions emitted from preview
+  useEffect(() => {
+    const handleLeadEvent = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail) {
+        addSubmission({
+          formName: customEvent.detail.formName || "Contact Form",
+          pageId: activePage,
+          data: {
+            name: customEvent.detail.name || "Anonymous",
+            email: customEvent.detail.email || "unknown@domain.com",
+            message: customEvent.detail.message || "",
+          },
+        });
+      }
+    };
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("website-event:lead-submitted", handleLeadEvent);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener(
+          "website-event:lead-submitted",
+          handleLeadEvent
+        );
+      }
+    };
+  }, [activePage, addSubmission]);
 
   const dispatch = useCallback(
     (action: ActionType) => {
@@ -119,7 +310,6 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
           setElements((prev) => {
             const next: ElementObjectMap = { ...prev };
 
-            // Recursively collect all descendant IDs to remove
             const idsToRemove = new Set<string>();
             const collect = (id: string) => {
               idsToRemove.add(id);
@@ -127,7 +317,6 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
             };
             collect(targetId);
 
-            // Remove from parent's children array
             Object.keys(next).forEach((k) => {
               if (next[k]?.children?.includes(targetId)) {
                 next[k] = {
@@ -137,11 +326,11 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
               }
             });
 
-            // Delete nodes
             idsToRemove.forEach((id) => {
               delete next[id];
             });
 
+            pushToHistory(next);
             return next;
           });
 
@@ -163,6 +352,7 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
                 children: [...(next[parentId].children || []), element.id],
               };
             }
+            pushToHistory(next);
             return next;
           });
           setFocusedElement(element.id);
@@ -176,13 +366,15 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
           };
           setElements((prev) => {
             if (!prev[id]) return prev;
-            return {
+            const next = {
               ...prev,
               [id]: {
                 ...prev[id],
                 ...changes,
               },
             };
+            pushToHistory(next);
+            return next;
           });
           break;
         }
@@ -207,8 +399,217 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
           break;
       }
     },
-    [focusedElement, selectedElement]
+    [focusedElement, selectedElement, pushToHistory]
   );
+
+  // Pages CRUD
+  const addPage = useCallback(
+    ({
+      name,
+      slug,
+      templateType = "blank",
+    }: {
+      name: string;
+      slug: string;
+      templateType?: string;
+    }) => {
+      const pageId = `page-${Date.now().toString(36)}`;
+      const rootId = `root-${pageId}`;
+      const cleanSlug = slug.startsWith("/") ? slug : `/${slug}`;
+
+      const newRootElement: ElementNode = {
+        id: rootId,
+        label: `${name} Root`,
+        elementType: "Container",
+        isRoot: true,
+        visible: true,
+        children: [`nav-${pageId}`, `hero-${pageId}`, `footer-${pageId}`],
+        style: {
+          backgroundColor: "#ffffff",
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+        },
+      };
+
+      const newNav: ElementNode = {
+        id: `nav-${pageId}`,
+        label: "Navbar",
+        elementType: "NavbarSection",
+        title: websiteName || "Nexoraft",
+        buttonText: "Get Started",
+        items: [
+          { label: "Home", href: "/" },
+          { label: name, href: cleanSlug },
+        ],
+        visible: true,
+      };
+
+      const newHero: ElementNode = {
+        id: `hero-${pageId}`,
+        label: "Hero Section",
+        elementType: "HeroSection",
+        badge: "PAGE",
+        title: name,
+        subtitle: `Welcome to the ${name} page. Add sections and style content from the inspector.`,
+        buttonText: "Explore More",
+        visible: true,
+      };
+
+      const newFooter: ElementNode = {
+        id: `footer-${pageId}`,
+        label: "Footer",
+        elementType: "FooterSection",
+        title: websiteName || "Nexoraft",
+        content: "Built with Nexoraft Visual Website Builder.",
+        visible: true,
+      };
+
+      const newPageConfig: PageConfig = {
+        id: pageId,
+        name,
+        slug: cleanSlug,
+        rootElementId: rootId,
+        status: "published",
+        order: Object.keys(pages).length + 1,
+        templateId: templateType,
+        seo: {
+          title: `${name} | ${websiteName}`,
+          description: `Discover ${name} on ${websiteName}.`,
+        },
+      };
+
+      setElements((prev) => ({
+        ...prev,
+        [rootId]: newRootElement,
+        [`nav-${pageId}`]: newNav,
+        [`hero-${pageId}`]: newHero,
+        [`footer-${pageId}`]: newFooter,
+      }));
+
+      setPages((prev) => ({
+        ...prev,
+        [pageId]: newPageConfig,
+      }));
+
+      setActivePage(pageId);
+    },
+    [pages, websiteName]
+  );
+
+  const updatePage = useCallback(
+    (pageId: string, changes: Partial<PageConfig>) => {
+      setPages((prev) => {
+        if (!prev[pageId]) return prev;
+        return {
+          ...prev,
+          [pageId]: {
+            ...prev[pageId],
+            ...changes,
+          },
+        };
+      });
+    },
+    []
+  );
+
+  const deletePage = useCallback(
+    (pageId: string) => {
+      if (Object.keys(pages).length <= 1) return; // Keep at least one page
+      setPages((prev) => {
+        const next = { ...prev };
+        delete next[pageId];
+        return next;
+      });
+      if (activePage === pageId) {
+        const remaining = Object.keys(pages).filter((k) => k !== pageId);
+        if (remaining.length > 0) setActivePage(remaining[0]);
+      }
+    },
+    [pages, activePage]
+  );
+
+  // Blog Posts CRUD
+  const addPost = useCallback(
+    (postData: Omit<BlogPost, "id" | "publishedAt">) => {
+      const newPost: BlogPost = {
+        ...postData,
+        id: `post-${Date.now().toString(36)}`,
+        publishedAt: Date.now(),
+      };
+      setPosts((prev) => [newPost, ...prev]);
+    },
+    []
+  );
+
+  const updatePost = useCallback(
+    (id: string, changes: Partial<BlogPost>) => {
+      setPosts((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, ...changes } : p))
+      );
+    },
+    []
+  );
+
+  const deletePost = useCallback((id: string) => {
+    setPosts((prev) => prev.filter((p) => p.id !== id));
+  }, []);
+
+  // Media Library CRUD
+  const addMedia = useCallback(
+    (assetData: Omit<MediaAsset, "id" | "createdAt">) => {
+      const newAsset: MediaAsset = {
+        ...assetData,
+        id: `media-${Date.now().toString(36)}`,
+        createdAt: Date.now(),
+      };
+      setMedia((prev) => [newAsset, ...prev]);
+    },
+    []
+  );
+
+  const deleteMedia = useCallback((id: string) => {
+    setMedia((prev) => prev.filter((m) => m.id !== id));
+  }, []);
+
+  // Revisions & Publishing
+  const publishSite = useCallback(
+    (summary: string = "Published latest changes"): Revision => {
+      const newRev: Revision = {
+        id: `rev-${Date.now().toString(36)}`,
+        timestamp: Date.now(),
+        summary,
+        author: "Arham ahmed",
+        elementsSnapshot: JSON.parse(JSON.stringify(elements)),
+        pagesSnapshot: JSON.parse(JSON.stringify(pages)),
+      };
+      setRevisions((prev) => [newRev, ...prev]);
+      setSaveStatus("published");
+      return newRev;
+    },
+    [elements, pages]
+  );
+
+  const restoreRevision = useCallback(
+    (revisionId: string): boolean => {
+      const target = revisions.find((r) => r.id === revisionId);
+      if (!target) return false;
+      setElements(JSON.parse(JSON.stringify(target.elementsSnapshot)));
+      setPages(JSON.parse(JSON.stringify(target.pagesSnapshot)));
+      pushToHistory(JSON.parse(JSON.stringify(target.elementsSnapshot)));
+      return true;
+    },
+    [revisions, pushToHistory]
+  );
+
+  const updateTheme = useCallback((themeChanges: Partial<WebsiteTheme>) => {
+    if (themeChanges.primaryColor) setThemeCode(themeChanges.primaryColor);
+    if (themeChanges.secondaryColor) setSecondaryColor(themeChanges.secondaryColor);
+    if (themeChanges.accentColor) setAccentColor(themeChanges.accentColor);
+    if (themeChanges.fontFamily) setFontFamily(themeChanges.fontFamily);
+    if (themeChanges.headingFont) setHeadingFont(themeChanges.headingFont);
+    if (themeChanges.borderRadius) setBorderRadius(themeChanges.borderRadius);
+  }, []);
 
   const contextValue: FormBuilderContextValue = useMemo(
     () => ({
@@ -224,8 +625,19 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
       pages,
       navbarMode,
       themeCode,
+      secondaryColor,
+      accentColor,
       fontFamily,
+      headingFont,
+      borderRadius,
       variables,
+      posts,
+      media,
+      submissions,
+      revisions,
+      saveStatus,
+      canUndo,
+      canRedo,
       dispatch,
       setFocusedElement,
       setSelectedElement,
@@ -234,7 +646,24 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
       setWebsiteName,
       setThemeCode,
       setFontFamily,
+      updateTheme,
       eventDispatcher,
+      undo,
+      redo,
+      addPage,
+      updatePage,
+      deletePage,
+      addPost,
+      updatePost,
+      deletePost,
+      addMedia,
+      deleteMedia,
+      addSubmission,
+      updateSubmissionStatus,
+      deleteSubmission,
+      publishSite,
+      restoreRevision,
+      setSaveStatus,
     }),
     [
       websiteId,
@@ -248,10 +677,37 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
       pages,
       navbarMode,
       themeCode,
+      secondaryColor,
+      accentColor,
       fontFamily,
+      headingFont,
+      borderRadius,
       variables,
+      posts,
+      media,
+      submissions,
+      revisions,
+      saveStatus,
+      canUndo,
+      canRedo,
       dispatch,
+      updateTheme,
       eventDispatcher,
+      undo,
+      redo,
+      addPage,
+      updatePage,
+      deletePage,
+      addPost,
+      updatePost,
+      deletePost,
+      addMedia,
+      deleteMedia,
+      addSubmission,
+      updateSubmissionStatus,
+      deleteSubmission,
+      publishSite,
+      restoreRevision,
     ]
   );
 
@@ -279,8 +735,19 @@ export function useFormBuilderState(): FormBuilderContextValue {
       pages: defaultTemplate.pages,
       navbarMode: "horizontal",
       themeCode: defaultTemplate.theme.primaryColor,
+      secondaryColor: "#6366f1",
+      accentColor: "#10b981",
       fontFamily: defaultTemplate.theme.fontFamily,
+      headingFont: "Inter, sans-serif",
+      borderRadius: "lg",
       variables: {},
+      posts: [],
+      media: [],
+      submissions: [],
+      revisions: [],
+      saveStatus: "saved",
+      canUndo: false,
+      canRedo: false,
       dispatch: fallbackDispatch,
       setFocusedElement: () => {},
       setSelectedElement: () => {},
@@ -289,7 +756,31 @@ export function useFormBuilderState(): FormBuilderContextValue {
       setWebsiteName: () => {},
       setThemeCode: () => {},
       setFontFamily: () => {},
+      updateTheme: () => {},
       eventDispatcher: () => {},
+      undo: () => {},
+      redo: () => {},
+      addPage: () => {},
+      updatePage: () => {},
+      deletePage: () => {},
+      addPost: () => {},
+      updatePost: () => {},
+      deletePost: () => {},
+      addMedia: () => {},
+      deleteMedia: () => {},
+      addSubmission: () => {},
+      updateSubmissionStatus: () => {},
+      deleteSubmission: () => {},
+      publishSite: () => ({
+        id: "rev-stub",
+        timestamp: Date.now(),
+        summary: "Stub",
+        author: "User",
+        elementsSnapshot: {},
+        pagesSnapshot: {},
+      }),
+      restoreRevision: () => false,
+      setSaveStatus: () => {},
     };
   }
   return ctx;
@@ -312,7 +803,9 @@ export const elementSlice = {
 };
 
 export const variablesSlice = {
-  addMultipleVariables: (payload: { allVariablesList: Record<string, unknown> }) => ({
+  addMultipleVariables: (payload: {
+    allVariablesList: Record<string, unknown>;
+  }) => ({
     type: "variables/addMultipleVariables" as const,
     payload,
   }),
@@ -325,7 +818,8 @@ export const hooks = {
     return elements;
   },
   useElementState: () => {
-    const { focusedElement, selectedElement, hoveredElement } = useFormBuilderState();
+    const { focusedElement, selectedElement, hoveredElement } =
+      useFormBuilderState();
     return { focusedElement, selectedElement, hoveredElement };
   },
   useElementSelector: (id?: string) => {
@@ -354,7 +848,8 @@ export const hooks = {
     return fontFamily;
   },
   useWebsiteInfo: () => {
-    const { websiteId, websiteName, websiteDescription } = useFormBuilderState();
+    const { websiteId, websiteName, websiteDescription } =
+      useFormBuilderState();
     return { websiteId, websiteName, websiteDescription };
   },
   // Legacy stubs kept for backwards compatibility

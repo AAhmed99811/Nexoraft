@@ -7,30 +7,50 @@ import {
   generateReactViteProjectFiles,
   downloadProjectZip,
 } from "../lib/exportProject";
-import { Download, Copy, Check, Code2, Globe, Rocket, X, Terminal, FileCode } from "lucide-react";
+import {
+  Download,
+  Copy,
+  Check,
+  Code2,
+  Globe,
+  Rocket,
+  X,
+  FileCode,
+  ShieldCheck,
+} from "lucide-react";
 
 export interface ExportModalProps {
-  isOpen: boolean;
+  isOpen?: boolean;
   onClose: () => void;
-  website: WebsiteSite;
+  website?: WebsiteSite;
+  site?: WebsiteSite;
 }
 
-export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, website }) => {
+export const ExportModal: React.FC<ExportModalProps> = ({
+  isOpen = true,
+  onClose,
+  website,
+  site,
+}) => {
+  const currentWebsite = website || site;
   const [format, setFormat] = useState<"nextjs" | "react">("nextjs");
-  const [activeTab, setActiveTab] = useState<"download" | "code" | "deploy">("download");
+  const [activeTab, setActiveTab] = useState<
+    "download" | "report" | "code" | "deploy"
+  >("download");
   const [selectedFile, setSelectedFile] = useState<string>("app/page.tsx");
   const [copied, setCopied] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  if (!isOpen) return null;
+  if (!isOpen || !currentWebsite) return null;
 
   const projectFiles =
     format === "nextjs"
-      ? generateNextJsProjectFiles(website)
-      : generateReactViteProjectFiles(website);
+      ? generateNextJsProjectFiles(currentWebsite)
+      : generateReactViteProjectFiles(currentWebsite);
 
   const fileKeys = Object.keys(projectFiles);
-  const currentCode = projectFiles[selectedFile] || projectFiles[fileKeys[0]] || "";
+  const currentCode =
+    projectFiles[selectedFile] || projectFiles[fileKeys[0]] || "";
 
   const handleCopy = () => {
     navigator.clipboard.writeText(currentCode);
@@ -41,7 +61,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, websi
   const handleDownload = async () => {
     try {
       setIsDownloading(true);
-      await downloadProjectZip(website, format);
+      await downloadProjectZip(currentWebsite, format);
     } catch (err) {
       console.error("Export error:", err);
       alert("Failed to create ZIP archive. Please check console.");
@@ -49,6 +69,9 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, websi
       setIsDownloading(false);
     }
   };
+
+  const pagesCount = Object.keys(currentWebsite.pages || {}).length;
+  const postsCount = currentWebsite.posts ? currentWebsite.posts.length : 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150">
@@ -61,10 +84,13 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, websi
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                Export Website Project
+                Export Website Codebase
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Generate production-ready code for <span className="font-semibold text-blue-600">{website.name}</span>
+                100% independent portable code for{" "}
+                <span className="font-semibold text-blue-600">
+                  {currentWebsite.name}
+                </span>
               </p>
             </div>
           </div>
@@ -107,41 +133,52 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, websi
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
               }`}
             >
-              ⚛ React + Vite
+              ⚛️ React (Vite + Router)
             </button>
           </div>
 
-          {/* Navigation Tabs */}
-          <div className="flex items-center gap-2">
+          {/* Action Tabs */}
+          <div className="flex items-center gap-1">
             <button
               type="button"
               onClick={() => setActiveTab("download")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                 activeTab === "download"
-                  ? "bg-blue-600 text-white font-semibold"
-                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  ? "bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 font-bold"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
               }`}
             >
-              Quick Download (.ZIP)
+              Quick Download
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("report")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                activeTab === "report"
+                  ? "bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 font-bold"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+              }`}
+            >
+              Compatibility Report
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("code")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                 activeTab === "code"
-                  ? "bg-blue-600 text-white font-semibold"
-                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  ? "bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 font-bold"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
               }`}
             >
-              Browse Code
+              Inspect Files
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("deploy")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                 activeTab === "deploy"
-                  ? "bg-blue-600 text-white font-semibold"
-                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  ? "bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 font-bold"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
               }`}
             >
               Deploy Guide
@@ -151,47 +188,118 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, websi
 
         {/* Modal Body */}
         <div className="flex-1 overflow-y-auto p-6">
+          {/* TAB 1: Quick Download */}
           {activeTab === "download" && (
-            <div className="flex flex-col items-center text-center max-w-lg mx-auto py-8">
-              <div className="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-5 shadow-sm">
+            <div className="max-w-2xl mx-auto py-6 flex flex-col items-center text-center space-y-6">
+              <div className="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-950/80 text-blue-600 flex items-center justify-center shadow-inner">
                 <Download className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                Download {format === "nextjs" ? "Next.js 15" : "React + Vite"} Project Bundle
-              </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                Includes all source code, Tailwind CSS styling, package.json, TypeScript configurations, and components generated from your canvas.
-              </p>
 
-              <div className="w-full mt-6 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-left space-y-2">
-                <div className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  <Terminal className="w-4 h-4 text-blue-500" />
-                  <span>3-Step Quick Run:</span>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  Download Complete {format === "nextjs" ? "Next.js 15" : "React Vite"} Project
+                </h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-lg mt-2 leading-relaxed">
+                  Export ready-to-run source code with Tailwind CSS, typed TSX components,
+                  multi-page routing ({pagesCount} pages), and standard scripts. Zero runtime dependencies.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full text-left">
+                <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40">
+                  <span className="text-[10px] font-bold uppercase text-slate-400">Pages</span>
+                  <p className="text-base font-bold text-slate-900 dark:text-white">{pagesCount}</p>
                 </div>
-                <pre className="text-xs font-mono bg-slate-900 text-slate-200 p-3 rounded-lg overflow-x-auto">
-{`unzip ${website.slug || "website"}-${format}-project.zip
-cd ${website.slug || "website"}
-npm install && npm run dev`}
-                </pre>
+                <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40">
+                  <span className="text-[10px] font-bold uppercase text-slate-400">Blog Posts</span>
+                  <p className="text-base font-bold text-slate-900 dark:text-white">{postsCount}</p>
+                </div>
+                <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40">
+                  <span className="text-[10px] font-bold uppercase text-slate-400">API Routes</span>
+                  <p className="text-base font-bold text-slate-900 dark:text-white">1 (Contact)</p>
+                </div>
+                <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40">
+                  <span className="text-[10px] font-bold uppercase text-slate-400">Lock-In</span>
+                  <p className="text-base font-bold text-emerald-600">0% (Own Code)</p>
+                </div>
               </div>
 
               <button
                 type="button"
                 onClick={handleDownload}
                 disabled={isDownloading}
-                className="mt-8 px-8 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-xl shadow-blue-500/25 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                className="w-full sm:w-auto px-10 py-3.5 rounded-xl font-bold text-sm bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 <Download className="w-4 h-4" />
-                <span>{isDownloading ? "Building ZIP Archive..." : `Download ${format === "nextjs" ? "Next.js" : "React"} ZIP`}</span>
+                <span>
+                  {isDownloading
+                    ? "Compiling ZIP Archive..."
+                    : `Download ${currentWebsite.slug || "website"}-${format}.zip`}
+                </span>
               </button>
             </div>
           )}
 
+          {/* TAB 2: Export Compatibility Report */}
+          {activeTab === "report" && (
+            <div className="max-w-2xl mx-auto py-4 space-y-5 text-xs text-slate-700 dark:text-slate-300">
+              <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex items-start gap-3">
+                <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-bold text-emerald-950 dark:text-emerald-200 text-sm">
+                    100% Independent & Portable
+                  </h4>
+                  <p className="text-emerald-800 dark:text-emerald-300 text-xs mt-0.5">
+                    This codebase compiles and runs locally without any network connection to Nexoraft. No external SDKs or telemetry are included.
+                  </p>
+                </div>
+              </div>
+
+              <div className="border border-slate-200 dark:border-slate-800 rounded-xl divide-y divide-slate-100 dark:divide-slate-800">
+                <div className="p-3 flex items-center justify-between">
+                  <span className="font-semibold">Export Format</span>
+                  <span className="font-bold text-blue-600">
+                    {format === "nextjs" ? "Next.js 15 App Router + Tailwind 4" : "React 19 Vite + Router"}
+                  </span>
+                </div>
+                <div className="p-3 flex items-center justify-between">
+                  <span className="font-semibold">Multi-Page Routing</span>
+                  <span className="font-semibold text-emerald-600 flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5" />
+                    <span>{pagesCount} routes ({Object.values(currentWebsite.pages).map((p) => p.name).join(", ")})</span>
+                  </span>
+                </div>
+                <div className="p-3 flex items-center justify-between">
+                  <span className="font-semibold">SEO & Meta Tags</span>
+                  <span className="font-semibold text-emerald-600 flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Automatic Title & Description per page</span>
+                  </span>
+                </div>
+                <div className="p-3 flex items-center justify-between">
+                  <span className="font-semibold">Forms & Leads Handler</span>
+                  <span className="font-semibold text-emerald-600 flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Self-contained /api/contact handler included</span>
+                  </span>
+                </div>
+                <div className="p-3 flex items-center justify-between">
+                  <span className="font-semibold">Design Tokens & Fonts</span>
+                  <span className="font-semibold text-emerald-600 flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5" />
+                    <span>CSS Variables synced with {currentWebsite.theme?.fontFamily || "Inter"}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: Code Viewer */}
           {activeTab === "code" && (
-            <div className="flex flex-col h-[460px] border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
-              {/* File list bar & copy button */}
-              <div className="bg-slate-100 dark:bg-slate-800/80 px-4 py-2 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 overflow-x-auto">
-                <div className="flex items-center gap-1.5">
+            <div className="flex flex-col h-[460px] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+              {/* File list header */}
+              <div className="px-4 py-2 bg-slate-100 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2 overflow-x-auto">
+                <div className="flex items-center gap-1.5 overflow-x-auto">
                   {fileKeys.map((fname) => (
                     <button
                       key={fname}
@@ -235,6 +343,7 @@ npm install && npm run dev`}
             </div>
           )}
 
+          {/* TAB 4: Deploy Guide */}
           {activeTab === "deploy" && (
             <div className="max-w-2xl mx-auto space-y-6 py-4">
               <div className="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60">
@@ -243,23 +352,23 @@ npm install && npm run dev`}
                   <span>Option 1: Deploy to Vercel (Recommended)</span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
-                  Vercel is built by the makers of Next.js and provides instant deployment with zero configuration.
+                  Vercel provides native edge deployment for Next.js with automated CI/CD and preview URLs.
                 </p>
                 <ol className="text-xs text-slate-600 dark:text-slate-400 space-y-2 list-decimal list-inside pl-2">
                   <li>Download the project zip file using the <strong>Quick Download</strong> tab.</li>
-                  <li>Extract the files and push them to a new GitHub repository.</li>
-                  <li>Visit <a href="https://vercel.com/new" target="_blank" rel="noreferrer" className="text-blue-600 font-semibold underline">vercel.com/new</a> and import the repository.</li>
-                  <li>Click <strong>Deploy</strong>. Your site will be live with free SSL and global CDN!</li>
+                  <li>Extract the files and initialize a Git repository (<code>git init && git add . && git commit -m &quot;Initial commit&quot;</code>).</li>
+                  <li>Push to GitHub and import the repository at <a href="https://vercel.com/new" target="_blank" rel="noreferrer" className="text-blue-600 font-semibold underline">vercel.com/new</a>.</li>
+                  <li>Click <strong>Deploy</strong>. Your site will be live with free automatic SSL and global CDN!</li>
                 </ol>
               </div>
 
               <div className="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60">
                 <div className="flex items-center gap-2.5 font-bold text-base text-slate-900 dark:text-white mb-2">
                   <Globe className="w-5 h-5 text-emerald-600" />
-                  <span>Option 2: Deploy to Netlify</span>
+                  <span>Option 2: Deploy to Netlify / Cloudflare Pages</span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
-                  Deploy effortlessly via Netlify CLI or Netlify Drag-and-Drop:
+                  Deploy via terminal in seconds:
                 </p>
                 <pre className="text-xs font-mono bg-slate-900 text-slate-200 p-3 rounded-lg overflow-x-auto">
 {`npm install

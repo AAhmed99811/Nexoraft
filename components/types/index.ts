@@ -2,6 +2,9 @@ import React from "react";
 
 export type DeviceType = "desktop" | "tablet" | "mobile" | string;
 export type NavbarMode = "vertical" | "horizontal";
+export type SiteStatus = "draft" | "published" | "archived";
+export type PageStatus = "draft" | "published";
+export type SubmissionStatus = "new" | "read" | "archived";
 
 export interface ElementNode {
   id: string;
@@ -38,11 +41,23 @@ export interface ElementNode {
 
 export type ElementObjectMap = Record<string, ElementNode>;
 
+export interface PageSeoConfig {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  keywords?: string;
+  noIndex?: boolean;
+}
+
 export interface PageConfig {
   id: string;
   name: string;
-  slug?: string;
+  slug: string;
   rootElementId: string;
+  status?: PageStatus;
+  seo?: PageSeoConfig;
+  order?: number;
+  templateId?: string;
   [key: string]: unknown;
 }
 
@@ -59,8 +74,71 @@ export interface ElementState {
 
 export interface WebsiteTheme {
   primaryColor: string;
+  secondaryColor?: string;
+  accentColor?: string;
   fontFamily: string;
+  headingFont?: string;
+  borderRadius?: "none" | "sm" | "md" | "lg" | "full";
   mode?: "light" | "dark" | "system";
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  tags?: string[];
+  author: string;
+  featuredImage?: string;
+  publishedAt: number;
+  status: "draft" | "published";
+}
+
+export interface MediaAsset {
+  id: string;
+  name: string;
+  url: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  size?: string;
+  mimeType?: string;
+  createdAt: number;
+}
+
+export interface NavMenuItem {
+  id: string;
+  label: string;
+  href: string;
+  target?: "_self" | "_blank";
+  isExternal?: boolean;
+}
+
+export interface NavMenu {
+  id: string;
+  name: string;
+  location: "header" | "footer";
+  items: NavMenuItem[];
+}
+
+export interface FormSubmission {
+  id: string;
+  formName: string;
+  pageId?: string;
+  submittedAt: number;
+  data: Record<string, string>;
+  status: SubmissionStatus;
+}
+
+export interface Revision {
+  id: string;
+  timestamp: number;
+  summary: string;
+  author: string;
+  elementsSnapshot: ElementObjectMap;
+  pagesSnapshot: Record<string, PageConfig>;
 }
 
 export interface WebsiteSite {
@@ -69,12 +147,19 @@ export interface WebsiteSite {
   slug: string;
   description: string;
   category: "saas" | "portfolio" | "agency" | "ecommerce" | "blog" | "blank";
+  status?: SiteStatus;
+  version?: number;
   updatedAt: number;
   createdAt: number;
   theme: WebsiteTheme;
   pages: Record<string, PageConfig>;
   activePage: string;
   elements: ElementObjectMap;
+  posts?: BlogPost[];
+  media?: MediaAsset[];
+  menus?: NavMenu[];
+  submissions?: FormSubmission[];
+  revisions?: Revision[];
 }
 
 export interface NavbarSliceState {

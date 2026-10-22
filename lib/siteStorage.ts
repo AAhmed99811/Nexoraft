@@ -1,7 +1,8 @@
-import { WebsiteSite } from "../components/types";
+import { WebsiteSite, Revision, FormSubmission } from "../components/types";
 import { TEMPLATES } from "./templates";
 
-const STORAGE_KEY = "webcraft_websites_v1";
+const STORAGE_KEY = "nexoraft_websites_v2";
+const LEGACY_STORAGE_KEY = "webcraft_websites_v1";
 
 function isClient(): boolean {
   return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
@@ -57,17 +58,34 @@ export function getAllWebsites(): WebsiteSite[] {
   }
 
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    let raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      // Seed initial templates
+      // Check for legacy data migration
+      const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (legacyRaw) {
+        try {
+          const parsedLegacy = JSON.parse(legacyRaw);
+          if (Array.isArray(parsedLegacy) && parsedLegacy.length > 0) {
+            localStorage.setItem(STORAGE_KEY, legacyRaw);
+            raw = legacyRaw;
+          }
+        } catch {
+          // ignore legacy parse errors
+        }
+      }
+    }
+
+    if (!raw) {
       const initial = Object.values(TEMPLATES);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
       return initial;
     }
+
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
       return parsed.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
     }
+
     const initial = Object.values(TEMPLATES);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
     return initial;
@@ -82,7 +100,6 @@ export function getWebsite(id: string): WebsiteSite | null {
   const found = all.find((site) => site.id === id);
   if (found) return found;
 
-  // Fallback to template if id matches a template id
   const fromTemplates = Object.values(TEMPLATES).find((t) => t.id === id);
   return fromTemplates || null;
 }
@@ -117,6 +134,7 @@ export function createWebsite(options: {
   name: string;
   templateKey?: string;
   description?: string;
+  category?: "saas" | "portfolio" | "agency" | "ecommerce" | "blog" | "blank";
 }): WebsiteSite {
   const templateKey = options.templateKey || "saas-landing";
   const baseTemplate = TEMPLATES[templateKey] || TEMPLATES["blank-canvas"];
@@ -129,11 +147,26 @@ export function createWebsite(options: {
     name: options.name,
     slug: slug || "my-website",
     description: options.description || baseTemplate.description,
+    category: options.category || baseTemplate.category,
+    status: "draft",
     createdAt: Date.now(),
     updatedAt: Date.now(),
-    // Deep clone elements to prevent cross-mutations
     elements: JSON.parse(JSON.stringify(baseTemplate.elements)),
     pages: JSON.parse(JSON.stringify(baseTemplate.pages)),
+    posts: baseTemplate.posts ? JSON.parse(JSON.stringify(baseTemplate.posts)) : [],
+    media: baseTemplate.media ? JSON.parse(JSON.stringify(baseTemplate.media)) : [],
+    menus: baseTemplate.menus ? JSON.parse(JSON.stringify(baseTemplate.menus)) : [],
+    submissions: [],
+    revisions: [
+      {
+        id: `rev-${Date.now().toString(36)}`,
+        timestamp: Date.now(),
+        summary: "Initial Project Created",
+        author: "Arham ahmed",
+        elementsSnapshot: JSON.parse(JSON.stringify(baseTemplate.elements)),
+        pagesSnapshot: JSON.parse(JSON.stringify(baseTemplate.pages)),
+      },
+    ],
   };
 
   saveWebsite(newSite);
@@ -150,10 +183,16 @@ export function duplicateWebsite(id: string): WebsiteSite | null {
     id: newId,
     name: `${source.name} (Copy)`,
     slug: `${source.slug}-copy`,
+    status: "draft",
     createdAt: Date.now(),
     updatedAt: Date.now(),
     elements: JSON.parse(JSON.stringify(source.elements)),
     pages: JSON.parse(JSON.stringify(source.pages)),
+    posts: source.posts ? JSON.parse(JSON.stringify(source.posts)) : [],
+    media: source.media ? JSON.parse(JSON.stringify(source.media)) : [],
+    menus: source.menus ? JSON.parse(JSON.stringify(source.menus)) : [],
+    submissions: [],
+    revisions: [],
   };
 
   saveWebsite(cloned);
@@ -171,6 +210,71 @@ export function deleteWebsite(id: string): void {
   } catch (err) {
     console.error("Failed to delete website from localStorage:", err);
   }
+}
+
+export function toggleArchiveWebsite(id: string): void {
+  const site = getWebsite(id);
+  if (!site) return;
+  const nextStatus = site.status === "archived" ? "published" : "archived";
+  saveWebsite({ ...site, status: nextStatus });
+}
+
+export function publishWebsite(id: string, summary: string = "Published latest changes"): Revision | null {
+  const site = getWebsite(id);
+  if (!site) return null;
+
+  const newRevision: Revision = {
+    id: `rev-${Date.now().toString(36)}`,
+    timestamp: Date.now(),
+    summary,
+    author: "Arham ahmed",
+    elementsSnapshot: JSON.parse(JSON.stringify(site.elements)),
+    pagesSnapshot: JSON.parse(JSON.stringify(site.pages)),
+  };
+
+  const updatedRevisions = [newRevision, ...(site.revisions || [])];
+  saveWebsite({
+    ...site,
+    status: "published",
+    revisions: updatedRevisions,
+  });
+
+  return newRevision;
+}
+
+export function restoreWebsiteRevision(siteId: string, revisionId: string): boolean {
+  const site = getWebsite(siteId);
+  if (!site || !site.revisions) return false;
+
+  const targetRevision = site.revisions.find((r) => r.id === revisionId);
+  if (!targetRevision) return false;
+
+  saveWebsite({
+    ...site,
+    elements: JSON.parse(JSON.stringify(targetRevision.elementsSnapshot)),
+    pages: JSON.parse(JSON.stringify(targetRevision.pagesSnapshot)),
+    updatedAt: Date.now(),
+  });
+
+  return true;
+}
+
+export function addWebsiteSubmission(siteId: string, submission: Omit<FormSubmission, "id" | "submittedAt" | "status">): void {
+  const site = getWebsite(siteId);
+  if (!site) return;
+
+  const newSubmission: FormSubmission = {
+    ...submission,
+    id: `sub-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 5)}`,
+    submittedAt: Date.now(),
+    status: "new",
+  };
+
+  const updatedSubmissions = [newSubmission, ...(site.submissions || [])];
+  saveWebsite({
+    ...site,
+    submissions: updatedSubmissions,
+  });
 }
 
 export function resetToDefaults(): WebsiteSite[] {
