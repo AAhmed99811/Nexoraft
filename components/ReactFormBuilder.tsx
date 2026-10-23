@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useCallback, useEffect } from "react";
 import NavbarComponentWrapper from "./NavbarComponentWrapper";
 import AppRenderer from "./AppRenderer";
 import {
@@ -151,6 +151,7 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
     deletePage,
     dispatch,
     setFocusedElement,
+    setSelectedElement,
   } = useFormBuilderState();
 
   const [newVarKey, setNewVarKey] = useState("");
@@ -199,13 +200,27 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
   const activePageConfig = pages[activePage] || Object.values(pages)[0];
   const targetElementId = focusedElement || selectedElement;
   const elementConfig = targetElementId ? elements[targetElementId] : undefined;
+  const isRootElement =
+    Boolean(elementConfig?.isRoot) ||
+    Object.values(pages).some((p) => p.rootElementId === elementConfig?.id);
 
   // Insert Element Handler
-  const handleInsertElement = (type: string, label: string) => {
-    const parentId =
-      focusedElement && elements[focusedElement]?.elementType === "Container"
-        ? focusedElement
-        : activePageConfig?.rootElementId || "root";
+  const handleInsertElement = useCallback((type: string, label: string) => {
+    const activePageRoot = activePageConfig?.rootElementId;
+    let parentId = activePageRoot;
+
+    if (
+      focusedElement &&
+      elements[focusedElement] &&
+      elements[focusedElement]?.elementType === "Container"
+    ) {
+      parentId = focusedElement;
+    } else if (!parentId || !elements[parentId]) {
+      const foundRoot = Object.values(elements).find(
+        (el) => el.isRoot || el.elementType === "Container"
+      );
+      parentId = foundRoot ? foundRoot.id : (activePageRoot || "root");
+    }
 
     const newId = generateElementId("elem");
     let extraProps: Record<string, unknown> = {};
@@ -587,8 +602,26 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
     };
 
     dispatch(addElement(parentId, newElement));
+    setFocusedElement(newId);
+    setSelectedElement(newId);
     setShowInspector(true);
-  };
+  }, [activePageConfig, elements, focusedElement, dispatch, setFocusedElement, setSelectedElement, websiteName]);
+
+  useEffect(() => {
+    const handleCustomInsert = (e: Event) => {
+      const customEvent = e as CustomEvent<{ type: string; label: string }>;
+      if (customEvent.detail?.type) {
+        handleInsertElement(
+          customEvent.detail.type,
+          customEvent.detail.label || customEvent.detail.type
+        );
+      }
+    };
+    window.addEventListener("nexoraft-insert-element", handleCustomInsert);
+    return () => {
+      window.removeEventListener("nexoraft-insert-element", handleCustomInsert);
+    };
+  }, [handleInsertElement]);
 
   const handleDuplicate = () => {
     if (!elementConfig) return;
@@ -598,10 +631,12 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
     cloned.label = `${elementConfig.label || "Element"} (Copy)`;
     const parentId = activePageConfig?.rootElementId || "root";
     dispatch(addElement(parentId, cloned));
+    setFocusedElement(newId);
+    setSelectedElement(newId);
   };
 
   const handleDelete = () => {
-    if (!elementConfig) return;
+    if (!elementConfig || isRootElement) return;
     dispatch(removeElement({ id: elementConfig.id }));
   };
 
@@ -1938,14 +1973,16 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                 >
                   <Copy className="w-3.5 h-3.5" />
                 </button>
-                <button
-                  type="button"
-                  onClick={handleDelete}
-                  title="Delete element"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
+                {!isRootElement && (
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    title="Delete element"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => setShowInspector(false)}

@@ -32,6 +32,12 @@ export function withEditable<P extends object>(
     const isSection =
       elementType === "Container" ||
       (elementType && elementType.toLowerCase().includes("section"));
+    const isRoot =
+      Boolean(props.isRoot) ||
+      (id
+        ? Boolean(context?.elements?.[id]?.isRoot) ||
+          Object.values(context?.pages || {}).some((p) => p.rootElementId === id)
+        : false);
 
     if (isPreview || !isEditable) {
       return (
@@ -110,14 +116,16 @@ export function withEditable<P extends object>(
                 {label || elementType || "Section"}
               </span>
             </div>
-            <button
-              type="button"
-              onClick={handleDelete}
-              title="Delete Section"
-              className="hover:text-red-200 p-0.5"
-            >
-              <Trash2 className="w-3 h-3" />
-            </button>
+            {!isRoot && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                title="Delete Section"
+                className="hover:text-red-200 p-0.5 cursor-pointer"
+              >
+                <Trash2 className="w-3 h-3" />
+              </button>
+            )}
           </div>
         )}
 

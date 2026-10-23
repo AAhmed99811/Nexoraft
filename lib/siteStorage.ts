@@ -120,13 +120,42 @@ export function getAllWebsites(): WebsiteSite[] {
   }
 }
 
+export function ensureSiteIntegrity(site: WebsiteSite): WebsiteSite {
+  if (!site || !site.pages || !site.elements) return site;
+  const elements = { ...site.elements };
+  let modified = false;
+
+  Object.values(site.pages).forEach((page) => {
+    if (page.rootElementId && !elements[page.rootElementId]) {
+      modified = true;
+      elements[page.rootElementId] = {
+        id: page.rootElementId,
+        label: `${page.name || "Page"} Root`,
+        elementType: "Container",
+        isRoot: true,
+        visible: true,
+        children: [],
+        style: {
+          backgroundColor: "#ffffff",
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          gap: "0px",
+        },
+      };
+    }
+  });
+
+  return modified ? { ...site, elements } : site;
+}
+
 export function getWebsite(id: string): WebsiteSite | null {
   const all = getAllWebsites();
   const found = all.find((site) => site.id === id);
-  if (found) return found;
+  if (found) return ensureSiteIntegrity(found);
 
   const fromTemplates = Object.values(TEMPLATES).find((t) => t.id === id);
-  return fromTemplates || null;
+  return fromTemplates ? ensureSiteIntegrity(fromTemplates) : null;
 }
 
 export function saveWebsite(website: WebsiteSite): void {

@@ -201,7 +201,32 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
   const [websiteId] = useState<string>(initialWebsiteId);
   const [websiteName, setWebsiteName] = useState<string>(initialWebsiteName);
   const [websiteDescription] = useState<string>(initialWebsiteDescription);
-  const [elements, setElements] = useState<ElementObjectMap>(initialElements);
+
+  const sanitizedInitialElements = useMemo(() => {
+    const map: ElementObjectMap = { ...initialElements };
+    Object.values(initialPages || {}).forEach((p) => {
+      if (p.rootElementId && !map[p.rootElementId]) {
+        map[p.rootElementId] = {
+          id: p.rootElementId,
+          label: `${p.name || "Page"} Root`,
+          elementType: "Container",
+          isRoot: true,
+          visible: true,
+          children: [],
+          style: {
+            backgroundColor: "#ffffff",
+            minHeight: "100vh",
+            display: "flex",
+            flexDirection: "column",
+            gap: "0px",
+          },
+        };
+      }
+    });
+    return map;
+  }, [initialElements, initialPages]);
+
+  const [elements, setElements] = useState<ElementObjectMap>(sanitizedInitialElements);
   const [focusedElement, setFocusedElement] = useState<string | null>(null);
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [hoveredElement] = useState<string | null>(null);
@@ -271,42 +296,63 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
   );
 
   // Undo / Redo history stacks
-  const [history, setHistory] = useState<ElementObjectMap[]>([initialElements]);
+  const [history, setHistory] = useState<ElementObjectMap[]>([sanitizedInitialElements]);
   const [historyIndex, setHistoryIndex] = useState<number>(0);
+  const historyIndexRef = useRef<number>(0);
   const isUndoingOrRedoing = useRef(false);
 
   const pushToHistory = useCallback((nextElements: ElementObjectMap) => {
     if (isUndoingOrRedoing.current) return;
+    const cloned = JSON.parse(JSON.stringify(nextElements));
     setHistory((prev) => {
-      const sliced = prev.slice(0, historyIndex + 1);
-      return [...sliced, nextElements].slice(-30); // max 30 history states
+      const sliced = prev.slice(0, historyIndexRef.current + 1);
+      const nextHistory = [...sliced, cloned].slice(-30);
+      const nextIdx = nextHistory.length - 1;
+      historyIndexRef.current = nextIdx;
+      setHistoryIndex(nextIdx);
+      return nextHistory;
     });
-    setHistoryIndex((prev) => Math.min(prev + 1, 29));
-  }, [historyIndex]);
+  }, []);
 
   const undo = useCallback(() => {
-    if (historyIndex > 0) {
+    if (historyIndexRef.current > 0) {
       isUndoingOrRedoing.current = true;
-      const targetState = history[historyIndex - 1];
-      setHistoryIndex((prev) => prev - 1);
-      setElements(targetState);
+      const targetIndex = historyIndexRef.current - 1;
+      const targetState = history[targetIndex];
+      if (targetState) {
+        historyIndexRef.current = targetIndex;
+        setHistoryIndex(targetIndex);
+        setElements(JSON.parse(JSON.stringify(targetState)));
+
+        // Clean up focus and selection if target element is no longer present
+        setFocusedElement((curr) => (curr && targetState[curr] ? curr : null));
+        setSelectedElement((curr) => (curr && targetState[curr] ? curr : null));
+      }
       setTimeout(() => {
         isUndoingOrRedoing.current = false;
       }, 50);
     }
-  }, [history, historyIndex]);
+  }, [history]);
 
   const redo = useCallback(() => {
-    if (historyIndex < history.length - 1) {
+    if (historyIndexRef.current < history.length - 1) {
       isUndoingOrRedoing.current = true;
-      const targetState = history[historyIndex + 1];
-      setHistoryIndex((prev) => prev + 1);
-      setElements(targetState);
+      const targetIndex = historyIndexRef.current + 1;
+      const targetState = history[targetIndex];
+      if (targetState) {
+        historyIndexRef.current = targetIndex;
+        setHistoryIndex(targetIndex);
+        setElements(JSON.parse(JSON.stringify(targetState)));
+
+        // Clean up focus and selection if target element is no longer present
+        setFocusedElement((curr) => (curr && targetState[curr] ? curr : null));
+        setSelectedElement((curr) => (curr && targetState[curr] ? curr : null));
+      }
       setTimeout(() => {
         isUndoingOrRedoing.current = false;
       }, 50);
     }
-  }, [history, historyIndex]);
+  }, [history]);
 
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
@@ -391,6 +437,34 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
 
           setElements((prev) => {
             const next: ElementObjectMap = { ...prev };
+            if (!next[targetId]) return prev;
+
+            const isRoot =
+              Boolean(next[targetId]?.isRoot) ||
+              Object.values(pages).some((p) => p.rootElementId === targetId);
+
+            if (isRoot) {
+              const childIds = new Set<string>();
+              const collectChildren = (cid: string) => {
+                childIds.add(cid);
+                next[cid]?.children?.forEach((subId) => collectChildren(subId));
+              };
+              next[targetId]?.children?.forEach((cid) => collectChildren(cid));
+
+              childIds.forEach((cid) => {
+                delete next[cid];
+              });
+
+              next[targetId] = {
+                ...next[targetId],
+                children: [],
+              };
+
+              setFocusedElement(null);
+              setSelectedElement(null);
+              pushToHistory(next);
+              return next;
+            }
 
             const idsToRemove = new Set<string>();
             const collect = (id: string) => {
@@ -412,12 +486,12 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
               delete next[id];
             });
 
+            setFocusedElement((curr) => (curr && idsToRemove.has(curr) ? null : curr));
+            setSelectedElement((curr) => (curr && idsToRemove.has(curr) ? null : curr));
+
             pushToHistory(next);
             return next;
           });
-
-          if (focusedElement === targetId) setFocusedElement(null);
-          if (selectedElement === targetId) setSelectedElement(null);
           break;
         }
 
@@ -428,16 +502,67 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
           };
           setElements((prev) => {
             const next: ElementObjectMap = { ...prev, [element.id]: element };
-            if (next[parentId]) {
-              next[parentId] = {
-                ...next[parentId],
-                children: [...(next[parentId].children || []), element.id],
+
+            let targetParentId = parentId;
+            if (
+              !next[targetParentId] ||
+              next[targetParentId]?.elementType !== "Container"
+            ) {
+              const activeRootId = pages[activePage]?.rootElementId;
+              if (activeRootId && next[activeRootId]) {
+                targetParentId = activeRootId;
+              } else {
+                const foundRoot = Object.keys(next).find((k) => next[k]?.isRoot);
+                if (foundRoot) {
+                  targetParentId = foundRoot;
+                } else {
+                  const anyContainer = Object.keys(next).find(
+                    (k) => next[k]?.elementType === "Container"
+                  );
+                  if (anyContainer) {
+                    targetParentId = anyContainer;
+                  }
+                }
+              }
+            }
+
+            if (!next[targetParentId]) {
+              const rootId = pages[activePage]?.rootElementId || "root-saas";
+              targetParentId = rootId;
+              next[rootId] = {
+                id: rootId,
+                label: "Page Root",
+                elementType: "Container",
+                isRoot: true,
+                visible: true,
+                children: [],
+                style: {
+                  backgroundColor: "#ffffff",
+                  minHeight: "100vh",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0px",
+                },
               };
             }
+
+            const rawChildren = next[targetParentId]?.children;
+            const currentChildren: string[] = Array.isArray(rawChildren)
+              ? rawChildren
+              : [];
+            next[targetParentId] = {
+              ...next[targetParentId],
+              children: [
+                ...currentChildren.filter((cid: string) => cid !== element.id),
+                element.id,
+              ],
+            };
+
             pushToHistory(next);
             return next;
           });
           setFocusedElement(element.id);
+          setSelectedElement(element.id);
           break;
         }
 
@@ -481,7 +606,7 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
           break;
       }
     },
-    [focusedElement, selectedElement, pushToHistory]
+    [focusedElement, selectedElement, pushToHistory, pages, activePage]
   );
 
   // Pages CRUD
@@ -676,9 +801,34 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
     (revisionId: string): boolean => {
       const target = revisions.find((r) => r.id === revisionId);
       if (!target) return false;
-      setElements(JSON.parse(JSON.stringify(target.elementsSnapshot)));
-      setPages(JSON.parse(JSON.stringify(target.pagesSnapshot)));
-      pushToHistory(JSON.parse(JSON.stringify(target.elementsSnapshot)));
+      const restoredElements = JSON.parse(JSON.stringify(target.elementsSnapshot));
+      const restoredPages = JSON.parse(JSON.stringify(target.pagesSnapshot));
+
+      Object.values(restoredPages as Record<string, PageConfig>).forEach((p) => {
+        if (p.rootElementId && !restoredElements[p.rootElementId]) {
+          restoredElements[p.rootElementId] = {
+            id: p.rootElementId,
+            label: `${p.name || "Page"} Root`,
+            elementType: "Container",
+            isRoot: true,
+            visible: true,
+            children: [],
+            style: {
+              backgroundColor: "#ffffff",
+              minHeight: "100vh",
+              display: "flex",
+              flexDirection: "column",
+              gap: "0px",
+            },
+          };
+        }
+      });
+
+      setElements(restoredElements);
+      setPages(restoredPages);
+      pushToHistory(restoredElements);
+      setFocusedElement(null);
+      setSelectedElement(null);
       return true;
     },
     [revisions, pushToHistory]
