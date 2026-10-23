@@ -250,7 +250,7 @@ function ProjectDashboardInner({ params }: ProjectDashboardProps) {
       title: quickDraftTitle.trim(),
       slug: quickDraftTitle.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-"),
       category: "Draft",
-      excerpt: quickDraftContent.trim() || "Drafted from WordPress dashboard.",
+      excerpt: quickDraftContent.trim() || "Drafted from Nexoraft CMS dashboard.",
       content: quickDraftContent.trim() || "",
       author: "Arham ahmed",
       publishedAt: Date.now(),
@@ -360,19 +360,19 @@ function ProjectDashboardInner({ params }: ProjectDashboardProps) {
 
   return (
     <div className="min-h-screen bg-[#f0f0f1] text-[#2c3338] font-sans flex flex-col antialiased">
-      {/* 1. AUTHENTIC WORDPRESS TOP ADMIN BAR */}
+      {/* 1. AUTHENTIC NEXORAFT CMS TOP ADMIN BAR */}
       <header className="h-8 bg-[#1d2327] text-[#c3c4c7] px-3 flex items-center justify-between text-[13px] z-50 select-none border-b border-[#2c3338] shrink-0">
         <div className="flex items-center gap-3">
-          {/* WordPress W Logo */}
+          {/* Nexoraft N Logo */}
           <Link
             href="/"
             title="Return to Nexoraft Hub"
             className="flex items-center gap-1.5 hover:text-white transition-colors"
           >
-            <div className="w-5 h-5 rounded-full bg-[#2271b1] text-white flex items-center justify-center font-bold text-[11px] shadow-xs">
-              W
+            <div className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-[11px] shadow-xs">
+              N
             </div>
-            <span className="font-semibold text-white hidden sm:inline">WordPress 6.7</span>
+            <span className="font-semibold text-white hidden sm:inline">Nexoraft Studio v2.5</span>
           </Link>
 
           {/* Site Name & Visit Site */}
@@ -382,7 +382,7 @@ function ProjectDashboardInner({ params }: ProjectDashboardProps) {
             <Link
               href={`/builder?siteId=${site.id}`}
               className="text-[11px] text-[#72aee6] hover:text-[#9ec5fe] flex items-center gap-0.5 ml-1"
-              title="Visit site in Elementor builder"
+              title="Visit site in Nexoraft Visual Studio"
             >
               <span>Visit Site</span>
               <ExternalLink className="w-2.5 h-2.5" />
@@ -415,13 +415,13 @@ function ProjectDashboardInner({ params }: ProjectDashboardProps) {
             </button>
           </div>
 
-          {/* Elementor Pro Direct Launcher */}
+          {/* Nexoraft Pro Direct Launcher */}
           <Link
             href={`/builder?siteId=${site.id}`}
-            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#92003b] hover:bg-[#a60043] text-white rounded text-[11px] font-bold shadow-xs transition-colors"
+            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-[11px] font-bold shadow-xs transition-colors"
           >
             <Sparkles className="w-3 h-3" />
-            <span>Edit with Elementor</span>
+            <span>Visual Studio</span>
           </Link>
 
           {/* Export Codebase (Next.js 15 App Router & React) */}
@@ -467,7 +467,7 @@ function ProjectDashboardInner({ params }: ProjectDashboardProps) {
 
       {/* 2. MAIN LAYOUT: SIDEBAR + CONTENT AREA */}
       <div className="flex flex-1 min-h-[calc(100vh-32px)] overflow-hidden">
-        {/* WORDPRESS NAV SIDEBAR */}
+        {/* NEXORAFT CMS NAV SIDEBAR */}
         <aside
           className={`bg-[#1d2327] text-[#c3c4c7] flex flex-col justify-between transition-all duration-200 select-none shrink-0 ${
             sidebarCollapsed ? "w-12" : "w-48 sm:w-52"
@@ -542,15 +542,15 @@ function ProjectDashboardInner({ params }: ProjectDashboardProps) {
           </div>
         </aside>
 
-        {/* 3. MAIN WORDPRESS ADMIN CONTENT AREA */}
+        {/* 3. MAIN NEXORAFT CMS CONTENT AREA */}
         <main className="flex-1 bg-[#f0f0f1] p-4 sm:p-6 overflow-y-auto max-h-[calc(100vh-32px)]">
-          {/* WordPress Global Notification Banner */}
+          {/* Nexoraft Global Notification Banner */}
           {!noticeDismissed && (
             <div className="bg-white border-l-4 border-[#72aee6] p-3 shadow-xs mb-5 flex items-center justify-between text-xs text-[#1d2327]">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#2271b1]" />
+                <Sparkles className="w-4 h-4 text-blue-600" />
                 <span>
-                  <strong>Elementor Pro Active:</strong> You can edit any page with visual drag &amp; drop, or export 100% independent Next.js 15 &amp; React code at any time.
+                  <strong>Nexoraft Pro Active:</strong> You can edit any page with visual drag &amp; drop, or export 100% independent Next.js 15 &amp; React code at any time.
                 </span>
               </div>
               <button
@@ -571,16 +571,16 @@ function ProjectDashboardInner({ params }: ProjectDashboardProps) {
                 <h1 className="text-2xl font-normal text-[#1d2327]">Dashboard</h1>
                 <Link
                   href={`/builder?siteId=${site.id}`}
-                  className="px-3.5 py-1.5 bg-[#92003b] hover:bg-[#a60043] text-white text-xs font-bold rounded shadow-xs inline-flex items-center gap-1.5 transition-colors"
+                  className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded shadow-xs inline-flex items-center gap-1.5 transition-colors"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>Edit Site with Elementor</span>
+                  <span>Open Visual Studio</span>
                 </Link>
               </div>
 
-              {/* Welcome to WordPress Banner */}
+              {/* Welcome to Nexoraft Banner */}
               <div className="bg-white border border-[#c3c4c7] p-6 shadow-xs rounded-sm">
-                <h2 className="text-xl font-normal text-[#1d2327]">Welcome to WordPress!</h2>
+                <h2 className="text-xl font-normal text-[#1d2327]">Welcome to Nexoraft Studio!</h2>
                 <p className="text-xs text-[#646970] mt-1">
                   We&apos;ve assembled some links to get you started customizing your website:
                 </p>
@@ -668,7 +668,7 @@ function ProjectDashboardInner({ params }: ProjectDashboardProps) {
                 </div>
               </div>
 
-              {/* 2-Column WordPress Dashboard Widgets */}
+              {/* 2-Column Dashboard Widgets */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                 {/* Column 1 */}
                 <div className="space-y-5">
@@ -676,12 +676,12 @@ function ProjectDashboardInner({ params }: ProjectDashboardProps) {
                   <div className="bg-white border border-[#c3c4c7] shadow-xs rounded-sm">
                     <div className="px-4 py-3 border-b border-[#f0f0f1] flex items-center justify-between">
                       <h3 className="text-sm font-bold text-[#1d2327]">At a Glance</h3>
-                      <span className="text-[11px] text-[#646970]">WordPress 6.7</span>
+                      <span className="text-[11px] text-[#646970]">Nexoraft Studio v2.5</span>
                     </div>
                     <div className="p-4">
                       <div className="grid grid-cols-2 gap-3 text-xs text-[#1d2327] mb-4">
                         <div className="flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-[#2271b1]" />
+                          <FileText className="w-4 h-4 text-blue-600" />
                           <span><strong>{pagesList.length}</strong> Pages</span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -698,7 +698,7 @@ function ProjectDashboardInner({ params }: ProjectDashboardProps) {
                         </div>
                       </div>
                       <div className="pt-3 border-t border-[#f0f0f1] text-[11px] text-[#646970] flex items-center justify-between">
-                        <span>Nexoraft Studio running Elementor Pro Theme</span>
+                        <span>Nexoraft Studio Pro Engine</span>
                         <span className="text-[#00a32a] font-semibold flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3" />
                           <span>Edge Ready</span>
@@ -868,7 +868,7 @@ function ProjectDashboardInner({ params }: ProjectDashboardProps) {
                 </div>
               </div>
 
-              {/* Authentic WordPress Table */}
+              {/* Authentic Nexoraft CMS Table */}
               <div className="bg-white border border-[#c3c4c7] shadow-xs rounded-sm overflow-hidden">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
@@ -906,9 +906,9 @@ function ProjectDashboardInner({ params }: ProjectDashboardProps) {
                             <div className="flex items-center gap-2 mt-1 text-[11px] text-[#2271b1] opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                               <Link
                                 href={`/builder?siteId=${site.id}&pageId=${page.id}`}
-                                className="font-bold text-[#92003b] hover:underline"
+                                className="font-bold text-blue-600 hover:underline"
                               >
-                                Edit with Elementor
+                                Edit in Visual Studio
                               </Link>
                               <span>|</span>
                               <button
@@ -961,10 +961,10 @@ function ProjectDashboardInner({ params }: ProjectDashboardProps) {
                           <td className="p-3 text-right">
                             <Link
                               href={`/builder?siteId=${site.id}&pageId=${page.id}`}
-                              className="px-2.5 py-1 bg-[#92003b] hover:bg-[#a60043] text-white text-[11px] font-bold rounded inline-flex items-center gap-1 transition-colors"
+                              className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold rounded inline-flex items-center gap-1 transition-colors"
                             >
                               <Sparkles className="w-3 h-3" />
-                              <span>Edit with Elementor</span>
+                              <span>Edit in Visual Studio</span>
                             </Link>
                           </td>
                         </tr>
@@ -1134,7 +1134,7 @@ function ProjectDashboardInner({ params }: ProjectDashboardProps) {
                     {submissionsList.length === 0 ? (
                       <tr>
                         <td colSpan={7} className="p-8 text-center text-xs text-[#646970]">
-                          No form submissions yet. Test your Contact Form or Newsletter CTA in the Elementor visual preview to capture live leads!
+                          No form submissions yet. Test your Contact Form or Newsletter CTA in the Nexoraft Visual Studio preview to capture live leads!
                         </td>
                       </tr>
                     ) : (
@@ -1252,12 +1252,12 @@ function ProjectDashboardInner({ params }: ProjectDashboardProps) {
                   <tbody className="divide-y divide-[#f0f0f1]">
                     <tr className="bg-[#f0f6fc]">
                       <td className="p-3 font-bold text-[#1d2327] whitespace-nowrap">
-                        Elementor Pro
+                        Nexoraft Pro Suite
                         <span className="ml-2 text-[10px] text-[#005c2a] font-bold uppercase bg-[#d1e4dd] px-1.5 py-0.5 rounded">Active</span>
-                        <div className="text-[11px] text-[#646970] font-normal mt-0.5">Version 3.24.1 | By Elementor.com</div>
+                        <div className="text-[11px] text-[#646970] font-normal mt-0.5">Version 3.2.0 | By Nexoraft Core</div>
                       </td>
                       <td className="p-3 text-[#646970]">
-                        The leading visual website builder for WordPress. Provides high-fidelity visual layout editing, responsive controls, and pro widgets (Pricing toggles, Accordions, Countdown Timers, Posts Loops).
+                        The leading visual website builder for Nexoraft. Provides high-fidelity visual layout editing, responsive controls, and pro widgets (Bento Grids, Process Timelines, Pricing toggles, Accordions, Countdown Timers, Newsletter Capture).
                       </td>
                     </tr>
                     <tr>
@@ -1272,12 +1272,12 @@ function ProjectDashboardInner({ params }: ProjectDashboardProps) {
                     </tr>
                     <tr>
                       <td className="p-3 font-bold text-[#1d2327] whitespace-nowrap">
-                        WPForms Lite
+                        Nexoraft Forms Pro
                         <span className="ml-2 text-[10px] text-[#005c2a] font-bold uppercase bg-[#d1e4dd] px-1.5 py-0.5 rounded">Active</span>
-                        <div className="text-[11px] text-[#646970] font-normal mt-0.5">Version 1.9.0 | By WPForms</div>
+                        <div className="text-[11px] text-[#646970] font-normal mt-0.5">Version 2.8.0 | By Nexoraft Labs</div>
                       </td>
                       <td className="p-3 text-[#646970]">
-                        Captures lead inquiries and newsletter subscribers directly into the WordPress admin inbox with instant CSV export and email notification hooks.
+                        Captures lead inquiries and newsletter subscribers directly into the Nexoraft CMS inbox with instant CSV export and email notification hooks.
                       </td>
                     </tr>
                   </tbody>

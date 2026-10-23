@@ -169,7 +169,7 @@ export default function Home() {
                 </span>
               </div>
               <p className="text-[11px] text-slate-400">
-                Visual Website Builder • WordPress-Grade CMS • Portable Next.js & React Code
+                Visual Website Builder • Nexoraft CMS • Portable Next.js & React Code
               </p>
             </div>
           </div>
@@ -204,7 +204,7 @@ export default function Home() {
           <div className="relative z-10 max-w-2xl">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/20 backdrop-blur-xs mb-4">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Elementor Visual Velocity + WordPress CMS Depth</span>
+              <span>Nexoraft Visual Studio + Dedicated CMS Depth</span>
             </div>
             <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
               Build Visually. Own Your Code. Deploy Anywhere.
@@ -434,13 +434,13 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Card Footer: WP Dashboard and Elementor Actions */}
+                  {/* Card Footer: Nexoraft CMS and Visual Studio Actions */}
                   <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs gap-2">
                     <span className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                      <span className="w-4 h-4 rounded-full bg-[#1d2327] text-white flex items-center justify-center text-[9px] font-bold">
-                        W
+                      <span className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[9px] font-bold">
+                        N
                       </span>
-                      <span className="font-semibold text-slate-700 dark:text-slate-200">WP Dashboard</span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-200">Nexoraft CMS</span>
                       <span className="text-slate-300 dark:text-slate-700">•</span>
                       <span className="text-[10px] text-slate-400 flex items-center gap-0.5">
                         <Clock className="w-3 h-3" />
@@ -454,10 +454,10 @@ export default function Home() {
                         e.stopPropagation();
                         router.push(`/builder?siteId=${site.id}`);
                       }}
-                      className="px-2.5 py-1 rounded-lg bg-[#92003b] hover:bg-[#a60043] text-white font-bold text-[10px] inline-flex items-center gap-1 shadow-xs transition-colors cursor-pointer"
+                      className="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] inline-flex items-center gap-1 shadow-xs transition-colors cursor-pointer"
                     >
                       <Sparkles className="w-2.5 h-2.5" />
-                      <span>Elementor</span>
+                      <span>Visual Studio</span>
                     </button>
                   </div>
                 </div>

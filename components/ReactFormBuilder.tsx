@@ -47,6 +47,12 @@ import {
   Clock,
   Play,
   Users,
+  LayoutGrid,
+  Milestone,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
 } from "lucide-react";
 
 const { removeElement, updateElement, addElement } = elementSlice;
@@ -294,9 +300,55 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
       case "VideoSection":
         extraProps = {
           title: "Watch How Nexoraft Ships in Minutes",
-          subtitle: "A complete walkthrough of the WordPress-grade CMS, Elementor Pro visual canvas, and Next.js 15 App Router export.",
+          subtitle: "A complete walkthrough of the Nexoraft CMS dashboard, Nexoraft Visual Studio canvas, and Next.js 15 App Router export.",
           thumbnail: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80",
           badge: "✦ FEATURE SHOWCASE",
+        };
+        break;
+      case "BentoGridSection":
+      case "BentoGrid":
+        extraProps = {
+          badge: "✨ NEXORAFT PRO BENTO ENGINE",
+          title: "Precision-Engineered for Speed, Scale & Visual Craft",
+          subtitle: "Every module is designed to maximize conversion, edge delivery, and production code fidelity.",
+          card1Tag: "EDGE COMPUTING",
+          card1Title: "Global Sub-10ms TTFB Distribution",
+          card1Desc: "Pre-rendered static HTML and assets distributed globally across 300+ edge locations with zero runtime overhead.",
+          card2Score: "100/100",
+          card2Tag: "PERFORMANCE SCORE",
+          card2Title: "Flawless Lighthouse Metrics",
+          card3Tag: "CODE PORTABILITY",
+          card3Title: "1-Click React & Next.js 15 Export",
+          card3Desc: "Extract clean, modular TSX code with Tailwind CSS utilities and zero external dependencies.",
+          card4Tag: "INTEGRATED CMS",
+          card4Title: "Built-in CMS & Lead Capture",
+          card4Desc: "Manage pages, blog posts, navigation menus, and lead captures without external plugins.",
+        };
+        break;
+      case "TimelineSection":
+      case "ProcessSection":
+      case "WorkflowSection":
+        extraProps = {
+          badge: "✨ STREAMLINED WORKFLOW",
+          title: "From Visual Idea to Production Code in 4 Steps",
+          subtitle: "How creators, marketing teams, and developers ship extraordinary web experiences in record time with Nexoraft.",
+        };
+        break;
+      case "NewsletterSection":
+      case "LeadMagnetSection":
+        extraProps = {
+          badge: "✨ WEEKLY ENGINEERING DISPATCH",
+          title: "Stay Ahead of Modern Web Craft & Architecture",
+          subtitle: "Join 25,000+ developers, designers, and founders receiving curated production components, Next.js 15 guides, and visual builder updates.",
+          buttonText: "Subscribe Free",
+          placeholder: "Enter your work email address...",
+          disclaimer: "🔒 No spam ever • Instant 1-click unsubscribe • Includes free Starter Template Kit",
+        };
+        break;
+      case "StatsCounterSection":
+      case "MetricsSection":
+        extraProps = {
+          title: "Enterprise Grade Impact Metrics",
         };
         break;
       case "FooterSection":
@@ -470,7 +522,7 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
 
       {/* Main Studio Area */}
       <div className="flex gap-3 items-start w-full relative">
-        {/* Left Drawer / Dock (Elementor-Grade) */}
+        {/* Left Drawer / Dock (Nexoraft Pro Suite) */}
         {!isPreview && (
           <aside className="w-80 shrink-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm text-slate-800 dark:text-slate-100 flex flex-col sticky top-3 max-h-[calc(100vh-100px)] overflow-hidden">
             {/* Tab Switcher Icons */}
@@ -588,7 +640,9 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       {[
                         { type: "HeroSection", label: "Hero Banner", icon: Sparkles },
+                        { type: "BentoGridSection", label: "Bento Grid", icon: LayoutGrid },
                         { type: "FeatureGridSection", label: "Feature Grid", icon: Layout },
+                        { type: "TimelineSection", label: "Process Flow", icon: Milestone },
                         { type: "StatsSection", label: "Stats Counter", icon: BarChart3 },
                         { type: "TestimonialsSection", label: "Testimonials", icon: Star },
                         { type: "PricingSection", label: "Pricing Table", icon: Layout },
@@ -597,6 +651,7 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                         { type: "PostsGridSection", label: "Posts Loop", icon: BookOpen },
                         { type: "TeamSection", label: "Team Grid", icon: Users },
                         { type: "VideoSection", label: "Video Showcase", icon: Play },
+                        { type: "NewsletterSection", label: "Newsletter VIP", icon: Mail },
                         { type: "LogoStripSection", label: "Logo Strip", icon: Building },
                         { type: "CallToActionSection", label: "Call to Action", icon: MousePointer },
                         { type: "ContactSection", label: "Contact Form", icon: Mail },
@@ -1104,7 +1159,7 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
           </div>
         </div>
 
-        {/* Right Element Inspector Panel (Elementor-Grade) */}
+        {/* Right Element Inspector Panel (Nexoraft Pro Suite) */}
         {!isPreview && showInspector && elementConfig && (
           <aside className="w-80 shrink-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm text-slate-800 dark:text-slate-100 flex flex-col gap-4 sticky top-3 max-h-[calc(100vh-100px)] overflow-y-auto">
             {/* Inspector Header */}
@@ -1232,7 +1287,7 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                 {elementConfig.buttonText !== undefined && (
                   <div>
                     <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Button Text
+                      Primary Button Text
                     </label>
                     <input
                       type="text"
@@ -1246,13 +1301,122 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                 {elementConfig.buttonSecondaryText !== undefined && (
                   <div>
                     <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Secondary Button
+                      Secondary Button Text
                     </label>
                     <input
                       type="text"
                       value={elementConfig.buttonSecondaryText || ""}
                       onChange={(e) => handlePropertyChange("buttonSecondaryText", e.target.value)}
                       className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                )}
+
+                {elementConfig.variant !== undefined && (
+                  <div>
+                    <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      Button Style Variant
+                    </label>
+                    <select
+                      value={String(elementConfig.variant || "primary")}
+                      onChange={(e) => handlePropertyChange("variant", e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="primary">Primary (Blue Gradient)</option>
+                      <option value="secondary">Secondary (Slate Neutral)</option>
+                      <option value="outline">Outline Border</option>
+                      <option value="danger">Danger Accent</option>
+                    </select>
+                  </div>
+                )}
+
+                {elementConfig.href !== undefined && (
+                  <div>
+                    <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      Action Link URL (href)
+                    </label>
+                    <input
+                      type="text"
+                      value={String(elementConfig.href || "")}
+                      onChange={(e) => handlePropertyChange("href", e.target.value)}
+                      placeholder="e.g. /pricing, #contact, https://..."
+                      className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                )}
+
+                {elementConfig.annualDiscount !== undefined && (
+                  <div>
+                    <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      Annual Discount Badge
+                    </label>
+                    <input
+                      type="text"
+                      value={String(elementConfig.annualDiscount || "")}
+                      onChange={(e) => handlePropertyChange("annualDiscount", e.target.value)}
+                      placeholder="e.g. Save 20%"
+                      className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                )}
+
+                {elementConfig.urgencyText !== undefined && (
+                  <div>
+                    <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      Countdown Urgency Text
+                    </label>
+                    <input
+                      type="text"
+                      value={String(elementConfig.urgencyText || "")}
+                      onChange={(e) => handlePropertyChange("urgencyText", e.target.value)}
+                      placeholder="⚡ SPECIAL EARLY BIRD ACCESS ENDS IN:"
+                      className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                )}
+
+                {elementConfig.searchPlaceholder !== undefined && (
+                  <div>
+                    <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      FAQ Search Placeholder
+                    </label>
+                    <input
+                      type="text"
+                      value={String(elementConfig.searchPlaceholder || "")}
+                      onChange={(e) => handlePropertyChange("searchPlaceholder", e.target.value)}
+                      placeholder="Search questions or keywords..."
+                      className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                )}
+
+                {/* Bento Grid Special Properties */}
+                {elementConfig.card1Title !== undefined && (
+                  <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-2">
+                    <span className="font-bold text-[10px] uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                      Bento Card 1 (Edge Computing)
+                    </span>
+                    <input
+                      type="text"
+                      value={String(elementConfig.card1Title || "")}
+                      onChange={(e) => handlePropertyChange("card1Title", e.target.value)}
+                      placeholder="Card 1 Title"
+                      className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
+                    />
+                  </div>
+                )}
+
+                {elementConfig.card2Score !== undefined && (
+                  <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-2">
+                    <span className="font-bold text-[10px] uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                      Bento Card 2 (Performance Score)
+                    </span>
+                    <input
+                      type="text"
+                      value={String(elementConfig.card2Score || "")}
+                      onChange={(e) => handlePropertyChange("card2Score", e.target.value)}
+                      placeholder="e.g. 100/100"
+                      className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
                     />
                   </div>
                 )}
@@ -1290,6 +1454,7 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
             {/* Inspector Tab 2: Style */}
             {inspectorTab === "style" && (
               <div className="space-y-3.5 text-xs">
+                {/* Background Color */}
                 <div>
                   <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Background Color
@@ -1306,14 +1471,89 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                       value={String(elementConfig.style?.backgroundColor || "")}
                       onChange={(e) => handleStyleChange("backgroundColor", e.target.value)}
                       placeholder="#ffffff or transparent"
-                      className="flex-1 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                      className="flex-1 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono"
                     />
                   </div>
                 </div>
 
+                {/* Text Color */}
                 <div>
                   <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Padding
+                    Text / Foreground Color
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={String(elementConfig.style?.color || "#0f172a")}
+                      onChange={(e) => handleStyleChange("color", e.target.value)}
+                      className="w-7 h-7 rounded-lg border border-slate-300 cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={String(elementConfig.style?.color || "")}
+                      onChange={(e) => handleStyleChange("color", e.target.value)}
+                      placeholder="#0f172a or inherit"
+                      className="flex-1 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-mono"
+                    />
+                  </div>
+                </div>
+
+                {/* Text Alignment */}
+                <div>
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Text Alignment
+                  </label>
+                  <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+                    {[
+                      { val: "left", icon: AlignLeft },
+                      { val: "center", icon: AlignCenter },
+                      { val: "right", icon: AlignRight },
+                      { val: "justify", icon: AlignJustify },
+                    ].map((align) => {
+                      const isActive = (elementConfig.style?.textAlign || "left") === align.val;
+                      return (
+                        <button
+                          key={align.val}
+                          type="button"
+                          onClick={() => handleStyleChange("textAlign", align.val)}
+                          className={`flex-1 py-1 rounded-lg flex items-center justify-center transition-all ${
+                            isActive
+                              ? "bg-white dark:bg-slate-700 text-blue-600 shadow-xs font-bold"
+                              : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                          }`}
+                        >
+                          <align.icon className="w-3.5 h-3.5" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Font Size */}
+                <div>
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Font Scale / Size
+                  </label>
+                  <select
+                    value={String(elementConfig.style?.fontSize || "inherit")}
+                    onChange={(e) => handleStyleChange("fontSize", e.target.value)}
+                    className="w-full px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                  >
+                    <option value="inherit">Default / Inherit</option>
+                    <option value="12px">Extra Small (12px)</option>
+                    <option value="14px">Small (14px)</option>
+                    <option value="16px">Base Body (16px)</option>
+                    <option value="18px">Medium Lead (18px)</option>
+                    <option value="24px">Headline H3 (24px)</option>
+                    <option value="32px">Headline H2 (32px)</option>
+                    <option value="48px">Hero Display H1 (48px)</option>
+                  </select>
+                </div>
+
+                {/* Padding */}
+                <div>
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Padding (Inner Space)
                   </label>
                   <select
                     value={String(elementConfig.style?.padding || "16px")}
@@ -1321,15 +1561,34 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                     className="w-full px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
                   >
                     <option value="0px">None (0px)</option>
-                    <option value="8px">Small (8px)</option>
-                    <option value="16px">Medium (16px)</option>
-                    <option value="24px">Large (24px)</option>
-                    <option value="32px">XL (32px)</option>
-                    <option value="48px">2XL (48px)</option>
-                    <option value="64px">3XL (64px)</option>
+                    <option value="8px">Compact (8px)</option>
+                    <option value="16px">Standard (16px)</option>
+                    <option value="24px">Spacious (24px)</option>
+                    <option value="32px">Generous (32px)</option>
+                    <option value="48px">Section Padding (48px)</option>
+                    <option value="64px">Hero Large (64px)</option>
                   </select>
                 </div>
 
+                {/* Margin */}
+                <div>
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Margin (Outer Space)
+                  </label>
+                  <select
+                    value={String(elementConfig.style?.margin || "0px")}
+                    onChange={(e) => handleStyleChange("margin", e.target.value)}
+                    className="w-full px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                  >
+                    <option value="0px">None (0px)</option>
+                    <option value="8px">Small (8px)</option>
+                    <option value="16px">Medium (16px)</option>
+                    <option value="24px">Large (24px)</option>
+                    <option value="32px">Extra Large (32px)</option>
+                  </select>
+                </div>
+
+                {/* Border Radius */}
                 <div>
                   <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Border Radius
@@ -1343,7 +1602,25 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                     <option value="8px">Rounded (8px)</option>
                     <option value="12px">Smooth (12px)</option>
                     <option value="20px">Curved (20px)</option>
-                    <option value="9999px">Pill / Circle</option>
+                    <option value="9999px">Pill / Circle (9999px)</option>
+                  </select>
+                </div>
+
+                {/* Box Shadow */}
+                <div>
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Elevation &amp; Shadow
+                  </label>
+                  <select
+                    value={String(elementConfig.style?.boxShadow || "none")}
+                    onChange={(e) => handleStyleChange("boxShadow", e.target.value)}
+                    className="w-full px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                  >
+                    <option value="none">Flat (None)</option>
+                    <option value="0 1px 3px rgba(0,0,0,0.1)">Subtle Card</option>
+                    <option value="0 10px 25px -5px rgba(0,0,0,0.1)">Medium Floating</option>
+                    <option value="0 20px 25px -5px rgba(59,130,246,0.25)">Blue Glow Halo</option>
+                    <option value="0 20px 25px -5px rgba(16,185,129,0.2)">Emerald Glow</option>
                   </select>
                 </div>
               </div>
@@ -1354,7 +1631,7 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
               <div className="space-y-3.5 text-xs">
                 <div>
                   <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Node ID
+                    Element Unique Node ID
                   </label>
                   <input
                     type="text"
@@ -1372,21 +1649,64 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                     type="text"
                     value={elementConfig.className || ""}
                     onChange={(e) => handlePropertyChange("className", e.target.value)}
-                    placeholder="e.g. shadow-2xl hover:scale-105"
+                    placeholder="e.g. shadow-2xl hover:scale-102 transition-all"
                     className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
-                <div className="pt-2 flex items-center justify-between">
-                  <span className="font-semibold text-slate-700 dark:text-slate-300">
-                    Visible on Canvas
-                  </span>
-                  <input
-                    type="checkbox"
-                    checked={elementConfig.visible !== false}
-                    onChange={(e) => handlePropertyChange("visible", e.target.checked)}
-                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
-                  />
+                <div>
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Entrance Micro-Animation
+                  </label>
+                  <select
+                    value={String(elementConfig.animation || "none")}
+                    onChange={(e) => handlePropertyChange("animation", e.target.value)}
+                    className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="none">None (Standard)</option>
+                    <option value="fade-in">Fade In (Smooth)</option>
+                    <option value="slide-up">Slide In From Bottom</option>
+                    <option value="zoom-in">Zoom In Scale</option>
+                    <option value="pulse">Subtle Ambient Pulse</option>
+                  </select>
+                </div>
+
+                <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">
+                      Hide on Mobile (&lt;640px)
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={Boolean(elementConfig.hideOnMobile)}
+                      onChange={(e) => handlePropertyChange("hideOnMobile", e.target.checked)}
+                      className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">
+                      Hide on Desktop (&gt;=1024px)
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={Boolean(elementConfig.hideOnDesktop)}
+                      onChange={(e) => handlePropertyChange("hideOnDesktop", e.target.checked)}
+                      className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">
+                      Visible on Visual Canvas
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={elementConfig.visible !== false}
+                      onChange={(e) => handlePropertyChange("visible", e.target.checked)}
+                      className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                    />
+                  </div>
                 </div>
               </div>
             )}

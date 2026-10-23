@@ -75,11 +75,18 @@ export const TEMPLATES: Record<string, WebsiteSite> = {
           "site-nav",
           "saas-hero",
           "saas-logos",
+          "saas-bento",
           "features-section",
+          "saas-video",
+          "saas-process",
           "saas-stats",
+          "saas-countdown",
           "testimonials-section",
+          "saas-team",
           "pricing-section",
+          "saas-posts",
           "faq-section",
+          "saas-newsletter",
           "cta-section",
           "site-footer",
         ],
@@ -214,6 +221,185 @@ export const TEMPLATES: Record<string, WebsiteSite> = {
         title: "Apex Studio",
         content:
           "The visual website builder for modern creators and engineering teams. Export to Next.js in seconds.",
+        visible: true,
+      },
+      "saas-bento": {
+        id: "saas-bento",
+        label: "Bento Architecture Grid",
+        elementType: "BentoGridSection",
+        badge: "✨ NEXORAFT PRO BENTO ENGINE",
+        title: "Precision-Engineered for Speed, Scale & Visual Craft",
+        subtitle:
+          "Every module is designed to maximize conversion, edge delivery, and production code fidelity with zero runtime weight.",
+        card1Tag: "EDGE COMPUTING",
+        card1Title: "Global Sub-10ms TTFB Distribution",
+        card1Desc:
+          "Pre-rendered static HTML and assets distributed globally across 300+ edge locations with zero runtime overhead or vendor lock-in.",
+        card2Score: "100/100",
+        card2Tag: "PERFORMANCE SCORE",
+        card2Title: "Flawless Lighthouse Metrics",
+        card3Tag: "CODE PORTABILITY",
+        card3Title: "1-Click React & Next.js 15 Export",
+        card3Desc:
+          "Extract clean, modular TSX code with Tailwind CSS utilities and zero external dependencies.",
+        card4Tag: "INTEGRATED CMS",
+        card4Title: "Built-in CMS & Lead Capture",
+        card4Desc:
+          "Manage pages, blog posts, navigation menus, and lead captures without external plugins.",
+        visible: true,
+      },
+      "saas-video": {
+        id: "saas-video",
+        label: "Platform Video Showcase",
+        elementType: "VideoSection",
+        badge: "✦ PLATFORM DEMO",
+        title: "Watch How Nexoraft Ships in Minutes",
+        subtitle:
+          "A complete walkthrough of the Nexoraft CMS dashboard, Nexoraft Visual Studio canvas, and Next.js 15 App Router export.",
+        thumbnail:
+          "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80",
+        visible: true,
+      },
+      "saas-process": {
+        id: "saas-process",
+        label: "Workflow Process Roadmap",
+        elementType: "TimelineSection",
+        badge: "✨ STREAMLINED WORKFLOW",
+        title: "From Visual Idea to Production Code in 4 Steps",
+        subtitle:
+          "How creators, marketing teams, and developers ship extraordinary web experiences in record time with Nexoraft.",
+        items: [
+          {
+            step: "01",
+            title: "Visual Page Architecture",
+            description:
+              "Compose multi-column sections, headers, bento grids, and pro widgets with real-time responsive controls.",
+            tag: "Design Studio",
+          },
+          {
+            step: "02",
+            title: "Dynamic Content & Widgets",
+            description:
+              "Configure pricing tiers with monthly/annual toggles, searchable FAQ accordions, countdown timers, and forms.",
+            tag: "Pro Modules",
+          },
+          {
+            step: "03",
+            title: "CMS & SEO Governance",
+            description:
+              "Publish blog articles, manage navigation menus, customize URL slugs, and optimize OpenGraph metadata.",
+            tag: "CMS Engine",
+          },
+          {
+            step: "04",
+            title: "Production Code Export",
+            description:
+              "Download a clean, fully typed Next.js 15 App Router codebase ready to deploy to Vercel, Netlify, or any cloud host.",
+            tag: "Zero Lock-In",
+          },
+        ],
+        visible: true,
+      },
+      "saas-countdown": {
+        id: "saas-countdown",
+        label: "Launch Countdown Special",
+        elementType: "CountdownSection",
+        title: "Limited Time Offer: Early Founder Access",
+        subtitle:
+          "Lock in lifetime access with unlimited exports before our launch window closes.",
+        buttonText: "Claim 50% Off Early Access",
+        urgencyText: "⚡ SPECIAL LAUNCH WINDOW EXPIRES IN:",
+        targetDays: 4,
+        visible: true,
+      },
+      "saas-team": {
+        id: "saas-team",
+        label: "Team Showcase",
+        elementType: "TeamSection",
+        title: "Meet the Minds Behind the Vision",
+        subtitle:
+          "Designers, builders, and engineers united by an obsession with visual craft and developer freedom.",
+        items: [
+          {
+            name: "Arham Ahmed",
+            role: "Lead Systems Architect & Founder",
+            avatar:
+              "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+            bio: "Pioneering visual CMS architecture with zero runtime lock-in.",
+          },
+          {
+            name: "Sophia Zhang",
+            role: "Head of Product Design",
+            avatar:
+              "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80",
+            bio: "Crafting Nexoraft Pro visual drag & drop primitives.",
+          },
+          {
+            name: "Liam O'Connor",
+            role: "Next.js Compiler Specialist",
+            avatar:
+              "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+            bio: "Optimizing 1-click multi-page AST exporters and type generators.",
+          },
+        ],
+        visible: true,
+      },
+      "saas-posts": {
+        id: "saas-posts",
+        label: "Engineering Publication",
+        elementType: "PostsGridSection",
+        title: "From the Nexoraft Publication",
+        subtitle:
+          "Tutorials, design system playbooks, and architectural deep-dives from our engineering team.",
+        items: [
+          {
+            title: "Building High-Conversion Landing Pages with Nexoraft Pro Precision",
+            category: "Design",
+            excerpt:
+              "Master responsive layout tokens, visual hierarchy, and CTA placement for maximum engagement.",
+            author: "Sarah Chen",
+            date: "Oct 20, 2026",
+            readTime: "4 min read",
+            image:
+              "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
+          },
+          {
+            title: "Zero-Lock-In Web Architecture: Exporting Clean Next.js 15 App Router Code",
+            category: "Engineering",
+            excerpt:
+              "How our compiler outputs idiomatic React components, dynamic routes, and Tailwind classes without bloat.",
+            author: "Marcus Miller",
+            date: "Oct 18, 2026",
+            readTime: "6 min read",
+            image:
+              "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80",
+          },
+          {
+            title: "The Modern Modular CMS Paradigm in 2026: Why Nexoraft Architecture Wins",
+            category: "Product",
+            excerpt:
+              "Why organizing pages, blog posts, media assets, and form leads under a unified dashboard beats fragmented tools.",
+            author: "Elena Rostova",
+            date: "Oct 14, 2026",
+            readTime: "5 min read",
+            image:
+              "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
+          },
+        ],
+        visible: true,
+      },
+      "saas-newsletter": {
+        id: "saas-newsletter",
+        label: "Weekly Newsletter Dispatch",
+        elementType: "NewsletterSection",
+        badge: "✨ WEEKLY ENGINEERING DISPATCH",
+        title: "Stay Ahead of Modern Web Craft & Architecture",
+        subtitle:
+          "Join 25,000+ developers, designers, and founders receiving curated production components, Next.js 15 guides, and visual builder updates.",
+        buttonText: "Subscribe Free",
+        placeholder: "Enter your work email address...",
+        disclaimer:
+          "🔒 No spam ever • Instant 1-click unsubscribe • Includes free Starter Template Kit",
         visible: true,
       },
 

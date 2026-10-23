@@ -90,7 +90,7 @@ export function withEditable<P extends object>(
         data-editable="true"
         data-element-id={id}
       >
-        {/* Elementor Pro Section Top Handle [ + | ::: | X ] */}
+        {/* Nexoraft Pro Section Top Handle [ + | ::: | X ] */}
         {isSection && (isSelected || isHovered) && (
           <div
             className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-40 flex items-center bg-blue-600 text-white rounded-full px-2 py-0.5 shadow-md text-[10px] font-bold gap-1 animate-in fade-in duration-100"
@@ -121,7 +121,7 @@ export function withEditable<P extends object>(
           </div>
         )}
 
-        {/* Elementor Widget Action Pill [ Name | Duplicate | Delete ] */}
+        {/* Nexoraft Widget Action Pill [ Name | Duplicate | Delete ] */}
         {!isSection && (isSelected || isHovered) && (
           <div
             className="absolute -top-3.5 right-2 z-40 flex items-center bg-blue-600 text-white rounded-lg px-2 py-0.5 shadow-md text-[10px] font-bold gap-1.5 animate-in fade-in duration-100"

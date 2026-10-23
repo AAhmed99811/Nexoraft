@@ -10,8 +10,8 @@ import {
 } from "../components/types";
 import { TEMPLATES } from "./templates";
 
-const STORAGE_KEY = "nexoraft_websites_v2";
-const LEGACY_STORAGE_KEY = "webcraft_websites_v1";
+const STORAGE_KEY = "nexoraft_websites_v3";
+const LEGACY_STORAGE_KEYS = ["nexoraft_websites_v2", "webcraft_websites_v1"];
 
 function isClient(): boolean {
   return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
@@ -72,16 +72,30 @@ export function getAllWebsites(): WebsiteSite[] {
     let raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
       // Check for legacy data migration
-      const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEY);
-      if (legacyRaw) {
-        try {
-          const parsedLegacy = JSON.parse(legacyRaw);
-          if (Array.isArray(parsedLegacy) && parsedLegacy.length > 0) {
-            localStorage.setItem(STORAGE_KEY, legacyRaw);
-            raw = legacyRaw;
+      for (const legacyKey of LEGACY_STORAGE_KEYS) {
+        const legacyRaw = localStorage.getItem(legacyKey);
+        if (legacyRaw) {
+          try {
+            const parsedLegacy = JSON.parse(legacyRaw);
+            if (Array.isArray(parsedLegacy) && parsedLegacy.length > 0) {
+              const defaultLatest = TEMPLATES["saas-landing"];
+              const merged = parsedLegacy.map((site: WebsiteSite) => {
+                if (site.id === defaultLatest.id) {
+                  return { ...defaultLatest, updatedAt: Date.now() };
+                }
+                return site;
+              });
+              if (!merged.some((s: WebsiteSite) => s.id === defaultLatest.id)) {
+                merged.unshift(defaultLatest);
+              }
+              const stringified = JSON.stringify(merged);
+              localStorage.setItem(STORAGE_KEY, stringified);
+              raw = stringified;
+              break;
+            }
+          } catch {
+            // ignore legacy parse errors
           }
-        } catch {
-          // ignore legacy parse errors
         }
       }
     }

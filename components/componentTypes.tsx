@@ -214,7 +214,7 @@ const HeroSectionComponent: React.FC<
     buttonSecondaryText?: string;
   }
 > = ({
-  badge = "✨ ELEMENTOR-GRADE VISUAL CRAFT",
+  badge = "✨ NEXORAFT PRO VISUAL CRAFT",
   title = "Design Visually. Own Your Code. Ship Anywhere.",
   subtitle = "The modern visual website canvas engineered for high conversion, responsive fidelity, and instant Next.js & React project export with zero lock-in.",
   buttonText = "Start Free Project",
@@ -277,7 +277,7 @@ const FeatureGridSectionComponent: React.FC<
     {
       title: "Visual Drag & Drop",
       description:
-        "Intuitive canvas inspired by Elementor & modern CMS workflows. Create responsive layouts effortlessly.",
+        "Intuitive canvas engineered for high-velocity visual building and modern CMS workflows. Create responsive layouts effortlessly.",
     },
     {
       title: "Clean Next.js & React Export",
@@ -390,7 +390,7 @@ const TestimonialsSectionComponent: React.FC<
   items = [
     {
       quote:
-        "Nexoraft gives our marketing team the speed of WordPress and our developers the clean React code we insist on.",
+        "Nexoraft gives our marketing team the speed of a visual studio and our developers the clean React code we insist on.",
       name: "Sarah Chen",
       role: "VP of Product",
       company: "Aether Dynamics",
@@ -468,16 +468,18 @@ const TestimonialsSectionComponent: React.FC<
   </section>
 );
 
-// 11. FAQ Section (Elementor Pro Accordion)
+// 11. FAQ Section (Nexoraft Pro Accordion)
 const FAQSectionComponent: React.FC<
   BaseElementProps & {
     title?: string;
     subtitle?: string;
+    searchPlaceholder?: string;
     items?: Array<{ question?: string; answer?: string }>;
   }
 > = ({
   title = "Frequently Asked Questions",
   subtitle = "Everything you need to know about exporting, code ownership, and deployment.",
+  searchPlaceholder = "Search questions or keywords...",
   items = [
     {
       question: "Is the exported code really 100% independent?",
@@ -487,7 +489,7 @@ const FAQSectionComponent: React.FC<
     {
       question: "Can I manage multi-page websites and blog posts?",
       answer:
-        "Absolutely. Nexoraft includes a WordPress-grade CMS for multi-page architectures, navigation menus, custom slugs, SEO metadata, and blog post collections.",
+        "Absolutely. Nexoraft includes a built-in CMS dashboard for multi-page architectures, navigation menus, custom slugs, SEO metadata, and blog post collections.",
     },
     {
       question: "How do form submissions work?",
@@ -537,7 +539,7 @@ const FAQSectionComponent: React.FC<
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Filter questions..."
+              placeholder={searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white"
@@ -640,11 +642,12 @@ const LogoStripSectionComponent: React.FC<
   </section>
 );
 
-// 13. Pricing Section (Elementor Pro with Monthly/Annual Toggle)
+// 13. Pricing Section (Nexoraft Pro with Monthly/Annual Toggle)
 const PricingSectionComponent: React.FC<
   BaseElementProps & {
     title?: string;
     subtitle?: string;
+    annualDiscount?: string;
     items?: Array<{
       title?: string;
       price?: string;
@@ -658,6 +661,7 @@ const PricingSectionComponent: React.FC<
 > = ({
   title = "Transparent, Predictable Pricing",
   subtitle = "Choose the plan that fits your growth stage. Switch between monthly and annual billing to save 20%.",
+  annualDiscount = "Save 20%",
   items = [
     {
       title: "Starter",
@@ -726,7 +730,7 @@ const PricingSectionComponent: React.FC<
             </p>
           )}
 
-          {/* Elementor Pro Billing Period Switcher */}
+          {/* Nexoraft Pro Billing Period Switcher */}
           <div className="mt-8 inline-flex items-center gap-3 bg-white dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
             <button
               type="button"
@@ -750,7 +754,7 @@ const PricingSectionComponent: React.FC<
             >
               <span>Annual Billing</span>
               <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-emerald-500 text-white font-black animate-pulse">
-                Save 20%
+                {annualDiscount}
               </span>
             </button>
           </div>
@@ -829,7 +833,7 @@ const PricingSectionComponent: React.FC<
   );
 };
 
-// 14. Call to Action Section (Elementor Pro with Live Newsletter Form)
+// 14. Call to Action Section (Nexoraft Pro with Live Newsletter Form)
 const CallToActionSectionComponent: React.FC<
   BaseElementProps & { title?: string; subtitle?: string; buttonText?: string }
 > = ({
@@ -853,7 +857,7 @@ const CallToActionSectionComponent: React.FC<
             formName: "Newsletter CTA",
             name: "Subscriber",
             email,
-            message: "Subscribed via Elementor CTA Banner",
+            message: "Subscribed via Nexoraft CTA Banner",
             submittedAt: Date.now(),
           },
         })
@@ -917,18 +921,20 @@ const CallToActionSectionComponent: React.FC<
   );
 };
 
-// 14b. Elementor Pro Countdown Timer Section
+// 14b. Nexoraft Pro Countdown Timer Section
 const CountdownSectionComponent: React.FC<
   BaseElementProps & {
     title?: string;
     subtitle?: string;
     targetDays?: number;
     buttonText?: string;
+    urgencyText?: string;
   }
 > = ({
   title = "Limited Time Offer: Launch Special",
   subtitle = "Lock in lifetime early-access pricing before the countdown runs out.",
   buttonText = "Claim 50% Off Now",
+  urgencyText = "⚡ SPECIAL EARLY BIRD ACCESS ENDS IN:",
   style,
   className = "",
 }) => {
@@ -960,7 +966,7 @@ const CountdownSectionComponent: React.FC<
       <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/30 mb-4 animate-pulse">
           <Clock className="w-3.5 h-3.5" />
-          <span>URGENT • OFFER CLOSING SOON</span>
+          <span>{urgencyText || "URGENT • OFFER CLOSING SOON"}</span>
         </div>
 
         <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">
@@ -1004,7 +1010,7 @@ const CountdownSectionComponent: React.FC<
   );
 };
 
-// 14c. Elementor Pro Dynamic Posts Grid (Blog Loop)
+// 14c. Nexoraft Pro Dynamic Posts Grid (Blog Loop)
 const PostsGridSectionComponent: React.FC<
   BaseElementProps & {
     title?: string;
@@ -1024,7 +1030,7 @@ const PostsGridSectionComponent: React.FC<
   subtitle = "Tutorials, design system playbooks, and architectural deep-dives from our engineering team.",
   items = [
     {
-      title: "Building High-Conversion Landing Pages with Elementor-Grade Precision",
+      title: "Building High-Conversion Landing Pages with Nexoraft Pro Precision",
       category: "Design",
       excerpt: "Master responsive layout tokens, visual hierarchy, and CTA placement for maximum engagement.",
       author: "Sarah Chen",
@@ -1042,7 +1048,7 @@ const PostsGridSectionComponent: React.FC<
       image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80",
     },
     {
-      title: "The WordPress Paradigm in 2026: Why Modular CMS Dashboards Still Win",
+      title: "The Modern Modular CMS Paradigm in 2026: Why Nexoraft Architecture Wins",
       category: "Product",
       excerpt: "Why organizing pages, blog posts, media assets, and form leads under a unified dashboard beats fragmented tools.",
       author: "Elena Rostova",
@@ -1163,7 +1169,7 @@ const PostsGridSectionComponent: React.FC<
   );
 };
 
-// 14d. Elementor Pro Team Showcase Section
+// 14d. Nexoraft Pro Team Showcase Section
 const TeamSectionComponent: React.FC<
   BaseElementProps & {
     title?: string;
@@ -1189,7 +1195,7 @@ const TeamSectionComponent: React.FC<
       name: "Sophia Zhang",
       role: "Head of Product Design",
       avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80",
-      bio: "Crafting Elementor-grade visual drag & drop primitives.",
+      bio: "Crafting Nexoraft Pro visual drag & drop primitives.",
     },
     {
       name: "Liam O'Connor",
@@ -1261,7 +1267,7 @@ const TeamSectionComponent: React.FC<
   </section>
 );
 
-// 14e. Elementor Pro Video Showcase Section
+// 14e. Nexoraft Pro Video Showcase Section
 const VideoSectionComponent: React.FC<
   BaseElementProps & {
     title?: string;
@@ -1271,7 +1277,7 @@ const VideoSectionComponent: React.FC<
   }
 > = ({
   title = "Watch How Nexoraft Ships in Minutes",
-  subtitle = "A complete walkthrough of the WordPress-grade CMS, Elementor Pro visual canvas, and Next.js 15 App Router export.",
+  subtitle = "A complete walkthrough of the Nexoraft CMS dashboard, Nexoraft Visual Studio canvas, and Next.js 15 App Router export.",
   thumbnail = "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80",
   badge = "✦ FEATURE SHOWCASE",
   style,
@@ -1330,6 +1336,412 @@ const VideoSectionComponent: React.FC<
               </span>
             </>
           )}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// 14f. Bento Grid Section (Nexoraft Pro Bento Architecture)
+export interface BentoGridProps extends BaseElementProps {
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  card1Tag?: string;
+  card1Title?: string;
+  card1Desc?: string;
+  card2Score?: string;
+  card2Tag?: string;
+  card2Title?: string;
+  card3Tag?: string;
+  card3Title?: string;
+  card3Desc?: string;
+  card4Tag?: string;
+  card4Title?: string;
+  card4Desc?: string;
+}
+
+const BentoGridSectionComponent: React.FC<BentoGridProps> = ({
+  badge = "✨ NEXORAFT PRO BENTO ENGINE",
+  title = "Precision-Engineered for Speed, Scale & Visual Craft",
+  subtitle = "Every module is designed to maximize conversion, edge delivery, and production code fidelity with zero runtime weight.",
+  card1Tag = "EDGE COMPUTING",
+  card1Title = "Global Sub-10ms TTFB Distribution",
+  card1Desc = "Pre-rendered static HTML and assets distributed globally across 300+ edge locations with zero runtime overhead or vendor lock-in.",
+  card2Score = "100/100",
+  card2Tag = "PERFORMANCE SCORE",
+  card2Title = "Flawless Lighthouse Metrics",
+  card3Tag = "CODE PORTABILITY",
+  card3Title = "1-Click React & Next.js 15 Export",
+  card3Desc = "Extract clean, modular TSX code with Tailwind CSS utilities and zero external dependencies.",
+  card4Tag = "INTEGRATED CMS",
+  card4Title = "Built-in CMS & Lead Capture",
+  card4Desc = "Manage pages, blog posts, navigation menus, and lead captures without external plugins.",
+  style,
+  className = "",
+}) => {
+  return (
+    <section
+      style={style}
+      className={`py-16 sm:py-24 px-4 sm:px-8 bg-slate-900 text-white relative overflow-hidden ${className}`}
+    >
+      {/* Background glow effects */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="text-center max-w-3xl mx-auto mb-14">
+          {badge && (
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 mb-4">
+              <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+              <span>{badge}</span>
+            </div>
+          )}
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+            {title}
+          </h2>
+          {subtitle && (
+            <p className="mt-4 text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
+              {subtitle}
+            </p>
+          )}
+        </div>
+
+        {/* Bento Grid layout */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {/* Bento Card 1: 2-column span */}
+          <div className="md:col-span-2 rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-slate-800/90 to-slate-900/90 border border-slate-700/60 shadow-xl relative overflow-hidden group hover:border-blue-500/50 transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[10px] font-bold tracking-widest text-blue-400 uppercase bg-blue-500/10 px-2.5 py-1 rounded-full border border-blue-500/20">
+                {card1Tag}
+              </span>
+              <div className="flex items-center gap-1.5 text-emerald-400 text-xs font-semibold">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>300+ Edge Nodes Active</span>
+              </div>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
+              {card1Title}
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-xl mb-6">
+              {card1Desc}
+            </p>
+
+            {/* Interactive Visual Element */}
+            <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 font-mono text-xs text-slate-300 space-y-2">
+              <div className="flex items-center justify-between text-[11px] text-slate-500 pb-2 border-b border-slate-800">
+                <span>Route: /api/edge-stream</span>
+                <span className="text-emerald-400 font-bold">200 OK • 6.4ms</span>
+              </div>
+              <div className="flex items-center gap-2 text-blue-400">
+                <Zap className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-[11px]">Edge Cache Hit: 99.8% (Cloudflare &amp; Vercel Edge Networks)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Bento Card 2: 1-column span (Performance Gauge) */}
+          <div className="rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-slate-800/90 to-slate-900/90 border border-slate-700/60 shadow-xl flex flex-col justify-between group hover:border-emerald-500/50 transition-all duration-300">
+            <div>
+              <span className="text-[10px] font-bold tracking-widest text-emerald-400 uppercase bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                {card2Tag}
+              </span>
+              <div className="my-6 text-center">
+                <div className="inline-flex items-center justify-center w-24 h-24 rounded-full border-4 border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-extrabold text-2xl shadow-lg shadow-emerald-500/20">
+                  {card2Score}
+                </div>
+                <div className="mt-3 text-xs font-semibold text-emerald-400 flex items-center justify-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Core Web Vitals Pass</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-white mb-1">{card2Title}</h3>
+              <p className="text-xs text-slate-400">Zero cumulative layout shift, instant edge rendering.</p>
+            </div>
+          </div>
+
+          {/* Bento Card 3: 1-column span */}
+          <div className="rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-slate-800/90 to-slate-900/90 border border-slate-700/60 shadow-xl flex flex-col justify-between group hover:border-indigo-500/50 transition-all duration-300">
+            <div>
+              <span className="text-[10px] font-bold tracking-widest text-indigo-400 uppercase bg-indigo-500/10 px-2.5 py-1 rounded-full border border-indigo-500/20">
+                {card3Tag}
+              </span>
+              <h3 className="text-lg font-bold text-white mt-4 mb-2">
+                {card3Title}
+              </h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                {card3Desc}
+              </p>
+            </div>
+            <div className="mt-5 pt-4 border-t border-slate-800 flex items-center justify-between text-xs font-semibold text-indigo-400">
+              <span>Next.js 15 &amp; React Vite</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+
+          {/* Bento Card 4: 2-column span */}
+          <div className="md:col-span-2 rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-slate-800/90 to-slate-900/90 border border-slate-700/60 shadow-xl group hover:border-purple-500/50 transition-all duration-300">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-bold tracking-widest text-purple-400 uppercase bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">
+                {card4Tag}
+              </span>
+              <span className="text-[10px] text-slate-400">Multi-page routing ready</span>
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">{card4Title}</h3>
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed mb-4">
+              {card4Desc}
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-center text-xs">
+              <div className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800">
+                <span className="text-white font-bold block">1-Click</span>
+                <span className="text-[10px] text-slate-400">Page Creator</span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800">
+                <span className="text-white font-bold block">Dynamic</span>
+                <span className="text-[10px] text-slate-400">Post Loops</span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800">
+                <span className="text-white font-bold block">CSV</span>
+                <span className="text-[10px] text-slate-400">Lead Export</span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800">
+                <span className="text-white font-bold block">SEO Meta</span>
+                <span className="text-[10px] text-slate-400">Slug Control</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// 14g. Timeline / Process Section (Nexoraft Pro Workflow Roadmap)
+export interface TimelineProps extends BaseElementProps {
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  items?: Array<{ step?: string; title?: string; description?: string; tag?: string }>;
+}
+
+const TimelineSectionComponent: React.FC<TimelineProps> = ({
+  badge = "✨ STREAMLINED WORKFLOW",
+  title = "From Visual Idea to Production Code in 4 Steps",
+  subtitle = "How creators, marketing teams, and developers ship extraordinary web experiences in record time with Nexoraft.",
+  items = [
+    {
+      step: "01",
+      title: "Visual Page Architecture",
+      description: "Compose multi-column sections, headers, bento grids, and pro widgets with real-time responsive controls.",
+      tag: "Design Studio",
+    },
+    {
+      step: "02",
+      title: "Dynamic Content & Widgets",
+      description: "Configure pricing tiers with monthly/annual toggles, searchable FAQ accordions, countdown timers, and forms.",
+      tag: "Pro Modules",
+    },
+    {
+      step: "03",
+      title: "CMS & SEO Governance",
+      description: "Publish blog articles, manage navigation menus, customize URL slugs, and optimize OpenGraph metadata.",
+      tag: "CMS Engine",
+    },
+    {
+      step: "04",
+      title: "Production Code Export",
+      description: "Download a clean, fully typed Next.js 15 App Router codebase ready to deploy to Vercel, Netlify, or any cloud host.",
+      tag: "Zero Lock-In",
+    },
+  ],
+  style,
+  className = "",
+}) => {
+  return (
+    <section
+      style={style}
+      className={`py-16 sm:py-24 px-4 sm:px-8 bg-slate-50 dark:bg-slate-900/60 border-b border-slate-100 dark:border-slate-800 ${className}`}
+    >
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          {badge && (
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 mb-4">
+              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+              <span>{badge}</span>
+            </div>
+          )}
+          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            {title}
+          </h2>
+          {subtitle && (
+            <p className="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-400">
+              {subtitle}
+            </p>
+          )}
+        </div>
+
+        {/* Steps Grid with connected timeline */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+          {items.map((step, idx) => (
+            <div
+              key={idx}
+              className="relative p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-blue-500/40 transition-all group"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-extrabold text-sm flex items-center justify-center shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
+                    {step.step || `0${idx + 1}`}
+                  </div>
+                  {step.tag && (
+                    <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider bg-blue-50 dark:bg-blue-950/50 px-2 py-0.5 rounded-full">
+                      {step.tag}
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2">
+                  {step.title}
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  {step.description}
+                </p>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-1.5 text-[11px] font-semibold text-blue-600 dark:text-blue-400">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Production Verified</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// 14h. Dedicated Newsletter Lead Magnet Section (Nexoraft Pro Conversion)
+export interface NewsletterProps extends BaseElementProps {
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  buttonText?: string;
+  placeholder?: string;
+  disclaimer?: string;
+}
+
+const NewsletterSectionComponent: React.FC<NewsletterProps> = ({
+  badge = "✨ WEEKLY ENGINEERING DISPATCH",
+  title = "Stay Ahead of Modern Web Craft & Architecture",
+  subtitle = "Join 25,000+ developers, designers, and founders receiving curated production components, Next.js 15 guides, and visual builder release updates.",
+  buttonText = "Subscribe Free",
+  placeholder = "Enter your work email address...",
+  disclaimer = "🔒 No spam ever • Instant 1-click unsubscribe • Includes free Starter Template Kit",
+  style,
+  className = "",
+}) => {
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !email.includes("@")) return;
+
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("website-event:lead-submitted", {
+          detail: {
+            formName: "Newsletter Lead Magnet",
+            email: email,
+            message: "Subscribed to Weekly Engineering Dispatch",
+            submittedAt: Date.now(),
+          },
+        })
+      );
+    }
+    setSubmitted(true);
+    setTimeout(() => {
+      setSubmitted(false);
+      setEmail("");
+    }, 4500);
+  };
+
+  return (
+    <section
+      style={style}
+      className={`py-16 sm:py-24 px-4 sm:px-8 bg-white dark:bg-slate-950 ${className}`}
+    >
+      <div className="max-w-4xl mx-auto rounded-3xl p-8 sm:p-14 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white shadow-2xl relative overflow-hidden">
+        {/* Ambient decorative circles */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/20 rounded-full blur-2xl pointer-events-none" />
+
+        <div className="relative z-10 text-center max-w-2xl mx-auto">
+          {badge && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/20 backdrop-blur-md mb-5">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{badge}</span>
+            </div>
+          )}
+
+          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+            {title}
+          </h2>
+
+          <p className="mt-3 text-xs sm:text-sm text-blue-100 leading-relaxed">
+            {subtitle}
+          </p>
+
+          {submitted ? (
+            <div className="mt-8 p-4 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 text-white font-bold text-sm flex items-center justify-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-emerald-300" />
+              <span>🎉 You are on the VIP list! Check your inbox for the starter kit.</span>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="mt-8 flex flex-col sm:flex-row gap-2.5 max-w-lg mx-auto">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={placeholder}
+                className="flex-1 px-4 py-3 rounded-xl bg-white/95 text-slate-900 placeholder:text-slate-400 text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-white shadow-inner"
+              />
+              <button
+                type="submit"
+                className="px-6 py-3 rounded-xl font-bold text-xs bg-slate-900 hover:bg-black text-white transition-all shadow-lg shadow-black/25 shrink-0 cursor-pointer flex items-center justify-center gap-2"
+              >
+                <span>{buttonText}</span>
+                <Send className="w-3.5 h-3.5" />
+              </button>
+            </form>
+          )}
+
+          {disclaimer && (
+            <p className="mt-4 text-[11px] text-blue-200">
+              {disclaimer}
+            </p>
+          )}
+
+          {/* Social Proof Avatars */}
+          <div className="mt-6 pt-6 border-t border-white/15 flex flex-wrap items-center justify-center gap-3 text-xs text-blue-100">
+            <div className="flex -space-x-2">
+              {["A", "M", "S", "E", "T"].map((char, i) => (
+                <div
+                  key={i}
+                  className="w-7 h-7 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center text-[10px] font-bold text-white shadow-xs"
+                >
+                  {char}
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center gap-1 text-amber-300 text-xs font-bold">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-3.5 h-3.5 fill-amber-300" />
+              ))}
+            </div>
+            <span className="font-semibold">Joined by 25,000+ creators</span>
+          </div>
         </div>
       </div>
     </section>
@@ -1731,6 +2143,33 @@ export const componentTypes: Record<
   ) as unknown as ComponentType<Record<string, unknown>>,
   VideoSection: withEditable(
     VideoSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  BentoGridSection: withEditable(
+    BentoGridSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  BentoGrid: withEditable(
+    BentoGridSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  TimelineSection: withEditable(
+    TimelineSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  ProcessSection: withEditable(
+    TimelineSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  WorkflowSection: withEditable(
+    TimelineSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  NewsletterSection: withEditable(
+    NewsletterSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  LeadMagnetSection: withEditable(
+    NewsletterSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  StatsCounterSection: withEditable(
+    StatsSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  MetricsSection: withEditable(
+    StatsSectionComponent
   ) as unknown as ComponentType<Record<string, unknown>>,
   ContactSection: withEditable(
     ContactSectionComponent

@@ -434,6 +434,214 @@ ${pad}  </div>
 ${pad}</footer>`;
     }
 
+    case "BentoGridSection":
+    case "BentoGrid": {
+      const badge = node.badge || "✨ NEXORAFT PRO BENTO ENGINE";
+      const title = node.title || "Precision-Engineered for Speed, Scale & Visual Craft";
+      const subtitle = node.subtitle || "Every module is designed to maximize conversion, edge delivery, and production code fidelity.";
+      const card1Title = node.card1Title || "Global Sub-10ms TTFB Distribution";
+      const card1Desc = node.card1Desc || "Pre-rendered static HTML and assets distributed globally across 300+ edge locations.";
+      const card2Score = node.card2Score || "100/100";
+      const card2Title = node.card2Title || "Flawless Lighthouse Metrics";
+      const card3Title = node.card3Title || "1-Click React & Next.js 15 Export";
+      const card3Desc = node.card3Desc || "Extract clean, modular TSX code with Tailwind CSS utilities.";
+      const card4Title = node.card4Title || "Built-in CMS & Lead Capture";
+      const card4Desc = node.card4Desc || "Manage pages, blog posts, navigation menus, and lead captures without external plugins.";
+
+      return `${pad}<section className="py-20 lg:py-28 bg-slate-900 text-white relative overflow-hidden">
+${pad}  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+${pad}    <div className="text-center max-w-3xl mx-auto mb-16">
+${pad}      <span className="inline-block px-3.5 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 mb-4">${escapeJsx(String(badge))}</span>
+${pad}      <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">${escapeJsx(String(title))}</h2>
+${pad}      <p className="mt-4 text-slate-400 text-sm sm:text-base">${escapeJsx(String(subtitle))}</p>
+${pad}    </div>
+${pad}    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+${pad}      <div className="md:col-span-2 p-8 rounded-3xl bg-slate-800/80 border border-slate-700/80 shadow-xl">
+${pad}        <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">EDGE COMPUTE</span>
+${pad}        <h3 className="text-2xl font-bold mt-3 mb-2">${escapeJsx(String(card1Title))}</h3>
+${pad}        <p className="text-slate-400 text-sm mb-6">${escapeJsx(String(card1Desc))}</p>
+${pad}        <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800 font-mono text-xs text-slate-300">
+${pad}          <div className="flex justify-between border-b border-slate-800 pb-2"><span>Route: /api/edge-stream</span><span className="text-emerald-400 font-bold">200 OK • 6.4ms</span></div>
+${pad}          <div className="pt-2 text-blue-400">Edge Cache Hit: 99.8% (Global Distribution)</div>
+${pad}        </div>
+${pad}      </div>
+${pad}      <div className="p-8 rounded-3xl bg-slate-800/80 border border-slate-700/80 shadow-xl flex flex-col justify-between text-center">
+${pad}        <div>
+${pad}          <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">PERFORMANCE</span>
+${pad}          <div className="my-6 inline-flex items-center justify-center w-24 h-24 rounded-full border-4 border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-extrabold text-2xl mx-auto">${escapeJsx(String(card2Score))}</div>
+${pad}        </div>
+${pad}        <div><h3 className="text-lg font-bold mb-1">${escapeJsx(String(card2Title))}</h3><p className="text-xs text-slate-400">Zero cumulative layout shift.</p></div>
+${pad}      </div>
+${pad}      <div className="p-8 rounded-3xl bg-slate-800/80 border border-slate-700/80 shadow-xl flex flex-col justify-between">
+${pad}        <div>
+${pad}          <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest">PORTABILITY</span>
+${pad}          <h3 className="text-xl font-bold mt-3 mb-2">${escapeJsx(String(card3Title))}</h3>
+${pad}          <p className="text-slate-400 text-xs">${escapeJsx(String(card3Desc))}</p>
+${pad}        </div>
+${pad}        <div className="mt-6 text-xs text-indigo-400 font-semibold">Next.js 15 App Router &amp; React Vite</div>
+${pad}      </div>
+${pad}      <div className="md:col-span-2 p-8 rounded-3xl bg-slate-800/80 border border-slate-700/80 shadow-xl">
+${pad}        <span className="text-xs font-bold text-purple-400 uppercase tracking-widest">CMS ENGINE</span>
+${pad}        <h3 className="text-2xl font-bold mt-3 mb-2">${escapeJsx(String(card4Title))}</h3>
+${pad}        <p className="text-slate-400 text-sm mb-6">${escapeJsx(String(card4Desc))}</p>
+${pad}        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
+${pad}          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 font-bold">Multi-Page</div>
+${pad}          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 font-bold">Blog Loops</div>
+${pad}          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 font-bold">CSV Leads</div>
+${pad}          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 font-bold">SEO Slugs</div>
+${pad}        </div>
+${pad}      </div>
+${pad}    </div>
+${pad}  </div>
+${pad}</section>`;
+    }
+
+    case "TimelineSection":
+    case "ProcessSection": {
+      const badge = node.badge || "✨ STREAMLINED WORKFLOW";
+      const title = node.title || "From Visual Idea to Production Code in 4 Steps";
+      const subtitle = node.subtitle || "How creators, marketing teams, and developers ship extraordinary web experiences.";
+
+      return `${pad}<section className="py-20 bg-slate-50 border-b border-slate-200">
+${pad}  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+${pad}    <div className="text-center max-w-3xl mx-auto mb-16">
+${pad}      <span className="inline-block px-3.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 mb-4">${escapeJsx(String(badge))}</span>
+${pad}      <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">${escapeJsx(String(title))}</h2>
+${pad}      <p className="mt-3 text-slate-600 text-sm sm:text-base">${escapeJsx(String(subtitle))}</p>
+${pad}    </div>
+${pad}    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+${pad}      <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+${pad}        <div>
+${pad}          <div className="w-10 h-10 rounded-xl bg-blue-600 text-white font-extrabold text-sm flex items-center justify-center mb-4">01</div>
+${pad}          <h3 className="font-bold text-slate-900 mb-2">Visual Page Architecture</h3>
+${pad}          <p className="text-xs text-slate-600">Compose sections, headers, and pro widgets with real-time responsive controls.</p>
+${pad}        </div>
+${pad}      </div>
+${pad}      <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+${pad}        <div>
+${pad}          <div className="w-10 h-10 rounded-xl bg-blue-600 text-white font-extrabold text-sm flex items-center justify-center mb-4">02</div>
+${pad}          <h3 className="font-bold text-slate-900 mb-2">Dynamic Content &amp; Widgets</h3>
+${pad}          <p className="text-xs text-slate-600">Configure pricing toggles, searchable FAQ accordions, and lead forms.</p>
+${pad}        </div>
+${pad}      </div>
+${pad}      <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+${pad}        <div>
+${pad}          <div className="w-10 h-10 rounded-xl bg-blue-600 text-white font-extrabold text-sm flex items-center justify-center mb-4">03</div>
+${pad}          <h3 className="font-bold text-slate-900 mb-2">CMS &amp; SEO Governance</h3>
+${pad}          <p className="text-xs text-slate-600">Publish blog articles, manage navigation menus, and optimize metadata.</p>
+${pad}        </div>
+${pad}      </div>
+${pad}      <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+${pad}        <div>
+${pad}          <div className="w-10 h-10 rounded-xl bg-blue-600 text-white font-extrabold text-sm flex items-center justify-center mb-4">04</div>
+${pad}          <h3 className="font-bold text-slate-900 mb-2">Production Code Export</h3>
+${pad}          <p className="text-xs text-slate-600">Download clean Next.js 15 App Router code ready to deploy anywhere.</p>
+${pad}        </div>
+${pad}      </div>
+${pad}    </div>
+${pad}  </div>
+${pad}</section>`;
+    }
+
+    case "NewsletterSection": {
+      const badge = node.badge || "✨ WEEKLY ENGINEERING DISPATCH";
+      const title = node.title || "Stay Ahead of Modern Web Craft & Architecture";
+      const subtitle = node.subtitle || "Join 25,000+ creators receiving curated production components and Next.js guides.";
+
+      return `${pad}<section className="py-20 px-4 bg-white">
+${pad}  <div className="max-w-4xl mx-auto rounded-3xl p-10 sm:p-14 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white text-center shadow-2xl">
+${pad}    <span className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/20 mb-4">${escapeJsx(String(badge))}</span>
+${pad}    <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">${escapeJsx(String(title))}</h2>
+${pad}    <p className="mt-3 text-sm text-blue-100 max-w-xl mx-auto">${escapeJsx(String(subtitle))}</p>
+${pad}    <form action="/api/contact" method="POST" className="mt-8 flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+${pad}      <input type="email" name="email" required placeholder="Enter work email..." className="flex-1 px-4 py-3 rounded-xl bg-white text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none" />
+${pad}      <button type="submit" className="px-6 py-3 rounded-xl font-bold text-sm bg-slate-900 hover:bg-black text-white transition-all shadow-lg shrink-0">Subscribe</button>
+${pad}    </form>
+${pad}  </div>
+${pad}</section>`;
+    }
+
+    case "CountdownSection": {
+      const title = node.title || "Limited Time Offer: Early Access";
+      const subtitle = node.subtitle || "Lock in early founder access before the special offer ends.";
+      const buttonText = node.buttonText || "Claim Access Now";
+
+      return `${pad}<section className="py-16 bg-slate-900 text-white text-center">
+${pad}  <div className="max-w-3xl mx-auto px-4">
+${pad}    <span className="text-xs font-bold text-amber-400 tracking-widest uppercase">⚡ SPECIAL LAUNCH WINDOW</span>
+${pad}    <h2 className="text-3xl font-extrabold mt-2 mb-3">${escapeJsx(String(title))}</h2>
+${pad}    <p className="text-sm text-slate-400 mb-8">${escapeJsx(String(subtitle))}</p>
+${pad}    <div className="flex justify-center gap-4 mb-8 font-mono text-center">
+${pad}      <div className="p-4 rounded-2xl bg-slate-800 border border-slate-700 w-20"><div className="text-3xl font-bold text-blue-400">04</div><div className="text-[10px] text-slate-400">DAYS</div></div>
+${pad}      <div className="p-4 rounded-2xl bg-slate-800 border border-slate-700 w-20"><div className="text-3xl font-bold text-blue-400">18</div><div className="text-[10px] text-slate-400">HOURS</div></div>
+${pad}      <div className="p-4 rounded-2xl bg-slate-800 border border-slate-700 w-20"><div className="text-3xl font-bold text-blue-400">42</div><div className="text-[10px] text-slate-400">MINS</div></div>
+${pad}      <div className="p-4 rounded-2xl bg-slate-800 border border-slate-700 w-20"><div className="text-3xl font-bold text-blue-400">15</div><div className="text-[10px] text-slate-400">SECS</div></div>
+${pad}    </div>
+${pad}    <a href="#contact" className="px-8 py-3.5 rounded-xl font-bold text-sm bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25">${escapeJsx(String(buttonText))}</a>
+${pad}  </div>
+${pad}</section>`;
+    }
+
+    case "VideoSection": {
+      const title = node.title || "Watch How Nexoraft Ships in Minutes";
+      const subtitle = node.subtitle || "A complete walkthrough of the Nexoraft CMS dashboard and Visual Studio canvas.";
+
+      return `${pad}<section className="py-20 bg-white text-center">
+${pad}  <div className="max-w-5xl mx-auto px-4">
+${pad}    <h2 className="text-3xl font-extrabold text-slate-900">${escapeJsx(String(title))}</h2>
+${pad}    <p className="mt-3 text-slate-600 text-sm max-w-2xl mx-auto mb-10">${escapeJsx(String(subtitle))}</p>
+${pad}    <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200 aspect-video bg-slate-900 flex items-center justify-center">
+${pad}      <div className="w-20 h-20 rounded-full bg-blue-600 text-white flex items-center justify-center text-2xl font-bold shadow-xl cursor-pointer hover:scale-105 transition-all">▶</div>
+${pad}    </div>
+${pad}  </div>
+${pad}</section>`;
+    }
+
+    case "PostsGridSection": {
+      const title = node.title || "From the Nexoraft Publication";
+      const subtitle = node.subtitle || "Tutorials and architectural deep-dives from our engineering team.";
+
+      return `${pad}<section className="py-20 bg-slate-50">
+${pad}  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+${pad}    <div className="text-center max-w-3xl mx-auto mb-16">
+${pad}      <h2 className="text-3xl font-bold text-slate-900">${escapeJsx(String(title))}</h2>
+${pad}      <p className="mt-3 text-sm text-slate-600">${escapeJsx(String(subtitle))}</p>
+${pad}    </div>
+${pad}    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+${pad}      <article className="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden p-6 flex flex-col justify-between">
+${pad}        <div><span className="text-xs font-bold text-blue-600 uppercase">Design</span><h3 className="text-lg font-bold text-slate-900 mt-2 mb-2">High-Conversion Landing Pages with Nexoraft Precision</h3><p className="text-xs text-slate-600">Master responsive layout tokens, visual hierarchy, and CTA placement.</p></div>
+${pad}        <div className="mt-6 pt-4 border-t border-slate-100 text-xs text-slate-500">By Sarah Chen • 4 min read</div>
+${pad}      </article>
+${pad}      <article className="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden p-6 flex flex-col justify-between">
+${pad}        <div><span className="text-xs font-bold text-emerald-600 uppercase">Engineering</span><h3 className="text-lg font-bold text-slate-900 mt-2 mb-2">Zero-Lock-In Web Architecture: Exporting Next.js 15</h3><p className="text-xs text-slate-600">How our compiler outputs clean components, dynamic routes, and Tailwind classes.</p></div>
+${pad}        <div className="mt-6 pt-4 border-t border-slate-100 text-xs text-slate-500">By Marcus Miller • 6 min read</div>
+${pad}      </article>
+${pad}      <article className="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden p-6 flex flex-col justify-between">
+${pad}        <div><span className="text-xs font-bold text-purple-600 uppercase">Product</span><h3 className="text-lg font-bold text-slate-900 mt-2 mb-2">The Modern Modular CMS Paradigm in 2026</h3><p className="text-xs text-slate-600">Why organizing pages, blog posts, and leads under a unified dashboard wins.</p></div>
+${pad}        <div className="mt-6 pt-4 border-t border-slate-100 text-xs text-slate-500">By Elena Rostova • 5 min read</div>
+${pad}      </article>
+${pad}    </div>
+${pad}  </div>
+${pad}</section>`;
+    }
+
+    case "TeamSection": {
+      const title = node.title || "Meet the Minds Behind the Vision";
+      const subtitle = node.subtitle || "Designers, builders, and engineers united by an obsession with visual craft.";
+
+      return `${pad}<section className="py-20 bg-white">
+${pad}  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+${pad}    <h2 className="text-3xl font-bold text-slate-900">${escapeJsx(String(title))}</h2>
+${pad}    <p className="mt-3 text-slate-600 text-sm max-w-2xl mx-auto mb-16">${escapeJsx(String(subtitle))}</p>
+${pad}    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+${pad}      <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 text-center"><div className="w-20 h-20 rounded-full bg-blue-600 text-white text-xl font-bold mx-auto mb-4 flex items-center justify-center">AA</div><h3 className="font-bold text-slate-900">Arham Ahmed</h3><p className="text-xs text-blue-600 font-semibold mb-2">Lead Systems Architect &amp; Founder</p><p className="text-xs text-slate-600">Pioneering visual CMS architecture with zero runtime lock-in.</p></div>
+${pad}      <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 text-center"><div className="w-20 h-20 rounded-full bg-purple-600 text-white text-xl font-bold mx-auto mb-4 flex items-center justify-center">SZ</div><h3 className="font-bold text-slate-900">Sophia Zhang</h3><p className="text-xs text-purple-600 font-semibold mb-2">Head of Product Design</p><p className="text-xs text-slate-600">Crafting Nexoraft Pro visual drag &amp; drop primitives.</p></div>
+${pad}      <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 text-center"><div className="w-20 h-20 rounded-full bg-indigo-600 text-white text-xl font-bold mx-auto mb-4 flex items-center justify-center">LO</div><h3 className="font-bold text-slate-900">Liam O'Connor</h3><p className="text-xs text-indigo-600 font-semibold mb-2">Next.js Compiler Specialist</p><p className="text-xs text-slate-600">Optimizing 1-click multi-page AST exporters.</p></div>
+${pad}    </div>
+${pad}  </div>
+${pad}</section>`;
+    }
+
     case "Heading": {
       const title = node.title || "Section Heading";
       const subtitle = node.subtitle;

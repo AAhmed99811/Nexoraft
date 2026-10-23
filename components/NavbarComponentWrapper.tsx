@@ -158,17 +158,17 @@ export const NavbarComponentWrapper: React.FC<NavbarComponentWrapperProps> = ({
       >
         {/* Left Section: Back to Dashboard, Brand, Website Title & Page Switcher */}
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-          {/* Back to WordPress Dedicated Dashboard */}
+          {/* Back to Nexoraft Dedicated Dashboard */}
           <Link
             href={websiteId ? `/project/${websiteId}` : "/"}
-            title="Return to WordPress Dashboard"
+            title="Return to Nexoraft CMS Dashboard"
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#1d2327] hover:bg-[#2c3338] text-white text-xs font-semibold shadow-xs transition-colors"
           >
             <ChevronLeft className="w-4 h-4 text-[#72aee6]" />
-            <div className="w-4 h-4 rounded-full bg-[#2271b1] text-white flex items-center justify-center text-[10px] font-bold">
-              W
+            <div className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">
+              N
             </div>
-            <span className="hidden sm:inline font-semibold">WP Admin</span>
+            <span className="hidden sm:inline font-semibold">Nexoraft CMS</span>
           </Link>
 
           {/* Return to All Sites Hub */}
