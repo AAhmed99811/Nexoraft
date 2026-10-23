@@ -701,6 +701,303 @@ ${pad}</div>`;
       return `${pad}<div style={{ height: '${height}px' }} className="w-full" />`;
     }
 
+    case "FlipBoxSection":
+    case "FlipBox": {
+      const badge = node.badge || "✦ 3D INTERACTIVE CARDS";
+      const title = node.title || "Interactive Offerings";
+      const subtitle =
+        node.subtitle ||
+        "Hover over any card below to experience smooth 3D flip card interactions.";
+      const items = Array.isArray(node.items)
+        ? (node.items as ItemRecord[])
+        : [
+            {
+              frontTitle: "Fullstack Next.js",
+              frontDesc:
+                "Production-ready App Router architectures with Server Components.",
+              backTitle: "Zero Lock-In",
+              backDesc:
+                "Export clean TypeScript, Tailwind, and React code anytime.",
+              buttonText: "Learn More",
+              href: "#features",
+            },
+            {
+              frontTitle: "Visual Studio Engine",
+              frontDesc:
+                "Pixel-perfect drag, drop, and live inline editing canvas.",
+              backTitle: "High Velocity",
+              backDesc:
+                "Build agency and client sites in minutes without breaking code.",
+              buttonText: "See Demo",
+              href: "#pricing",
+            },
+            {
+              frontTitle: "Autonomous CMS",
+              frontDesc:
+                "Structured content modeling, blog publishing, and forms inbox.",
+              backTitle: "Integrated Leads",
+              backDesc:
+                "Collect customer inquiries directly into your site dashboard.",
+              buttonText: "Get Started",
+              href: "#contact",
+            },
+          ];
+
+      return `${pad}<section className="py-20 bg-slate-50">
+${pad}  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+${pad}    <div className="text-center max-w-3xl mx-auto mb-16">
+${pad}      <span className="text-xs font-black tracking-widest text-blue-600 uppercase mb-2 block">${escapeJsx(
+        String(badge)
+      )}</span>
+${pad}      <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">${escapeJsx(
+        String(title)
+      )}</h2>
+${pad}      <p className="mt-4 text-base text-slate-600">${escapeJsx(
+        String(subtitle)
+      )}</p>
+${pad}    </div>
+${pad}    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+${items
+  .map(
+    (card) => `${pad}      <div className="h-80 [perspective:1000px] group">
+${pad}        <div className="relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+${pad}          <div className="absolute inset-0 w-full h-full rounded-3xl p-8 bg-white border border-slate-200 shadow-sm flex flex-col justify-between [backface-visibility:hidden]">
+${pad}            <div>
+${pad}              <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg mb-4">✦</div>
+${pad}              <h3 className="text-xl font-bold text-slate-900 mb-2">${escapeJsx(
+      String(card.frontTitle || card.title || "Card")
+    )}</h3>
+${pad}              <p className="text-sm text-slate-600">${escapeJsx(
+      String(card.frontDesc || card.description || "")
+    )}</p>
+${pad}            </div>
+${pad}            <span className="text-xs font-semibold text-blue-600">Hover to flip ➔</span>
+${pad}          </div>
+${pad}          <div className="absolute inset-0 w-full h-full rounded-3xl p-8 bg-blue-600 text-white flex flex-col justify-between [transform:rotateY(180deg)] [backface-visibility:hidden] shadow-xl">
+${pad}            <div>
+${pad}              <h3 className="text-xl font-bold mb-2">${escapeJsx(
+      String(card.backTitle || "Details")
+    )}</h3>
+${pad}              <p className="text-sm text-blue-100">${escapeJsx(
+      String(card.backDesc || "")
+    )}</p>
+${pad}            </div>
+${pad}            <a href="${escapeJsx(
+      String(card.buttonHref || card.href || "#")
+    )}" className="px-4 py-2 rounded-xl bg-white text-blue-600 text-xs font-bold text-center hover:bg-blue-50 transition-colors">${escapeJsx(
+      String(card.buttonText || "Learn More")
+    )}</a>
+${pad}          </div>
+${pad}        </div>
+${pad}      </div>`
+  )
+  .join("\n")}
+${pad}    </div>
+${pad}  </div>
+${pad}</section>`;
+    }
+
+    case "PriceListSection":
+    case "PriceList": {
+      const badge = node.badge || "✦ TRANSPARENT RATES";
+      const title = node.title || "Services & Tiered Pricing Menu";
+      const subtitle =
+        node.subtitle ||
+        "A clear breakdown of available services, modular add-ons, and enterprise rates.";
+      const items = Array.isArray(node.items)
+        ? (node.items as ItemRecord[])
+        : [
+            {
+              title: "Visual Studio Setup",
+              price: "$490",
+              description:
+                "Complete brand design system configuration and canvas theme setup.",
+              tag: "Popular",
+            },
+            {
+              title: "Custom CMS Architecture",
+              price: "$850",
+              description:
+                "Structured content schemas, dynamic post loops, and inbox forms.",
+              tag: "Essential",
+            },
+            {
+              title: "Next.js App Router Export",
+              price: "$1,200",
+              description:
+                "Zero lock-in code generation with clean TypeScript, Tailwind, and components.",
+              tag: "Agency",
+            },
+            {
+              title: "Performance & SEO Audit",
+              price: "$350",
+              description:
+                "100/100 Lighthouse score tuning, meta schemas, and responsive checks.",
+            },
+          ];
+
+      return `${pad}<section className="py-20 bg-white">
+${pad}  <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+${pad}    <div className="text-center mb-16">
+${pad}      <span className="text-xs font-black tracking-widest text-blue-600 uppercase mb-2 block">${escapeJsx(
+        String(badge)
+      )}</span>
+${pad}      <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">${escapeJsx(
+        String(title)
+      )}</h2>
+${pad}      <p className="mt-4 text-base text-slate-600">${escapeJsx(
+        String(subtitle)
+      )}</p>
+${pad}    </div>
+${pad}    <div className="space-y-6">
+${items
+  .map(
+    (item) => `${pad}      <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition-colors">
+${pad}        <div className="flex items-baseline justify-between gap-4">
+${pad}          <div className="flex items-center gap-2">
+${pad}            <h3 className="font-bold text-slate-900 text-base sm:text-lg">${escapeJsx(
+      String(item.title || "Service")
+    )}</h3>
+${
+  item.tag
+    ? `${pad}            <span className="text-[10px] font-black uppercase tracking-wider bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">${escapeJsx(
+        String(item.tag)
+      )}</span>`
+    : ""
+}
+${pad}          </div>
+${pad}          <div className="flex-1 mx-3 border-b-2 border-dotted border-slate-300" />
+${pad}          <span className="font-black text-blue-600 text-lg sm:text-xl font-mono shrink-0">${escapeJsx(
+      String(item.price || "$0")
+    )}</span>
+${pad}        </div>
+${
+  item.description
+    ? `${pad}        <p className="text-xs sm:text-sm text-slate-500 mt-2 max-w-2xl">${escapeJsx(
+        String(item.description)
+      )}</p>`
+    : ""
+}
+${pad}      </div>`
+  )
+  .join("\n")}
+${pad}    </div>
+${pad}  </div>
+${pad}</section>`;
+    }
+
+    case "TableOfContentsSection":
+    case "TableOfContents": {
+      const title = node.title || "Table of Contents";
+      const subtitle =
+        node.subtitle ||
+        "Quickly navigate through all architecture sections and modules on this page.";
+      const items = Array.isArray(node.items)
+        ? (node.items as ItemRecord[])
+        : [
+            { label: "Executive Overview & Hero", href: "#hero" },
+            { label: "Bento High-Density Architecture", href: "#bento" },
+            { label: "Core Velocity Features", href: "#features" },
+            { label: "Flexible Pricing & Billing", href: "#pricing" },
+            { label: "Client Testimonials & Reviews", href: "#testimonials" },
+            { label: "Knowledge Base & FAQ", href: "#faq" },
+            { label: "Inquiries & Contact Form", href: "#contact" },
+          ];
+
+      return `${pad}<section className="py-10 px-4 sm:px-8 bg-slate-50 border-y border-slate-200">
+${pad}  <div className="max-w-3xl mx-auto rounded-3xl p-6 sm:p-8 bg-white border border-slate-200 shadow-sm">
+${pad}    <h3 className="text-lg font-bold text-slate-900 mb-2">${escapeJsx(
+        String(title)
+      )}</h3>
+${pad}    <p className="text-xs text-slate-500 mb-6">${escapeJsx(
+        String(subtitle)
+      )}</p>
+${pad}    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+${items
+  .map(
+    (item, idx) => `${pad}      <a href="${escapeJsx(
+      String(item.href || "#")
+    )}" className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-colors">
+${pad}        <span className="w-6 h-6 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center font-mono text-[10px] font-bold">${String(
+      idx + 1
+    ).padStart(2, "0")}</span>
+${pad}        <span>${escapeJsx(
+      String(item.label || item.title || "Section")
+    )}</span>
+${pad}      </a>`
+  )
+  .join("\n")}
+${pad}    </div>
+${pad}  </div>
+${pad}</section>`;
+    }
+
+    case "AlertBoxSection":
+    case "AlertBox": {
+      const title = node.title || "Nexoraft 2.0 Engine Update Live";
+      const description =
+        node.description ||
+        "Enjoy 2x faster visual compilation, instant live item repeaters, and zero-runtime Next.js 15 App Router code export.";
+      const buttonText = node.buttonText || "Explore Release Notes";
+      const href = node.href || "#features";
+
+      return `${pad}<div className="mx-auto max-w-5xl my-4 px-4 sm:px-6">
+${pad}  <div className="p-4 sm:p-5 rounded-2xl border bg-blue-50 border-blue-200 text-blue-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+${pad}    <div>
+${pad}      <h4 className="font-bold text-sm leading-tight">${escapeJsx(
+        String(title)
+      )}</h4>
+${pad}      <p className="text-xs opacity-90 mt-1 leading-relaxed">${escapeJsx(
+        String(description)
+      )}</p>
+${pad}    </div>
+${pad}    <a href="${escapeJsx(
+        String(href)
+      )}" className="px-3.5 py-1.5 rounded-xl font-bold text-xs bg-blue-600 text-white hover:bg-blue-700 transition-all shrink-0">${escapeJsx(
+        String(buttonText)
+      )}</a>
+${pad}  </div>
+${pad}</div>`;
+    }
+
+    case "ShareButtonsSection":
+    case "ShareButtons": {
+      const title = node.title || "Share this Website with Your Network";
+      const subtitle =
+        node.subtitle ||
+        "Help founders, creators, and engineering teams discover portable visual web building.";
+      const shareUrl = node.shareUrl || "https://nexoraft.com";
+      const shareText =
+        node.shareText ||
+        "Check out Nexoraft - The visual builder with zero platform lock-in!";
+
+      return `${pad}<section className="py-8 px-4 bg-slate-50 border-y border-slate-200 text-center">
+${pad}  <div className="max-w-2xl mx-auto">
+${pad}    <h4 className="text-sm font-bold text-slate-900">${escapeJsx(
+        String(title)
+      )}</h4>
+${pad}    <p className="text-xs text-slate-500 mt-0.5 mb-4">${escapeJsx(
+        String(subtitle)
+      )}</p>
+${pad}    <div className="flex flex-wrap items-center justify-center gap-2">
+${pad}      <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(
+        String(shareUrl)
+      )}&text=${encodeURIComponent(
+        String(shareText)
+      )}" target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-black transition-all">Post on X</a>
+${pad}      <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+        String(shareUrl)
+      )}" target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-all">Share on LinkedIn</a>
+${pad}      <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(
+        String(shareText)
+      )}%20${encodeURIComponent(
+        String(shareUrl)
+      )}" target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-all">WhatsApp</a>
+${pad}    </div>
+${pad}  </div>
+${pad}</section>`;
+    }
+
     case "Container":
     default: {
       const childrenIds = node.children || [];

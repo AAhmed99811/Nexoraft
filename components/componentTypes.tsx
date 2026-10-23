@@ -19,6 +19,15 @@ import {
   User,
   Mail,
   Zap,
+  Info,
+  AlertTriangle,
+  AlertCircle,
+  Share2,
+  Copy,
+  CheckCheck,
+  ListCollapse,
+  RefreshCw,
+  X,
 } from "lucide-react";
 
 export interface BaseElementProps {
@@ -1873,6 +1882,511 @@ const ContactSectionComponent: React.FC<
   );
 };
 
+// 15b. Nexoraft Pro 3D Flip Box Section
+export interface FlipBoxItem {
+  frontBadge?: string;
+  frontTitle?: string;
+  frontDesc?: string;
+  backTitle?: string;
+  backDesc?: string;
+  buttonText?: string;
+  buttonHref?: string;
+}
+
+export interface FlipBoxProps extends BaseElementProps {
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  items?: FlipBoxItem[];
+}
+
+const FlipBoxSectionComponent: React.FC<FlipBoxProps> = ({
+  badge = "✨ INTERACTIVE 3D CARDS",
+  title = "Engage Visitors with Interactive Flip Modules",
+  subtitle = "Hover or tap on any card to reveal details, calls to action, and interactive features in full 3D space.",
+  items = [
+    {
+      frontBadge: "ARCHITECT",
+      frontTitle: "Visual Studio Canvas",
+      frontDesc: "Design fluid responsive layouts with full drag-and-drop precision, auto-layout tokens, and real-time previews.",
+      backTitle: "Design Faster Than Ever",
+      backDesc: "Cut frontend assembly time by 80% while preserving 100% clean Next.js 15 App Router code structure.",
+      buttonText: "Launch Studio",
+      buttonHref: "#contact",
+    },
+    {
+      frontBadge: "PERFORMANCE",
+      frontTitle: "Sub-10ms Edge Delivery",
+      frontDesc: "Deploy static and server-rendered HTML globally across 300+ CDN edge nodes with zero cold starts.",
+      backTitle: "Score 100 on Lighthouse",
+      backDesc: "Zero bloat, zero cumulative layout shift, and instant core web vitals that guarantee top search rank.",
+      buttonText: "View Benchmarks",
+      buttonHref: "#pricing",
+    },
+    {
+      frontBadge: "PORTABILITY",
+      frontTitle: "Zero Platform Lock-In",
+      frontDesc: "Export clean TypeScript, Tailwind CSS, and React source code. Run and deploy anywhere with npm install.",
+      backTitle: "100% Code Ownership",
+      backDesc: "No subscription required to keep your site online. Deploy freely to Vercel, Netlify, Cloudflare, or AWS.",
+      buttonText: "Export Code",
+      buttonHref: "#contact",
+    },
+  ],
+  style,
+  className = "",
+}) => (
+  <section
+    style={style}
+    className={`py-16 sm:py-24 px-4 sm:px-8 bg-slate-50 dark:bg-slate-900/40 border-y border-slate-200/80 dark:border-slate-800 ${className}`}
+  >
+    <div className="max-w-7xl mx-auto">
+      <div className="text-center max-w-3xl mx-auto mb-14">
+        {badge && (
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 mb-4">
+            <RefreshCw className="w-3.5 h-3.5 text-blue-600 animate-spin" />
+            <span>{badge}</span>
+          </div>
+        )}
+        <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          {title}
+        </h2>
+        {subtitle && (
+          <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
+            {subtitle}
+          </p>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+        {items.map((card, idx) => (
+          <div
+            key={idx}
+            className="group h-80 [perspective:1000px] cursor-pointer"
+          >
+            <div className="relative h-full w-full rounded-3xl transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-md hover:shadow-2xl">
+              {/* FRONT FACE */}
+              <div className="absolute inset-0 h-full w-full rounded-3xl p-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 [backface-visibility:hidden] flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-1 rounded-full border border-blue-200 dark:border-blue-900">
+                      {card.frontBadge || `FEATURE 0${idx + 1}`}
+                    </span>
+                    <RefreshCw className="w-4 h-4 text-slate-400 group-hover:rotate-180 transition-transform duration-500" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 leading-snug">
+                    {card.frontTitle || "Front Title"}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                    {card.frontDesc || "Front side summary description."}
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-semibold text-blue-600 dark:text-blue-400">
+                  <span>Hover to flip 3D</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+
+              {/* BACK FACE */}
+              <div className="absolute inset-0 h-full w-full rounded-3xl p-7 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-between shadow-2xl">
+                <div>
+                  <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white mb-4">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">
+                    {card.backTitle || "Back Title"}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
+                    {card.backDesc || "Back side expanded actionable details."}
+                  </p>
+                </div>
+                <a
+                  href={card.buttonHref || "#contact"}
+                  className="w-full py-2.5 rounded-xl bg-white text-blue-700 font-bold text-xs text-center shadow-lg hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
+                >
+                  <span>{card.buttonText || "Get Started"}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+// 15c. Nexoraft Pro Price List / Menu Section
+export interface PriceListItem {
+  title?: string;
+  price?: string;
+  description?: string;
+  tag?: string;
+  href?: string;
+}
+
+export interface PriceListProps extends BaseElementProps {
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  items?: PriceListItem[];
+}
+
+const PriceListSectionComponent: React.FC<PriceListProps> = ({
+  badge = "✦ CURATED RATE CARD",
+  title = "Professional Services & Transparent Pricing",
+  subtitle = "High-velocity development, custom enterprise design systems, and dedicated full-stack architecture.",
+  items = [
+    {
+      title: "Custom Visual Design System Architecture",
+      price: "$2,400",
+      description: "Tailored component tokens, typography scales, dark mode variables, and reusable Figma UI libraries.",
+      tag: "Popular",
+    },
+    {
+      title: "1-Click Full Multi-Page Website Migration",
+      price: "$1,800",
+      description: "Full AST compilation of your legacy site into modern Next.js 15 App Router code with zero lock-in.",
+      tag: "Fast Track",
+    },
+    {
+      title: "Headless CMS API & Webhook Integration",
+      price: "$1,200",
+      description: "Automated webhook handlers, lead pipelines, CRM synchronization, and automated email dispatches.",
+    },
+    {
+      title: "Edge Performance & Lighthouse Optimization",
+      price: "$950",
+      description: "Comprehensive Core Web Vitals audit, sub-10ms edge caching rules, and asset compression pipeline.",
+    },
+  ],
+  style,
+  className = "",
+}) => (
+  <section
+    style={style}
+    className={`py-16 sm:py-24 px-4 sm:px-8 bg-white dark:bg-slate-950 ${className}`}
+  >
+    <div className="max-w-4xl mx-auto">
+      <div className="text-center mb-14">
+        {badge && (
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60 mb-3">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{badge}</span>
+          </div>
+        )}
+        <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          {title}
+        </h2>
+        {subtitle && (
+          <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
+            {subtitle}
+          </p>
+        )}
+      </div>
+
+      <div className="space-y-6">
+        {items.map((item, idx) => (
+          <div
+            key={idx}
+            className="p-5 sm:p-6 rounded-2xl bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800 hover:border-blue-500/30 transition-all"
+          >
+            <div className="flex items-baseline justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-slate-900 dark:text-white text-base sm:text-lg">
+                  {item.title || "Service Title"}
+                </h3>
+                {item.tag && (
+                  <span className="text-[10px] font-black uppercase tracking-wider bg-blue-100 text-blue-700 dark:bg-blue-950/70 dark:text-blue-300 px-2 py-0.5 rounded-full">
+                    {item.tag}
+                  </span>
+                )}
+              </div>
+              <div className="flex-1 mx-3 border-b-2 border-dotted border-slate-300 dark:border-slate-700" />
+              <span className="font-black text-blue-600 dark:text-blue-400 text-lg sm:text-xl font-mono shrink-0">
+                {item.price || "$0"}
+              </span>
+            </div>
+            {item.description && (
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed max-w-2xl">
+                {item.description}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+// 15d. Nexoraft Pro Table of Contents / Anchor Directory
+export interface TocItem {
+  label?: string;
+  href?: string;
+}
+
+export interface TableOfContentsProps extends BaseElementProps {
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  items?: TocItem[];
+}
+
+const TableOfContentsSectionComponent: React.FC<TableOfContentsProps> = ({
+  badge = "✦ PAGE DIRECTORY",
+  title = "Table of Contents",
+  subtitle = "Quickly navigate through all architecture sections and modules on this page.",
+  items = [
+    { label: "Executive Overview & Hero", href: "#hero" },
+    { label: "Bento High-Density Architecture", href: "#bento" },
+    { label: "Core Velocity Features", href: "#features" },
+    { label: "Flexible Pricing & Billing", href: "#pricing" },
+    { label: "Client Testimonials & Reviews", href: "#testimonials" },
+    { label: "Knowledge Base & FAQ", href: "#faq" },
+    { label: "Inquiries & Contact Form", href: "#contact" },
+  ],
+  style,
+  className = "",
+}) => (
+  <section
+    style={style}
+    className={`py-10 px-4 sm:px-8 bg-slate-50 dark:bg-slate-900/60 border-y border-slate-200/80 dark:border-slate-800 ${className}`}
+  >
+    <div className="max-w-3xl mx-auto rounded-3xl p-6 sm:p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+      {badge && (
+        <span className="text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400 block mb-2">
+          {badge}
+        </span>
+      )}
+      <div className="flex items-center gap-2 mb-2">
+        <ListCollapse className="w-5 h-5 text-blue-600" />
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+          {title}
+        </h3>
+      </div>
+      {subtitle && (
+        <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
+          {subtitle}
+        </p>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        {items.map((item, idx) => (
+          <a
+            key={idx}
+            href={item.href || "#"}
+            className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors"
+          >
+            <span className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center font-mono text-[10px] font-bold">
+              {String(idx + 1).padStart(2, "0")}
+            </span>
+            <span>{item.label}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+// 15e. Nexoraft Pro Alert / Announcement Box
+export interface AlertBoxProps extends BaseElementProps {
+  variant?: "info" | "success" | "warning" | "danger";
+  title?: string;
+  description?: string;
+  buttonText?: string;
+  href?: string;
+}
+
+const AlertBoxSectionComponent: React.FC<AlertBoxProps> = ({
+  variant = "info",
+  title = "Nexoraft 2.0 Engine Update Live",
+  description = "Enjoy 2x faster visual compilation, instant live item repeaters, and zero-runtime Next.js 15 App Router code export.",
+  buttonText = "Explore Release Notes",
+  href = "#features",
+  style,
+  className = "",
+}) => {
+  const [dismissed, setDismissed] = useState(false);
+
+  if (dismissed) {
+    return (
+      <div className="py-2 text-center text-xs text-slate-400">
+        <button
+          type="button"
+          onClick={() => setDismissed(false)}
+          className="underline hover:text-slate-600 dark:hover:text-slate-200"
+        >
+          Restore Announcement Bar
+        </button>
+      </div>
+    );
+  }
+
+  const variantStyles = {
+    info: {
+      bg: "bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-900 text-blue-900 dark:text-blue-100",
+      icon: <Info className="w-5 h-5 text-blue-600 shrink-0" />,
+      btn: "bg-blue-600 text-white hover:bg-blue-700",
+    },
+    success: {
+      bg: "bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-900 text-emerald-900 dark:text-emerald-100",
+      icon: <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />,
+      btn: "bg-emerald-600 text-white hover:bg-emerald-700",
+    },
+    warning: {
+      bg: "bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-900 text-amber-900 dark:text-amber-100",
+      icon: <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />,
+      btn: "bg-amber-600 text-white hover:bg-amber-700",
+    },
+    danger: {
+      bg: "bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-900 text-red-900 dark:text-red-100",
+      icon: <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />,
+      btn: "bg-red-600 text-white hover:bg-red-700",
+    },
+  }[variant || "info"];
+
+  return (
+    <div
+      style={style}
+      className={`mx-auto max-w-5xl my-4 px-4 sm:px-6 ${className}`}
+    >
+      <div
+        className={`p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs transition-all ${variantStyles.bg}`}
+      >
+        <div className="flex items-start gap-3">
+          {variantStyles.icon}
+          <div>
+            <h4 className="font-bold text-sm leading-tight">{title}</h4>
+            <p className="text-xs opacity-90 mt-1 leading-relaxed">
+              {description}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+          {buttonText && (
+            <a
+              href={href || "#"}
+              className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all ${variantStyles.btn}`}
+            >
+              {buttonText}
+            </a>
+          )}
+          <button
+            type="button"
+            onClick={() => setDismissed(true)}
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+            title="Dismiss announcement"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// 15f. Nexoraft Pro Social Share Buttons Strip
+export interface ShareButtonsProps extends BaseElementProps {
+  title?: string;
+  subtitle?: string;
+  shareUrl?: string;
+  shareText?: string;
+}
+
+const ShareButtonsSectionComponent: React.FC<ShareButtonsProps> = ({
+  title = "Share this Website with Your Network",
+  subtitle = "Help founders, creators, and engineering teams discover portable visual web building.",
+  shareUrl = "https://nexoraft.com",
+  shareText = "Check out Nexoraft - The visual builder with zero platform lock-in!",
+  style,
+  className = "",
+}) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    }
+  };
+
+  const encodedUrl = encodeURIComponent(shareUrl);
+  const encodedText = encodeURIComponent(shareText);
+
+  return (
+    <section
+      style={style}
+      className={`py-8 px-4 bg-slate-50 dark:bg-slate-900/40 border-y border-slate-200/80 dark:border-slate-800 text-center ${className}`}
+    >
+      <div className="max-w-2xl mx-auto">
+        <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+          {title}
+        </h4>
+        {subtitle && (
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 mb-4">
+            {subtitle}
+          </p>
+        )}
+
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {/* Twitter / X */}
+          <a
+            href={`https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs"
+          >
+            <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            <span>Post on X</span>
+          </a>
+
+          {/* LinkedIn */}
+          <a
+            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs"
+          >
+            <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            <span>Share</span>
+          </a>
+
+          {/* WhatsApp */}
+          <a
+            href={`https://api.whatsapp.com/send?text=${encodedText}%20${encodedUrl}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+            <span>WhatsApp</span>
+          </a>
+
+          {/* Copy Link */}
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+          >
+            {copied ? (
+              <>
+                <CheckCheck className="w-3.5 h-3.5 text-emerald-500" />
+                <span className="text-emerald-500">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3.5 h-3.5" />
+                <span>Copy Link</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 // 16. Footer Section
 const FooterSectionComponent: React.FC<
   BaseElementProps & { title?: string; content?: string }
@@ -2173,6 +2687,36 @@ export const componentTypes: Record<
   ) as unknown as ComponentType<Record<string, unknown>>,
   ContactSection: withEditable(
     ContactSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  FlipBoxSection: withEditable(
+    FlipBoxSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  FlipBox: withEditable(
+    FlipBoxSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  PriceListSection: withEditable(
+    PriceListSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  PriceList: withEditable(
+    PriceListSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  TableOfContentsSection: withEditable(
+    TableOfContentsSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  TableOfContents: withEditable(
+    TableOfContentsSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  AlertBoxSection: withEditable(
+    AlertBoxSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  AlertBox: withEditable(
+    AlertBoxSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  ShareButtonsSection: withEditable(
+    ShareButtonsSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  ShareButtons: withEditable(
+    ShareButtonsSectionComponent
   ) as unknown as ComponentType<Record<string, unknown>>,
   FooterSection: withEditable(
     FooterSectionComponent

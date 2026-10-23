@@ -84,8 +84,8 @@ function BuilderContent() {
       initialRevisions={site.revisions || []}
     >
       <AutoSaveListener siteId={site.id} category={site.category} status={site.status} />
-      <div className="p-2 sm:p-4 max-w-[1720px] mx-auto">
-        <ReactFormBuilder deviceType="desktop" />
+      <div className="h-full w-full max-w-[1850px] mx-auto p-2 sm:p-3 flex flex-col overflow-hidden">
+        <ReactFormBuilder deviceType="desktop" className="h-full flex-1 min-h-0" />
       </div>
     </FormBuilderProvider>
   );
@@ -196,10 +196,10 @@ function AutoSaveListener({
 
 export default function BuilderPage() {
   return (
-    <main className="min-h-screen bg-slate-100/60 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+    <main className="h-screen max-h-screen w-screen overflow-hidden flex flex-col bg-slate-100/60 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       <Suspense
         fallback={
-          <div className="min-h-screen flex items-center justify-center">
+          <div className="h-screen flex items-center justify-center">
             <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
           </div>
         }

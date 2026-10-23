@@ -166,6 +166,12 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [hoveredElement] = useState<string | null>(null);
   const [activePage, setActivePage] = useState<string>(initialActivePage);
+
+  const switchPage = useCallback((newPageId: string) => {
+    setActivePage(newPageId);
+    setFocusedElement(null);
+    setSelectedElement(null);
+  }, []);
   const [pages, setPages] =
     useState<Record<string, PageConfig>>(initialPages);
   const [navbarMode, setNavbarMode] = useState<NavbarMode>(initialNavbarMode);
@@ -492,9 +498,9 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
         [pageId]: newPageConfig,
       }));
 
-      setActivePage(pageId);
+      switchPage(pageId);
     },
-    [pages, websiteName]
+    [pages, websiteName, switchPage]
   );
 
   const updatePage = useCallback(
@@ -523,10 +529,10 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
       });
       if (activePage === pageId) {
         const remaining = Object.keys(pages).filter((k) => k !== pageId);
-        if (remaining.length > 0) setActivePage(remaining[0]);
+        if (remaining.length > 0) switchPage(remaining[0]);
       }
     },
-    [pages, activePage]
+    [pages, activePage, switchPage]
   );
 
   // Blog Posts CRUD
@@ -642,7 +648,7 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
       setFocusedElement,
       setSelectedElement,
       setNavbarMode,
-      setActivePage,
+      setActivePage: switchPage,
       setWebsiteName,
       setThemeCode,
       setFontFamily,
@@ -708,6 +714,7 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
       deleteSubmission,
       publishSite,
       restoreRevision,
+      switchPage,
     ]
   );
 

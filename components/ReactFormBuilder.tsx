@@ -53,6 +53,11 @@ import {
   AlignCenter,
   AlignRight,
   AlignJustify,
+  ChevronRight,
+  RefreshCw,
+  AlertCircle,
+  Share2,
+  ListCollapse,
 } from "lucide-react";
 
 const { removeElement, updateElement, addElement } = elementSlice;
@@ -92,8 +97,7 @@ export const Preview: React.FC<PreviewProps> = ({
   return (
     <div
       id="nexoraft_canvas"
-      className="classes w-full h-full p-2 sm:p-4 transition-all"
-      style={{ overflow: "auto", scrollbarWidth: "none" }}
+      className="classes w-full min-h-full p-2 sm:p-4 transition-all"
     >
       <AppRenderer
         {...props}
@@ -158,6 +162,7 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
   const [inspectorTab, setInspectorTab] = useState<
     "content" | "style" | "advanced"
   >("content");
+  const [expandedItemIndex, setExpandedItemIndex] = useState<number | null>(0);
 
   // Modals
   const [showNewPageModal, setShowNewPageModal] = useState(false);
@@ -382,6 +387,111 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
           buttonText: "Explore More",
         };
         break;
+      case "FlipBoxSection":
+      case "FlipBox":
+        extraProps = {
+          badge: "✨ INTERACTIVE 3D CARDS",
+          title: "Engage Visitors with Interactive Flip Modules",
+          subtitle: "Hover or tap on any card to reveal details, calls to action, and interactive features in full 3D space.",
+          items: [
+            {
+              frontBadge: "ARCHITECT",
+              frontTitle: "Visual Studio Canvas",
+              frontDesc: "Design fluid responsive layouts with full drag-and-drop precision, auto-layout tokens, and real-time previews.",
+              backTitle: "Design Faster Than Ever",
+              backDesc: "Cut frontend assembly time by 80% while preserving 100% clean Next.js 15 App Router code structure.",
+              buttonText: "Launch Studio",
+              buttonHref: "#contact",
+            },
+            {
+              frontBadge: "PERFORMANCE",
+              frontTitle: "Sub-10ms Edge Delivery",
+              frontDesc: "Deploy static and server-rendered HTML globally across 300+ CDN edge nodes with zero cold starts.",
+              backTitle: "Score 100 on Lighthouse",
+              backDesc: "Zero bloat, zero cumulative layout shift, and instant core web vitals that guarantee top search rank.",
+              buttonText: "View Benchmarks",
+              buttonHref: "#pricing",
+            },
+            {
+              frontBadge: "PORTABILITY",
+              frontTitle: "Zero Platform Lock-In",
+              frontDesc: "Export clean TypeScript, Tailwind CSS, and React source code. Run and deploy anywhere with npm install.",
+              backTitle: "100% Code Ownership",
+              backDesc: "No subscription required to keep your site online. Deploy freely to Vercel, Netlify, Cloudflare, or AWS.",
+              buttonText: "Export Code",
+              buttonHref: "#contact",
+            },
+          ],
+        };
+        break;
+      case "PriceListSection":
+      case "PriceList":
+        extraProps = {
+          badge: "✦ CURATED RATE CARD",
+          title: "Professional Services & Transparent Pricing",
+          subtitle: "High-velocity development, custom enterprise design systems, and dedicated full-stack architecture.",
+          items: [
+            {
+              title: "Custom Visual Design System Architecture",
+              price: "$2,400",
+              description: "Tailored component tokens, typography scales, dark mode variables, and reusable Figma UI libraries.",
+              tag: "Popular",
+            },
+            {
+              title: "1-Click Full Multi-Page Website Migration",
+              price: "$1,800",
+              description: "Full AST compilation of your legacy site into modern Next.js 15 App Router code with zero lock-in.",
+              tag: "Fast Track",
+            },
+            {
+              title: "Headless CMS API & Webhook Integration",
+              price: "$1,200",
+              description: "Automated webhook handlers, lead pipelines, CRM synchronization, and automated email dispatches.",
+            },
+            {
+              title: "Edge Performance & Lighthouse Optimization",
+              price: "$950",
+              description: "Comprehensive Core Web Vitals audit, sub-10ms edge caching rules, and asset compression pipeline.",
+            },
+          ],
+        };
+        break;
+      case "TableOfContentsSection":
+      case "TableOfContents":
+        extraProps = {
+          badge: "✦ PAGE DIRECTORY",
+          title: "Table of Contents",
+          subtitle: "Quickly navigate through all architecture sections and modules on this page.",
+          items: [
+            { label: "Executive Overview & Hero", href: "#hero" },
+            { label: "Bento High-Density Architecture", href: "#bento" },
+            { label: "Core Velocity Features", href: "#features" },
+            { label: "Flexible Pricing & Billing", href: "#pricing" },
+            { label: "Client Testimonials & Reviews", href: "#testimonials" },
+            { label: "Knowledge Base & FAQ", href: "#faq" },
+            { label: "Inquiries & Contact Form", href: "#contact" },
+          ],
+        };
+        break;
+      case "AlertBoxSection":
+      case "AlertBox":
+        extraProps = {
+          variant: "info",
+          title: "Nexoraft 2.0 Engine Update Live",
+          description: "Enjoy 2x faster visual compilation, instant live item repeaters, and zero-runtime Next.js 15 App Router code export.",
+          buttonText: "Explore Release Notes",
+          href: "#features",
+        };
+        break;
+      case "ShareButtonsSection":
+      case "ShareButtons":
+        extraProps = {
+          title: "Share this Website with Your Network",
+          subtitle: "Help founders, creators, and engineering teams discover portable visual web building.",
+          shareUrl: "https://nexoraft.com",
+          shareText: "Check out Nexoraft - The visual builder with zero platform lock-in!",
+        };
+        break;
       case "Divider":
         extraProps = { variant: "solid" };
         break;
@@ -422,6 +532,137 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
   const handlePropertyChange = (key: string, value: unknown) => {
     if (!elementConfig) return;
     dispatch(updateElement(elementConfig.id, { [key]: value }));
+  };
+
+  const handleUpdateItem = (itemIndex: number, field: string, value: unknown) => {
+    if (!elementConfig || !Array.isArray(elementConfig.items)) return;
+    const nextItems = elementConfig.items.map((item, idx) => {
+      if (idx !== itemIndex) return item;
+      return { ...item, [field]: value };
+    });
+    dispatch(updateElement(elementConfig.id, { items: nextItems }));
+  };
+
+  const handleAddItem = () => {
+    if (!elementConfig) return;
+    const currentItems = Array.isArray(elementConfig.items) ? elementConfig.items : [];
+    let defaultItem: Record<string, unknown> = {
+      title: "New Item",
+      description: "Description of the new item.",
+    };
+    if (elementConfig.elementType === "PricingSection") {
+      defaultItem = {
+        title: "Enterprise Plus",
+        price: "$149",
+        period: "/month",
+        description: "Custom capabilities for high-velocity teams.",
+        features: ["All Pro Features", "Dedicated Engineering Support", "Custom AST Compilers", "99.99% SLA"],
+        buttonText: "Contact Us",
+      };
+    } else if (elementConfig.elementType === "FAQSection") {
+      defaultItem = {
+        question: "Can I customize the items dynamically?",
+        answer: "Yes, you can edit questions, answers, and add as many items as needed in the Element Inspector.",
+      };
+    } else if (elementConfig.elementType === "TestimonialsSection") {
+      defaultItem = {
+        name: "Jordan Lee",
+        role: "Chief Technology Officer",
+        company: "Veloce Systems",
+        quote: "The visual repeater controls and 1-click Next.js export saved us dozens of development hours.",
+        rating: 5,
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+      };
+    } else if (elementConfig.elementType === "StatsSection" || elementConfig.elementType === "StatsCounterSection") {
+      defaultItem = {
+        value: "99.99%",
+        label: "Performance Benchmark",
+        change: "+25% MoM",
+      };
+    } else if (elementConfig.elementType === "TimelineSection" || elementConfig.elementType === "ProcessSection") {
+      defaultItem = {
+        step: `0${currentItems.length + 1}`,
+        title: "Scale & Deploy",
+        description: "Continuous integration pipeline and instant edge distribution.",
+        tag: "DevOps",
+      };
+    } else if (elementConfig.elementType === "TeamSection") {
+      defaultItem = {
+        name: "Alex Rivera",
+        role: "Lead Interface Designer",
+        bio: "Specializing in micro-animations, accessible color tokens, and responsive canvas design.",
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+      };
+    } else if (elementConfig.elementType === "FlipBoxSection" || elementConfig.elementType === "FlipBox") {
+      defaultItem = {
+        frontBadge: "INNOVATION",
+        frontTitle: "3D Dynamic Card",
+        frontDesc: "Interactive card front with hover micro-animation.",
+        backTitle: "Take Immediate Action",
+        backDesc: "Expanded content and direct call-to-action link.",
+        buttonText: "Explore More",
+        buttonHref: "#contact",
+      };
+    } else if (elementConfig.elementType === "PriceListSection" || elementConfig.elementType === "PriceList") {
+      defaultItem = {
+        title: "Enterprise Custom Architecture",
+        price: "$3,200",
+        description: "Full end-to-end design, database schema, and automated cloud infrastructure.",
+        tag: "Enterprise",
+      };
+    } else if (elementConfig.elementType === "TableOfContentsSection" || elementConfig.elementType === "TableOfContents") {
+      defaultItem = {
+        label: "Additional Section",
+        href: "#section",
+      };
+    } else if (elementConfig.elementType === "LogoStripSection") {
+      defaultItem = {
+        name: "NextGen Brand",
+      };
+    } else if (elementConfig.elementType === "NavbarSection") {
+      defaultItem = {
+        label: "Resources",
+        href: "/resources",
+      };
+    }
+
+    const nextItems = [...currentItems, defaultItem];
+    dispatch(updateElement(elementConfig.id, { items: nextItems }));
+    setExpandedItemIndex(nextItems.length - 1);
+  };
+
+  const handleRemoveItem = (itemIndex: number) => {
+    if (!elementConfig || !Array.isArray(elementConfig.items)) return;
+    if (elementConfig.items.length <= 1) return;
+    const nextItems = elementConfig.items.filter((_, idx) => idx !== itemIndex);
+    dispatch(updateElement(elementConfig.id, { items: nextItems }));
+    if (expandedItemIndex === itemIndex) {
+      setExpandedItemIndex(Math.max(0, itemIndex - 1));
+    }
+  };
+
+  const handleUpdateItemFeature = (itemIndex: number, featureIndex: number, value: string) => {
+    if (!elementConfig || !Array.isArray(elementConfig.items)) return;
+    const item = elementConfig.items[itemIndex] as Record<string, unknown>;
+    if (!item || !Array.isArray(item.features)) return;
+    const nextFeatures = [...item.features];
+    nextFeatures[featureIndex] = value;
+    handleUpdateItem(itemIndex, "features", nextFeatures);
+  };
+
+  const handleAddItemFeature = (itemIndex: number) => {
+    if (!elementConfig || !Array.isArray(elementConfig.items)) return;
+    const item = elementConfig.items[itemIndex] as Record<string, unknown>;
+    const currentFeatures = Array.isArray(item?.features) ? item.features : [];
+    handleUpdateItem(itemIndex, "features", [...currentFeatures, "New Feature Capability"]);
+  };
+
+  const handleRemoveItemFeature = (itemIndex: number, featureIndex: number) => {
+    if (!elementConfig || !Array.isArray(elementConfig.items)) return;
+    const item = elementConfig.items[itemIndex] as Record<string, unknown>;
+    if (!item || !Array.isArray(item.features)) return;
+    const nextFeatures = item.features.filter((_, fIdx) => fIdx !== featureIndex);
+    handleUpdateItem(itemIndex, "features", nextFeatures);
   };
 
   const handleStyleChange = (key: string, value: unknown) => {
@@ -509,24 +750,26 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
   };
 
   return (
-    <div className={`react-form-builder flex flex-col gap-3 w-full ${props.className || ""}`}>
+    <div className={`react-form-builder flex flex-col h-full max-h-full overflow-hidden w-full gap-2.5 ${props.className || ""}`}>
       {/* Top Navbar Component */}
-      <NavbarComponentWrapper
-        pageConfig={activePageConfig}
-        deviceType={deviceType}
-        onDeviceChange={setDeviceType}
-        isPreview={isPreview}
-        onTogglePreview={() => setIsPreview(!isPreview)}
-        calledFrom="builder"
-      />
+      <div className="shrink-0">
+        <NavbarComponentWrapper
+          pageConfig={activePageConfig}
+          deviceType={deviceType}
+          onDeviceChange={setDeviceType}
+          isPreview={isPreview}
+          onTogglePreview={() => setIsPreview(!isPreview)}
+          calledFrom="builder"
+        />
+      </div>
 
       {/* Main Studio Area */}
-      <div className="flex gap-3 items-start w-full relative">
+      <div className="flex-1 min-h-0 flex gap-2.5 items-stretch w-full overflow-hidden relative">
         {/* Left Drawer / Dock (Nexoraft Pro Suite) */}
         {!isPreview && (
-          <aside className="w-80 shrink-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm text-slate-800 dark:text-slate-100 flex flex-col sticky top-3 max-h-[calc(100vh-100px)] overflow-hidden">
+          <aside className="w-80 shrink-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm text-slate-800 dark:text-slate-100 flex flex-col h-full max-h-full overflow-hidden">
             {/* Tab Switcher Icons */}
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-2 py-1.5 bg-slate-50/60 dark:bg-slate-800/40">
+            <div className="shrink-0 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-2 py-1.5 bg-slate-50/60 dark:bg-slate-800/40">
               <button
                 type="button"
                 onClick={() => setActiveSidebarTab("blocks")}
@@ -578,7 +821,7 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
               <button
                 type="button"
                 onClick={() => setActiveSidebarTab("media")}
-                title="Media Assets"
+                title="Media Asset Manager"
                 className={`p-2 rounded-xl text-xs font-bold transition-all ${
                   activeSidebarTab === "media"
                     ? "bg-white dark:bg-slate-800 text-blue-600 shadow-xs"
@@ -629,10 +872,41 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
             </div>
 
             {/* Tab Body */}
-            <div className="p-4 overflow-y-auto flex-1 max-h-[calc(100vh-160px)]">
+            <div className="p-3.5 overflow-y-auto flex-1 min-h-0">
               {/* 1. Blocks Tab */}
               {activeSidebarTab === "blocks" && (
                 <div className="space-y-5">
+                  <div>
+                    <h3 className="text-xs font-extrabold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-2.5 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Nexoraft Pro Widgets</span>
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      {[
+                        { type: "FlipBoxSection", label: "3D Flip Box", icon: RefreshCw },
+                        { type: "PriceListSection", label: "Rate Card Menu", icon: BarChart3 },
+                        { type: "TableOfContentsSection", label: "Page Directory", icon: ListCollapse },
+                        { type: "AlertBoxSection", label: "Alert Notification", icon: AlertCircle },
+                        { type: "ShareButtonsSection", label: "Social Share", icon: Share2 },
+                        { type: "BentoGridSection", label: "Bento Grid", icon: LayoutGrid },
+                        { type: "TimelineSection", label: "Process Flow", icon: Milestone },
+                        { type: "CountdownSection", label: "Countdown Timer", icon: Clock },
+                        { type: "VideoSection", label: "Video Showcase", icon: Play },
+                        { type: "NewsletterSection", label: "Newsletter VIP", icon: Mail },
+                      ].map((item) => (
+                        <button
+                          key={item.type}
+                          type="button"
+                          onClick={() => handleInsertElement(item.type, item.label)}
+                          className="p-2.5 rounded-xl border border-blue-200/60 dark:border-blue-900/60 bg-blue-50/40 dark:bg-blue-950/30 hover:bg-blue-100/60 dark:hover:bg-blue-900/50 hover:border-blue-400 dark:hover:border-blue-600 flex flex-col items-center gap-1.5 transition-all text-slate-800 dark:text-slate-200 cursor-pointer text-center"
+                        >
+                          <item.icon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                          <span className="font-semibold text-[11px]">{item.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <div>
                     <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-2.5">
                       Marketing Sections
@@ -640,18 +914,13 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       {[
                         { type: "HeroSection", label: "Hero Banner", icon: Sparkles },
-                        { type: "BentoGridSection", label: "Bento Grid", icon: LayoutGrid },
                         { type: "FeatureGridSection", label: "Feature Grid", icon: Layout },
-                        { type: "TimelineSection", label: "Process Flow", icon: Milestone },
                         { type: "StatsSection", label: "Stats Counter", icon: BarChart3 },
                         { type: "TestimonialsSection", label: "Testimonials", icon: Star },
                         { type: "PricingSection", label: "Pricing Table", icon: Layout },
                         { type: "FAQSection", label: "FAQ Accordion", icon: HelpCircle },
-                        { type: "CountdownSection", label: "Countdown Timer", icon: Clock },
                         { type: "PostsGridSection", label: "Posts Loop", icon: BookOpen },
                         { type: "TeamSection", label: "Team Grid", icon: Users },
-                        { type: "VideoSection", label: "Video Showcase", icon: Play },
-                        { type: "NewsletterSection", label: "Newsletter VIP", icon: Mail },
                         { type: "LogoStripSection", label: "Logo Strip", icon: Building },
                         { type: "CallToActionSection", label: "Call to Action", icon: MousePointer },
                         { type: "ContactSection", label: "Contact Form", icon: Mail },
@@ -1153,17 +1422,17 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
         )}
 
         {/* Central Visual Canvas Area */}
-        <div className="flex-1 min-h-[calc(100vh-140px)] bg-slate-100/70 dark:bg-slate-950 p-2 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex justify-center overflow-auto transition-all">
-          <div className={`transition-all duration-300 min-h-[600px] overflow-hidden ${computeDeviceContainerWidth()}`}>
+        <div className="flex-1 min-h-0 h-full bg-slate-100/70 dark:bg-slate-950 p-2 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex justify-center overflow-y-auto overflow-x-hidden transition-all">
+          <div className={`transition-all duration-300 ${computeDeviceContainerWidth()}`}>
             <Preview rootId={activePageConfig?.rootElementId} isPreview={isPreview} />
           </div>
         </div>
 
         {/* Right Element Inspector Panel (Nexoraft Pro Suite) */}
         {!isPreview && showInspector && elementConfig && (
-          <aside className="w-80 shrink-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm text-slate-800 dark:text-slate-100 flex flex-col gap-4 sticky top-3 max-h-[calc(100vh-100px)] overflow-y-auto">
+          <aside className="w-84 shrink-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm text-slate-800 dark:text-slate-100 flex flex-col h-full max-h-full overflow-hidden">
             {/* Inspector Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="shrink-0 p-3.5 pb-2.5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <Sliders className="w-4 h-4 text-blue-600" />
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
@@ -1175,7 +1444,7 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                   type="button"
                   onClick={handleDuplicate}
                   title="Duplicate element"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   <Copy className="w-3.5 h-3.5" />
                 </button>
@@ -1183,49 +1452,53 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                   type="button"
                   onClick={handleDelete}
                   title="Delete element"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowInspector(false)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
 
-            {/* Element Identity Badge */}
-            <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 px-3 py-2 rounded-xl text-xs">
-              <span className="font-semibold text-slate-700 dark:text-slate-300">
-                {elementConfig.elementType || "Element"}
-              </span>
-              <code className="text-[10px] font-mono text-blue-500">
-                #{elementConfig.id.slice(-6)}
-              </code>
+            {/* Element Identity Badge & Tab Selector */}
+            <div className="shrink-0 px-3.5 pt-2.5 pb-2 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-2">
+              <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 rounded-xl text-xs">
+                <span className="font-semibold text-slate-700 dark:text-slate-300">
+                  {elementConfig.elementType || "Element"}
+                </span>
+                <code className="text-[10px] font-mono text-blue-500">
+                  #{elementConfig.id.slice(-6)}
+                </code>
+              </div>
+
+              {/* Inspector Tabs: Content | Style | Advanced */}
+              <div className="flex items-center text-xs">
+                {(["content", "style", "advanced"] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setInspectorTab(tab)}
+                    className={`flex-1 py-1.5 font-bold uppercase tracking-wider border-b-2 capitalize transition-colors cursor-pointer ${
+                      inspectorTab === tab
+                        ? "border-blue-600 text-blue-600"
+                        : "border-transparent text-slate-400 hover:text-slate-700"
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Inspector Tabs: Content | Style | Advanced */}
-            <div className="flex items-center border-b border-slate-100 dark:border-slate-800 text-xs">
-              {(["content", "style", "advanced"] as const).map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setInspectorTab(tab)}
-                  className={`flex-1 py-1.5 font-bold uppercase tracking-wider border-b-2 capitalize transition-colors ${
-                    inspectorTab === tab
-                      ? "border-blue-600 text-blue-600"
-                      : "border-transparent text-slate-400 hover:text-slate-700"
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-
-            {/* Inspector Tab 1: Content */}
+            {/* Scrollable Inspector Body */}
+            <div className="flex-1 min-h-0 overflow-y-auto p-3.5 space-y-4">
+              {/* Inspector Tab 1: Content */}
             {inspectorTab === "content" && (
               <div className="space-y-3.5 text-xs">
                 {elementConfig.badge !== undefined && (
@@ -1446,6 +1719,497 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                       onChange={(e) => handlePropertyChange("alt", e.target.value)}
                       className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500"
                     />
+                  </div>
+                )}
+
+                {/* Pro Component specific fields: AlertBox variant */}
+                {(elementConfig.elementType === "AlertBoxSection" || elementConfig.elementType === "AlertBox") && (
+                  <div>
+                    <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      Alert Notification Style
+                    </label>
+                    <select
+                      value={String(elementConfig.variant || "info")}
+                      onChange={(e) => handlePropertyChange("variant", e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="info">Information (Blue)</option>
+                      <option value="success">Success (Emerald)</option>
+                      <option value="warning">Warning Notice (Amber)</option>
+                      <option value="danger">Urgent / Danger (Red)</option>
+                    </select>
+                  </div>
+                )}
+
+                {/* Video Thumbnail */}
+                {elementConfig.thumbnail !== undefined && (
+                  <div>
+                    <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      Video Cover Thumbnail URL
+                    </label>
+                    <input
+                      type="text"
+                      value={String(elementConfig.thumbnail || "")}
+                      onChange={(e) => handlePropertyChange("thumbnail", e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                )}
+
+                {/* Social Share Buttons */}
+                {elementConfig.shareUrl !== undefined && (
+                  <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        URL to Share
+                      </label>
+                      <input
+                        type="text"
+                        value={String(elementConfig.shareUrl || "")}
+                        onChange={(e) => handlePropertyChange("shareUrl", e.target.value)}
+                        placeholder="https://yourwebsite.com"
+                        className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-mono"
+                      />
+                    </div>
+                    {elementConfig.shareText !== undefined && (
+                      <div>
+                        <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                          Share Message Preset
+                        </label>
+                        <input
+                          type="text"
+                          value={String(elementConfig.shareText || "")}
+                          onChange={(e) => handlePropertyChange("shareText", e.target.value)}
+                          className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Universal Dynamic Items Repeater Control */}
+                {elementConfig.items && Array.isArray(elementConfig.items) && (
+                  <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-extrabold text-[11px] uppercase tracking-wider text-slate-800 dark:text-slate-200 block">
+                          Repeater Items ({elementConfig.items.length})
+                        </span>
+                        <span className="text-[10px] text-slate-400">
+                          Live editable collection items
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleAddItem}
+                        className="px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/70 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-bold text-xs flex items-center gap-1 shadow-xs cursor-pointer transition-all"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Add Item</span>
+                      </button>
+                    </div>
+
+                    <div className="space-y-2">
+                      {elementConfig.items.map((item, itemIdx) => {
+                        const isExpanded = expandedItemIndex === itemIdx;
+                        const itemRecord = item as Record<string, unknown>;
+                        const itemTitle =
+                          itemRecord.title ||
+                          itemRecord.name ||
+                          itemRecord.frontTitle ||
+                          itemRecord.question ||
+                          itemRecord.label ||
+                          itemRecord.value ||
+                          `Item #${itemIdx + 1}`;
+
+                        return (
+                          <div
+                            key={itemIdx}
+                            className={`rounded-xl border transition-all ${
+                              isExpanded
+                                ? "border-blue-500/50 bg-blue-50/20 dark:bg-blue-950/20 shadow-xs"
+                                : "border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 hover:border-slate-300"
+                            }`}
+                          >
+                            {/* Item Title Bar */}
+                            <div className="p-2.5 flex items-center justify-between gap-2">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setExpandedItemIndex(isExpanded ? null : itemIdx)
+                                }
+                                className="flex items-center gap-2 text-left truncate flex-1 cursor-pointer font-semibold text-xs text-slate-800 dark:text-slate-200"
+                              >
+                                <div
+                                  className={`w-4 h-4 rounded flex items-center justify-center transition-transform ${
+                                    isExpanded ? "rotate-90 text-blue-600" : "text-slate-400"
+                                  }`}
+                                >
+                                  <ChevronRight className="w-3.5 h-3.5" />
+                                </div>
+                                <span className="truncate">{String(itemTitle)}</span>
+                              </button>
+
+                              <div className="flex items-center gap-1">
+                                {elementConfig.items && elementConfig.items.length > 1 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveItem(itemIdx)}
+                                    title="Delete this item"
+                                    className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors cursor-pointer"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Item Expanded Form */}
+                            {isExpanded && (
+                              <div className="p-3 pt-0 border-t border-slate-100 dark:border-slate-800/80 space-y-2.5 mt-1">
+                                {/* Title / Name / Question / Label */}
+                                {(itemRecord.title !== undefined ||
+                                  itemRecord.name !== undefined ||
+                                  itemRecord.frontTitle !== undefined ||
+                                  itemRecord.question !== undefined ||
+                                  itemRecord.label !== undefined) && (
+                                  <div>
+                                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">
+                                      {itemRecord.question !== undefined
+                                        ? "Question Title"
+                                        : itemRecord.name !== undefined
+                                        ? "Person / Brand Name"
+                                        : itemRecord.frontTitle !== undefined
+                                        ? "Front Title"
+                                        : "Item Title"}
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={String(
+                                        itemRecord.title ??
+                                          itemRecord.name ??
+                                          itemRecord.frontTitle ??
+                                          itemRecord.question ??
+                                          itemRecord.label ??
+                                          ""
+                                      )}
+                                      onChange={(e) => {
+                                        const key =
+                                          itemRecord.question !== undefined
+                                            ? "question"
+                                            : itemRecord.name !== undefined
+                                            ? "name"
+                                            : itemRecord.frontTitle !== undefined
+                                            ? "frontTitle"
+                                            : itemRecord.label !== undefined
+                                            ? "label"
+                                            : "title";
+                                        handleUpdateItem(itemIdx, key, e.target.value);
+                                      }}
+                                      className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:ring-1 focus:ring-blue-500"
+                                    />
+                                  </div>
+                                )}
+
+                                {/* Price & Period */}
+                                {itemRecord.price !== undefined && (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                      <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">
+                                        Price
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={String(itemRecord.price || "")}
+                                        onChange={(e) =>
+                                          handleUpdateItem(itemIdx, "price", e.target.value)
+                                        }
+                                        className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-mono font-bold"
+                                      />
+                                    </div>
+                                    {itemRecord.period !== undefined && (
+                                      <div>
+                                        <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">
+                                          Period
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={String(itemRecord.period || "")}
+                                          onChange={(e) =>
+                                            handleUpdateItem(itemIdx, "period", e.target.value)
+                                          }
+                                          className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* Description / Answer / Bio / Quote / Excerpt */}
+                                {(itemRecord.description !== undefined ||
+                                  itemRecord.answer !== undefined ||
+                                  itemRecord.bio !== undefined ||
+                                  itemRecord.quote !== undefined ||
+                                  itemRecord.excerpt !== undefined ||
+                                  itemRecord.frontDesc !== undefined) && (
+                                  <div>
+                                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">
+                                      {itemRecord.answer !== undefined
+                                        ? "Answer Text"
+                                        : itemRecord.quote !== undefined
+                                        ? "Testimonial Quote"
+                                        : itemRecord.bio !== undefined
+                                        ? "Bio Description"
+                                        : itemRecord.frontDesc !== undefined
+                                        ? "Front Description"
+                                        : "Description"}
+                                    </label>
+                                    <textarea
+                                      rows={2}
+                                      value={String(
+                                        itemRecord.description ??
+                                          itemRecord.answer ??
+                                          itemRecord.quote ??
+                                          itemRecord.bio ??
+                                          itemRecord.excerpt ??
+                                          itemRecord.frontDesc ??
+                                          ""
+                                      )}
+                                      onChange={(e) => {
+                                        const key =
+                                          itemRecord.answer !== undefined
+                                            ? "answer"
+                                            : itemRecord.quote !== undefined
+                                            ? "quote"
+                                            : itemRecord.bio !== undefined
+                                            ? "bio"
+                                            : itemRecord.excerpt !== undefined
+                                            ? "excerpt"
+                                            : itemRecord.frontDesc !== undefined
+                                            ? "frontDesc"
+                                            : "description";
+                                        handleUpdateItem(itemIdx, key, e.target.value);
+                                      }}
+                                      className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
+                                    />
+                                  </div>
+                                )}
+
+                                {/* FlipBox Back Title & Description */}
+                                {itemRecord.backTitle !== undefined && (
+                                  <div className="p-2 rounded-lg bg-blue-50/50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 space-y-2">
+                                    <span className="font-bold text-[10px] text-blue-600 dark:text-blue-400 uppercase tracking-wider block">
+                                      Flip Card Back Side
+                                    </span>
+                                    <div>
+                                      <label className="block text-[10px] text-slate-500 mb-0.5">
+                                        Back Title
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={String(itemRecord.backTitle || "")}
+                                        onChange={(e) =>
+                                          handleUpdateItem(itemIdx, "backTitle", e.target.value)
+                                        }
+                                        className="w-full px-2 py-1 rounded bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
+                                      />
+                                    </div>
+                                    {itemRecord.backDesc !== undefined && (
+                                      <div>
+                                        <label className="block text-[10px] text-slate-500 mb-0.5">
+                                          Back Description
+                                        </label>
+                                        <textarea
+                                          rows={2}
+                                          value={String(itemRecord.backDesc || "")}
+                                          onChange={(e) =>
+                                            handleUpdateItem(itemIdx, "backDesc", e.target.value)
+                                          }
+                                          className="w-full px-2 py-1 rounded bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* Features List Repeater (for Pricing Cards) */}
+                                {Array.isArray(itemRecord.features) && (
+                                  <div className="p-2.5 rounded-xl bg-slate-100/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
+                                    <div className="flex items-center justify-between">
+                                      <span className="font-bold text-[10px] uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                                        Feature Bullets ({itemRecord.features.length})
+                                      </span>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleAddItemFeature(itemIdx)}
+                                        className="text-[10px] font-bold text-blue-600 hover:text-blue-700 flex items-center gap-0.5 cursor-pointer"
+                                      >
+                                        <Plus className="w-3 h-3" />
+                                        <span>Add Bullet</span>
+                                      </button>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                      {itemRecord.features.map((feat, fIdx) => (
+                                        <div key={fIdx} className="flex items-center gap-1.5">
+                                          <input
+                                            type="text"
+                                            value={String(feat || "")}
+                                            onChange={(e) =>
+                                              handleUpdateItemFeature(itemIdx, fIdx, e.target.value)
+                                            }
+                                            className="flex-1 px-2 py-1 rounded bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
+                                          />
+                                          {Array.isArray(itemRecord.features) && itemRecord.features.length > 1 && (
+                                            <button
+                                              type="button"
+                                              onClick={() => handleRemoveItemFeature(itemIdx, fIdx)}
+                                              className="text-slate-400 hover:text-red-600 p-0.5 cursor-pointer"
+                                            >
+                                              <X className="w-3 h-3" />
+                                            </button>
+                                          )}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Button Text & URL */}
+                                {(itemRecord.buttonText !== undefined ||
+                                  itemRecord.href !== undefined ||
+                                  itemRecord.buttonHref !== undefined) && (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {itemRecord.buttonText !== undefined && (
+                                      <div>
+                                        <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">
+                                          Button Text
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={String(itemRecord.buttonText || "")}
+                                          onChange={(e) =>
+                                            handleUpdateItem(itemIdx, "buttonText", e.target.value)
+                                          }
+                                          className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
+                                        />
+                                      </div>
+                                    )}
+                                    {(itemRecord.href !== undefined ||
+                                      itemRecord.buttonHref !== undefined) && (
+                                      <div>
+                                        <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">
+                                          Link Target (href)
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={String(
+                                            itemRecord.buttonHref ?? itemRecord.href ?? ""
+                                          )}
+                                          onChange={(e) => {
+                                            const key =
+                                              itemRecord.buttonHref !== undefined
+                                                ? "buttonHref"
+                                                : "href";
+                                            handleUpdateItem(itemIdx, key, e.target.value);
+                                          }}
+                                          placeholder="#contact"
+                                          className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-mono"
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* Metric Stats value & label */}
+                                {itemRecord.value !== undefined && (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                      <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">
+                                        Stat Value
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={String(itemRecord.value || "")}
+                                        onChange={(e) =>
+                                          handleUpdateItem(itemIdx, "value", e.target.value)
+                                        }
+                                        className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-bold font-mono"
+                                      />
+                                    </div>
+                                    {itemRecord.change !== undefined && (
+                                      <div>
+                                        <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">
+                                          Trend Pill
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={String(itemRecord.change || "")}
+                                          onChange={(e) =>
+                                            handleUpdateItem(itemIdx, "change", e.target.value)
+                                          }
+                                          placeholder="+140%"
+                                          className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* Star Rating & Highlight Toggle */}
+                                <div className="flex items-center justify-between pt-1">
+                                  {itemRecord.rating !== undefined && (
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="text-[10px] font-bold text-slate-500 uppercase">
+                                        Rating:
+                                      </span>
+                                      <select
+                                        value={Number(itemRecord.rating || 5)}
+                                        onChange={(e) =>
+                                          handleUpdateItem(
+                                            itemIdx,
+                                            "rating",
+                                            parseInt(e.target.value, 10)
+                                          )
+                                        }
+                                        className="px-2 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
+                                      >
+                                        {[5, 4, 3, 2, 1].map((r) => (
+                                          <option key={r} value={r}>
+                                            {r} Stars
+                                          </option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                  )}
+
+                                  {(itemRecord.highlighted !== undefined ||
+                                    itemRecord.popular !== undefined) && (
+                                    <label className="flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-300">
+                                      <input
+                                        type="checkbox"
+                                        checked={Boolean(
+                                          itemRecord.highlighted || itemRecord.popular
+                                        )}
+                                        onChange={(e) => {
+                                          const key =
+                                            itemRecord.highlighted !== undefined
+                                              ? "highlighted"
+                                              : "popular";
+                                          handleUpdateItem(itemIdx, key, e.target.checked);
+                                        }}
+                                        className="w-3.5 h-3.5 rounded text-blue-600"
+                                      />
+                                      <span>Featured Plan</span>
+                                    </label>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
@@ -1710,6 +2474,7 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                 </div>
               </div>
             )}
+            </div>
           </aside>
         )}
       </div>
