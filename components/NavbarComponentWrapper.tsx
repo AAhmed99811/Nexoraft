@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
-import { PageConfig, DeviceType, WebsiteSite } from "./types";
+import { PageConfig, DeviceType, WebsiteSite, CustomBreakpoints } from "./types";
 import { useFormBuilderState } from "./context/FormBuilderContext";
 import Modal from "./ui/Modal";
 import ExportModal from "./ExportModal";
@@ -10,6 +10,8 @@ import {
   Monitor,
   Tablet,
   Smartphone,
+  Laptop,
+  Sliders,
   Download,
   Eye,
   EyeOff,
@@ -70,11 +72,18 @@ export const NavbarComponentWrapper: React.FC<NavbarComponentWrapperProps> = ({
     media,
     submissions,
     revisions,
+    breakpoints,
+    updateBreakpoints,
   } = useFormBuilderState();
 
-  const [activeDevice, setActiveDevice] = useState<DeviceType>(deviceType);
+  const [internalDevice, setInternalDevice] = useState<DeviceType>(deviceType);
+  const activeDevice = onDeviceChange ? deviceType : internalDevice;
   const [showExportModal, setShowExportModal] = useState(false);
   const [showPublishModal, setShowPublishModal] = useState(false);
+  const [showBreakpointsModal, setShowBreakpointsModal] = useState(false);
+  const [tempBreakpoints, setTempBreakpoints] = useState<CustomBreakpoints>(
+    breakpoints || { desktop: 1280, laptop: 1024, tablet: 768, mobile: 390, custom: 640 }
+  );
   const [publishSummary, setPublishSummary] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -82,7 +91,7 @@ export const NavbarComponentWrapper: React.FC<NavbarComponentWrapperProps> = ({
   const [showPageMenu, setShowPageMenu] = useState(false);
 
   const handleDeviceChange = (dev: DeviceType) => {
-    setActiveDevice(dev);
+    setInternalDevice(dev);
     onDeviceChange?.(dev);
   };
 
@@ -301,7 +310,7 @@ export const NavbarComponentWrapper: React.FC<NavbarComponentWrapperProps> = ({
             <button
               type="button"
               onClick={() => handleDeviceChange("desktop")}
-              title="Desktop View (1200px+)"
+              title={`Desktop View (${breakpoints?.desktop || 1280}px)`}
               className={`p-1.5 rounded-lg transition-all ${
                 activeDevice === "desktop"
                   ? "bg-white dark:bg-slate-700 text-blue-600 shadow-xs font-semibold"
@@ -312,8 +321,20 @@ export const NavbarComponentWrapper: React.FC<NavbarComponentWrapperProps> = ({
             </button>
             <button
               type="button"
+              onClick={() => handleDeviceChange("laptop")}
+              title={`Laptop View (${breakpoints?.laptop || 1024}px)`}
+              className={`p-1.5 rounded-lg transition-all ${
+                activeDevice === "laptop"
+                  ? "bg-white dark:bg-slate-700 text-blue-600 shadow-xs font-semibold"
+                  : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+              }`}
+            >
+              <Laptop className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
               onClick={() => handleDeviceChange("tablet")}
-              title="Tablet View (768px)"
+              title={`Tablet View (${breakpoints?.tablet || 768}px)`}
               className={`p-1.5 rounded-lg transition-all ${
                 activeDevice === "tablet"
                   ? "bg-white dark:bg-slate-700 text-blue-600 shadow-xs font-semibold"
@@ -325,7 +346,7 @@ export const NavbarComponentWrapper: React.FC<NavbarComponentWrapperProps> = ({
             <button
               type="button"
               onClick={() => handleDeviceChange("mobile")}
-              title="Mobile View (390px)"
+              title={`Mobile View (${breakpoints?.mobile || 390}px)`}
               className={`p-1.5 rounded-lg transition-all ${
                 activeDevice === "mobile"
                   ? "bg-white dark:bg-slate-700 text-blue-600 shadow-xs font-semibold"
@@ -333,6 +354,33 @@ export const NavbarComponentWrapper: React.FC<NavbarComponentWrapperProps> = ({
               }`}
             >
               <Smartphone className="w-4 h-4" />
+            </button>
+
+            <div className="h-3 w-px bg-slate-300 dark:bg-slate-700 mx-1" />
+
+            <button
+              type="button"
+              onClick={() => {
+                setTempBreakpoints(
+                  breakpoints || { desktop: 1280, laptop: 1024, tablet: 768, mobile: 390, custom: 640 }
+                );
+                setShowBreakpointsModal(true);
+              }}
+              title="Custom Breakpoints & Viewport Settings"
+              className="px-2 py-1 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-white dark:hover:bg-slate-700 transition-all flex items-center gap-1.5 text-xs"
+            >
+              <Sliders className="w-3.5 h-3.5 text-blue-600" />
+              <span className="text-[11px] font-mono font-medium hidden sm:inline">
+                {activeDevice === "desktop"
+                  ? `${breakpoints?.desktop || 1280}px`
+                  : activeDevice === "laptop"
+                  ? `${breakpoints?.laptop || 1024}px`
+                  : activeDevice === "tablet"
+                  ? `${breakpoints?.tablet || 768}px`
+                  : activeDevice === "mobile"
+                  ? `${breakpoints?.mobile || 390}px`
+                  : `${breakpoints?.custom || 640}px`}
+              </span>
             </button>
           </div>
         </div>
@@ -464,6 +512,155 @@ export const NavbarComponentWrapper: React.FC<NavbarComponentWrapperProps> = ({
           </div>
         </div>
       </Modal>
+
+      {/* Responsive Breakpoints Settings Modal */}
+      {showBreakpointsModal && (
+        <Modal
+          isOpen={showBreakpointsModal}
+          onClose={() => setShowBreakpointsModal(false)}
+          title="Responsive Breakpoint Configuration"
+        >
+          <div className="space-y-4 text-xs">
+            <p className="text-slate-500 dark:text-slate-400">
+              Customize the exact pixel widths for your responsive design breakpoints. The Nexoraft canvas and preview adapt immediately.
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                  <Monitor className="w-3.5 h-3.5 text-blue-600" /> Desktop (px)
+                </label>
+                <input
+                  type="number"
+                  value={tempBreakpoints.desktop}
+                  onChange={(e) =>
+                    setTempBreakpoints((prev) => ({
+                      ...prev,
+                      desktop: Number(e.target.value) || 1280,
+                    }))
+                  }
+                  className="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                  <Laptop className="w-3.5 h-3.5 text-indigo-600" /> Laptop (px)
+                </label>
+                <input
+                  type="number"
+                  value={tempBreakpoints.laptop}
+                  onChange={(e) =>
+                    setTempBreakpoints((prev) => ({
+                      ...prev,
+                      laptop: Number(e.target.value) || 1024,
+                    }))
+                  }
+                  className="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                  <Tablet className="w-3.5 h-3.5 text-purple-600" /> Tablet (px)
+                </label>
+                <input
+                  type="number"
+                  value={tempBreakpoints.tablet}
+                  onChange={(e) =>
+                    setTempBreakpoints((prev) => ({
+                      ...prev,
+                      tablet: Number(e.target.value) || 768,
+                    }))
+                  }
+                  className="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                  <Smartphone className="w-3.5 h-3.5 text-emerald-600" /> Mobile (px)
+                </label>
+                <input
+                  type="number"
+                  value={tempBreakpoints.mobile}
+                  onChange={(e) =>
+                    setTempBreakpoints((prev) => ({
+                      ...prev,
+                      mobile: Number(e.target.value) || 390,
+                    }))
+                  }
+                  className="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white"
+                />
+              </div>
+            </div>
+
+            <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-slate-700 dark:text-slate-300">
+                  Custom Viewport Test Width
+                </span>
+                <span className="font-mono text-blue-600 font-bold">
+                  {tempBreakpoints.custom || 640}px
+                </span>
+              </div>
+              <input
+                type="range"
+                min="320"
+                max="1920"
+                step="10"
+                value={tempBreakpoints.custom || 640}
+                onChange={(e) =>
+                  setTempBreakpoints((prev) => ({
+                    ...prev,
+                    custom: Number(e.target.value),
+                  }))
+                }
+                className="w-full accent-blue-600 cursor-pointer"
+              />
+              <div className="flex justify-between text-[10px] text-slate-400">
+                <span>320px (Mobile S)</span>
+                <span>768px (Tablet)</span>
+                <span>1024px (Laptop)</span>
+                <span>1920px (Full HD)</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => {
+                  setTempBreakpoints({
+                    desktop: 1280,
+                    laptop: 1024,
+                    tablet: 768,
+                    mobile: 390,
+                    custom: 640,
+                  });
+                }}
+                className="px-3 py-1.5 rounded-lg text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+              >
+                Reset Defaults
+              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowBreakpointsModal(false)}
+                  className="px-3 py-1.5 rounded-lg text-xs bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    updateBreakpoints(tempBreakpoints);
+                    setShowBreakpointsModal(false);
+                  }}
+                  className="px-4 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs"
+                >
+                  Apply Breakpoints
+                </button>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
 
       {/* Export Code Modal */}
       {showExportModal && (

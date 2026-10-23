@@ -58,6 +58,8 @@ import {
   AlertCircle,
   Share2,
   ListCollapse,
+  Database,
+  Code,
 } from "lucide-react";
 
 const { removeElement, updateElement, addElement } = elementSlice;
@@ -122,9 +124,18 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
     setActivePage,
     themeCode,
     secondaryColor,
+    accentColor,
+    backgroundColor,
+    surfaceColor,
+    textColor,
     fontFamily,
+    headingFont,
     borderRadius,
     updateTheme,
+    customVariables,
+    addCustomVariable,
+    removeCustomVariable,
+    breakpoints,
     posts,
     addPost,
     deletePost,
@@ -141,6 +152,9 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
     dispatch,
     setFocusedElement,
   } = useFormBuilderState();
+
+  const [newVarKey, setNewVarKey] = useState("");
+  const [newVarVal, setNewVarVal] = useState("");
 
   const [deviceType, setDeviceType] = useState<DeviceType>(
     props.deviceType || "desktop"
@@ -203,17 +217,72 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
           style: { padding: "32px", minHeight: "140px", backgroundColor: "#ffffff" },
         };
         break;
+      case "DynamicCardsGridSection":
+      case "DynamicCardsGrid":
+      case "DynamicCollectionGrid":
+        type = "DynamicCardsGridSection";
+        extraProps = {
+          badge: "⚡ LIVE DATABASE FEED",
+          title: "Dynamic Content Grid",
+          subtitle: "Directly bound to live Nexoraft CMS database collections with instant query filtering.",
+          dataSource: "posts",
+          columns: 3,
+          count: 6,
+          cardStyle: "modern",
+          containerWidth: "7xl",
+          enableSearch: false,
+        };
+        break;
+      case "FloatingPillNavbar":
+        type = "NavbarSection";
+        extraProps = {
+          title: websiteName || "Nexoraft",
+          subtitle: "Pro Studio",
+          buttonText: "Launch Studio",
+          layoutVariant: "floating-pill",
+          isSticky: true,
+          transparent: true,
+          containerWidth: "7xl",
+          items: [
+            { label: "Features", href: "#features" },
+            { label: "Collections", href: "#collections" },
+            { label: "Pricing", href: "#pricing" },
+            { label: "Docs", href: "/docs" },
+          ],
+        };
+        break;
       case "NavbarSection":
         extraProps = {
           title: websiteName || "Nexoraft",
           subtitle: "Digital Studio",
           buttonText: "Get Started Free",
+          layoutVariant: "standard",
+          isSticky: true,
+          transparent: true,
+          containerWidth: "7xl",
           items: [
             { label: "Features", href: "#features" },
             { label: "Pricing", href: "#pricing" },
             { label: "About", href: "/about" },
             { label: "Contact", href: "/contact" },
           ],
+        };
+        break;
+      case "SaaSSplitHero":
+        type = "HeroSection";
+        extraProps = {
+          badge: "✨ NEXT-GEN ARCHITECTURE",
+          title: "Ship Production Web Apps 10x Faster",
+          subtitle: "Visual design studio powering modern teams with live CMS records, responsive tokens, and zero-runtime lock-in.",
+          buttonText: "Start Building Free",
+          buttonSecondaryText: "Live Interactive Demo",
+          layoutVariant: "split-image-right",
+          bgVariant: "radial-glow",
+          heroHeight: "large",
+          heroImage: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80",
+          showSocialProof: true,
+          socialProofCount: "5,000+ engineers",
+          containerWidth: "7xl",
         };
         break;
       case "HeroSection":
@@ -224,6 +293,13 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
             "Design responsive layouts visually and export independent, production-grade Next.js 15 & React code.",
           buttonText: "Start Building Now",
           buttonSecondaryText: "View Documentation",
+          layoutVariant: "centered",
+          bgVariant: "radial-glow",
+          heroHeight: "large",
+          heroImage: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80",
+          showSocialProof: true,
+          socialProofCount: "4,200+ founders",
+          containerWidth: "7xl",
         };
         break;
       case "FeatureGridSection":
@@ -740,14 +816,70 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
     URL.revokeObjectURL(url);
   };
 
-  const computeDeviceContainerWidth = () => {
+  const deviceContainerConfig = useMemo<{
+    className: string;
+    style: React.CSSProperties;
+  }>(() => {
     if (deviceType === "mobile") {
-      return "max-w-[390px] mx-auto shadow-2xl rounded-3xl border-8 border-slate-800 bg-white dark:bg-slate-900";
+      const w = breakpoints?.mobile || 390;
+      return {
+        className:
+          "mx-auto shadow-2xl rounded-3xl border-8 border-slate-800 bg-white dark:bg-slate-900 transition-all duration-300",
+        style: { width: "100%", maxWidth: `${w}px` },
+      };
     } else if (deviceType === "tablet") {
-      return "max-w-[768px] mx-auto shadow-2xl rounded-2xl border-4 border-slate-700 bg-white dark:bg-slate-900";
+      const w = breakpoints?.tablet || 768;
+      return {
+        className:
+          "mx-auto shadow-2xl rounded-2xl border-4 border-slate-700 bg-white dark:bg-slate-900 transition-all duration-300",
+        style: { width: "100%", maxWidth: `${w}px` },
+      };
+    } else if (deviceType === "laptop") {
+      const w = breakpoints?.laptop || 1024;
+      return {
+        className:
+          "mx-auto shadow-xl rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 transition-all duration-300",
+        style: { width: "100%", maxWidth: `${w}px` },
+      };
+    } else if (deviceType === "custom") {
+      const w = breakpoints?.custom || 640;
+      return {
+        className:
+          "mx-auto shadow-xl rounded-xl border border-dashed border-blue-500/50 bg-white dark:bg-slate-900 transition-all duration-300",
+        style: { width: "100%", maxWidth: `${w}px` },
+      };
     }
-    return "w-full max-w-7xl mx-auto rounded-xl shadow-xs";
-  };
+    const w = breakpoints?.desktop || 1280;
+    return {
+      className: "w-full mx-auto rounded-xl shadow-xs transition-all duration-300",
+      style: { width: "100%", maxWidth: `${w}px` },
+    };
+  }, [deviceType, breakpoints]);
+
+  const canvasCustomStyles = useMemo<React.CSSProperties>(() => {
+    const cssVars: Record<string, string> = {
+      "--color-primary": themeCode || "#3b82f6",
+      "--color-secondary": secondaryColor || "#6366f1",
+      "--color-accent": accentColor || "#ec4899",
+      "--color-bg": backgroundColor || "#ffffff",
+      "--color-surface": surfaceColor || "#ffffff",
+      "--color-text": textColor || "#0f172a",
+      "--font-family": fontFamily || "Inter, sans-serif",
+      "--font-heading": headingFont || fontFamily || "Outfit, sans-serif",
+      ...(customVariables || {}),
+    };
+    return cssVars as unknown as React.CSSProperties;
+  }, [
+    themeCode,
+    secondaryColor,
+    accentColor,
+    backgroundColor,
+    surfaceColor,
+    textColor,
+    fontFamily,
+    headingFont,
+    customVariables,
+  ]);
 
   return (
     <div className={`react-form-builder flex flex-col h-full max-h-full overflow-hidden w-full gap-2.5 ${props.className || ""}`}>
@@ -907,24 +1039,67 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                     </div>
                   </div>
 
+                  {/* Dynamic Database Collections */}
+                  <div>
+                    <h3 className="text-xs font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-2.5 flex items-center gap-1.5">
+                      <Database className="w-3.5 h-3.5" />
+                      <span>Database Collections</span>
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      {[
+                        {
+                          type: "DynamicCardsGridSection",
+                          label: "CMS Cards Grid",
+                          icon: Database,
+                          desc: "Live DB Cards",
+                        },
+                        {
+                          type: "PostsGridSection",
+                          label: "Live Posts Loop",
+                          icon: BookOpen,
+                          desc: "Live Articles",
+                        },
+                        {
+                          type: "TeamSection",
+                          label: "Live Team Grid",
+                          icon: Users,
+                          desc: "Staff Directory",
+                        },
+                      ].map((item) => (
+                        <button
+                          key={item.type}
+                          type="button"
+                          onClick={() => handleInsertElement(item.type, item.label)}
+                          className="p-2.5 rounded-xl border border-emerald-200/60 dark:border-emerald-900/60 bg-emerald-50/40 dark:bg-emerald-950/30 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/50 hover:border-emerald-400 dark:hover:border-emerald-600 flex flex-col items-center gap-1.5 transition-all text-slate-800 dark:text-slate-200 cursor-pointer text-center"
+                        >
+                          <item.icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                          <span className="font-semibold text-[11px]">{item.label}</span>
+                          <span className="text-[9px] px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 rounded-full font-bold">
+                            {item.desc}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <div>
                     <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-2.5">
                       Marketing Sections
                     </h3>
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       {[
-                        { type: "HeroSection", label: "Hero Banner", icon: Sparkles },
+                        { type: "HeroSection", label: "Hero (Centered)", icon: Sparkles },
+                        { type: "SaaSSplitHero", label: "Hero (SaaS Split)", icon: Layout },
                         { type: "FeatureGridSection", label: "Feature Grid", icon: Layout },
                         { type: "StatsSection", label: "Stats Counter", icon: BarChart3 },
                         { type: "TestimonialsSection", label: "Testimonials", icon: Star },
                         { type: "PricingSection", label: "Pricing Table", icon: Layout },
                         { type: "FAQSection", label: "FAQ Accordion", icon: HelpCircle },
-                        { type: "PostsGridSection", label: "Posts Loop", icon: BookOpen },
-                        { type: "TeamSection", label: "Team Grid", icon: Users },
                         { type: "LogoStripSection", label: "Logo Strip", icon: Building },
                         { type: "CallToActionSection", label: "Call to Action", icon: MousePointer },
                         { type: "ContactSection", label: "Contact Form", icon: Mail },
                         { type: "NavbarSection", label: "Navbar Header", icon: PanelBottom },
+                        { type: "FloatingPillNavbar", label: "Floating Navbar", icon: PanelBottom },
                         { type: "FooterSection", label: "Site Footer", icon: PanelBottom },
                       ].map((item) => (
                         <button
@@ -1290,79 +1465,307 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
               {/* 7. Design System & Theme Tab */}
               {activeSidebarTab === "theme" && (
                 <div className="space-y-4 text-xs">
-                  <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
-                    Global Design Tokens
-                  </h3>
-
+                  {/* Curated Theme Presets */}
                   <div>
-                    <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Primary Brand Color
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="color"
-                        value={themeCode}
-                        onChange={(e) => updateTheme({ primaryColor: e.target.value })}
-                        className="w-8 h-8 rounded-lg cursor-pointer border border-slate-300"
-                      />
-                      <input
-                        type="text"
-                        value={themeCode}
-                        onChange={(e) => updateTheme({ primaryColor: e.target.value })}
-                        className="flex-1 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono text-xs uppercase"
-                      />
+                    <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
+                      <span>Curated Presets</span>
+                      <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                    </h3>
+                    <div className="grid grid-cols-1 gap-1.5">
+                      {[
+                        {
+                          name: "Midnight SaaS",
+                          primary: "#3b82f6",
+                          secondary: "#6366f1",
+                          accent: "#ec4899",
+                          bg: "#0b0f19",
+                          surface: "#111827",
+                          text: "#f8fafc",
+                          font: "Inter, sans-serif",
+                          heading: "Outfit, sans-serif",
+                          radius: "lg" as const,
+                          desc: "Deep navy glassmorphism for enterprise SaaS",
+                        },
+                        {
+                          name: "Cyber Emerald",
+                          primary: "#10b981",
+                          secondary: "#06b6d4",
+                          accent: "#f59e0b",
+                          bg: "#022c22",
+                          surface: "#064e3b",
+                          text: "#ecfdf5",
+                          font: "Plus Jakarta Sans, sans-serif",
+                          heading: "Space Grotesk, sans-serif",
+                          radius: "md" as const,
+                          desc: "High-contrast cyber tech and fintech palette",
+                        },
+                        {
+                          name: "Obsidian Gold",
+                          primary: "#f59e0b",
+                          secondary: "#d97706",
+                          accent: "#fbbf24",
+                          bg: "#18181b",
+                          surface: "#27272a",
+                          text: "#fffbeb",
+                          font: "Inter, sans-serif",
+                          heading: "Playfair Display, serif",
+                          radius: "sm" as const,
+                          desc: "Luxury editorial styling for high-ticket brands",
+                        },
+                        {
+                          name: "Sunset Velvet",
+                          primary: "#8b5cf6",
+                          secondary: "#ec4899",
+                          accent: "#f43f5e",
+                          bg: "#0f172a",
+                          surface: "#1e293b",
+                          text: "#f1f5f9",
+                          font: "Outfit, sans-serif",
+                          heading: "Outfit, sans-serif",
+                          radius: "full" as const,
+                          desc: "Vibrant neon gradients for creators & AI apps",
+                        },
+                        {
+                          name: "Clean Minimalist",
+                          primary: "#2563eb",
+                          secondary: "#4f46e5",
+                          accent: "#0ea5e9",
+                          bg: "#f8fafc",
+                          surface: "#ffffff",
+                          text: "#0f172a",
+                          font: "Inter, sans-serif",
+                          heading: "Inter, sans-serif",
+                          radius: "md" as const,
+                          desc: "Crisp white studio layout with clean contrast",
+                        },
+                      ].map((preset) => (
+                        <button
+                          key={preset.name}
+                          type="button"
+                          onClick={() => {
+                            updateTheme({
+                              primaryColor: preset.primary,
+                              secondaryColor: preset.secondary,
+                              accentColor: preset.accent,
+                              backgroundColor: preset.bg,
+                              surfaceColor: preset.surface,
+                              textColor: preset.text,
+                              fontFamily: preset.font,
+                              headingFont: preset.heading,
+                              borderRadius: preset.radius,
+                            });
+                          }}
+                          className="p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:border-blue-300 dark:hover:border-blue-700 flex items-center justify-between text-left transition-all cursor-pointer group"
+                        >
+                          <div>
+                            <span className="font-bold text-slate-800 dark:text-slate-200 text-xs block group-hover:text-blue-600">
+                              {preset.name}
+                            </span>
+                            <span className="text-[10px] text-slate-400">
+                              {preset.desc}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <div
+                              className="w-3.5 h-3.5 rounded-full border border-white/20 shadow-xs"
+                              style={{ backgroundColor: preset.primary }}
+                            />
+                            <div
+                              className="w-3.5 h-3.5 rounded-full border border-white/20 shadow-xs"
+                              style={{ backgroundColor: preset.secondary }}
+                            />
+                            <div
+                              className="w-3.5 h-3.5 rounded-full border border-white/20 shadow-xs"
+                              style={{ backgroundColor: preset.surface }}
+                            />
+                          </div>
+                        </button>
+                      ))}
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Secondary Color
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="color"
-                        value={secondaryColor}
-                        onChange={(e) => updateTheme({ secondaryColor: e.target.value })}
-                        className="w-8 h-8 rounded-lg cursor-pointer border border-slate-300"
-                      />
-                      <input
-                        type="text"
-                        value={secondaryColor}
-                        onChange={(e) => updateTheme({ secondaryColor: e.target.value })}
-                        className="flex-1 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono text-xs uppercase"
-                      />
+                  {/* Brand & Canvas Colors */}
+                  <div className="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-800">
+                    <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
+                      Color Palette Tokens
+                    </h3>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Primary Brand Color
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={themeCode || "#3b82f6"}
+                          onChange={(e) => updateTheme({ primaryColor: e.target.value })}
+                          className="w-7 h-7 rounded-lg cursor-pointer border border-slate-300"
+                        />
+                        <input
+                          type="text"
+                          value={themeCode || "#3b82f6"}
+                          onChange={(e) => updateTheme({ primaryColor: e.target.value })}
+                          className="flex-1 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono text-xs uppercase"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Secondary Color
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={secondaryColor || "#6366f1"}
+                          onChange={(e) => updateTheme({ secondaryColor: e.target.value })}
+                          className="w-7 h-7 rounded-lg cursor-pointer border border-slate-300"
+                        />
+                        <input
+                          type="text"
+                          value={secondaryColor || "#6366f1"}
+                          onChange={(e) => updateTheme({ secondaryColor: e.target.value })}
+                          className="flex-1 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono text-xs uppercase"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Accent Highlight Color
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={accentColor || "#ec4899"}
+                          onChange={(e) => updateTheme({ accentColor: e.target.value })}
+                          className="w-7 h-7 rounded-lg cursor-pointer border border-slate-300"
+                        />
+                        <input
+                          type="text"
+                          value={accentColor || "#ec4899"}
+                          onChange={(e) => updateTheme({ accentColor: e.target.value })}
+                          className="flex-1 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono text-xs uppercase"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                          Canvas Background
+                        </label>
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="color"
+                            value={backgroundColor || "#ffffff"}
+                            onChange={(e) => updateTheme({ backgroundColor: e.target.value })}
+                            className="w-6 h-6 rounded cursor-pointer border border-slate-300"
+                          />
+                          <input
+                            type="text"
+                            value={backgroundColor || "#ffffff"}
+                            onChange={(e) => updateTheme({ backgroundColor: e.target.value })}
+                            className="w-full px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono text-[11px]"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                          Card Surface
+                        </label>
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="color"
+                            value={surfaceColor || "#ffffff"}
+                            onChange={(e) => updateTheme({ surfaceColor: e.target.value })}
+                            className="w-6 h-6 rounded cursor-pointer border border-slate-300"
+                          />
+                          <input
+                            type="text"
+                            value={surfaceColor || "#ffffff"}
+                            onChange={(e) => updateTheme({ surfaceColor: e.target.value })}
+                            className="w-full px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono text-[11px]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Text &amp; Headline Color
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={textColor || "#0f172a"}
+                          onChange={(e) => updateTheme({ textColor: e.target.value })}
+                          className="w-7 h-7 rounded-lg cursor-pointer border border-slate-300"
+                        />
+                        <input
+                          type="text"
+                          value={textColor || "#0f172a"}
+                          onChange={(e) => updateTheme({ textColor: e.target.value })}
+                          className="flex-1 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono text-xs"
+                        />
+                      </div>
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Font Family
-                    </label>
-                    <select
-                      value={fontFamily}
-                      onChange={(e) => updateTheme({ fontFamily: e.target.value })}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                    >
-                      <option value="Inter, sans-serif">Inter (Clean Modern Sans)</option>
-                      <option value="Outfit, sans-serif">Outfit (Geometric Tech)</option>
-                      <option value="Plus Jakarta Sans, sans-serif">Plus Jakarta Sans</option>
-                      <option value="Space Grotesk, sans-serif">Space Grotesk (Neo-Brutalist)</option>
-                      <option value="Playfair Display, serif">Playfair Display (Editorial Serif)</option>
-                      <option value="Roboto, sans-serif">Roboto</option>
-                    </select>
+                  {/* Typography Tokens */}
+                  <div className="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-800">
+                    <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
+                      Typography Scale
+                    </h3>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Heading Font
+                      </label>
+                      <select
+                        value={headingFont || fontFamily}
+                        onChange={(e) => updateTheme({ headingFont: e.target.value })}
+                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                      >
+                        <option value="Outfit, sans-serif">Outfit (Geometric Tech)</option>
+                        <option value="Plus Jakarta Sans, sans-serif">Plus Jakarta Sans</option>
+                        <option value="Space Grotesk, sans-serif">Space Grotesk (Neo-Brutalist)</option>
+                        <option value="Playfair Display, serif">Playfair Display (Editorial Serif)</option>
+                        <option value="Inter, sans-serif">Inter (Clean Modern Sans)</option>
+                        <option value="Roboto, sans-serif">Roboto</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Body Font
+                      </label>
+                      <select
+                        value={fontFamily}
+                        onChange={(e) => updateTheme({ fontFamily: e.target.value })}
+                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                      >
+                        <option value="Inter, sans-serif">Inter (Clean Modern Sans)</option>
+                        <option value="Roboto, sans-serif">Roboto</option>
+                        <option value="Plus Jakarta Sans, sans-serif">Plus Jakarta Sans</option>
+                        <option value="Outfit, sans-serif">Outfit (Geometric Tech)</option>
+                      </select>
+                    </div>
                   </div>
 
-                  <div>
-                    <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  {/* Border Radius Tokens */}
+                  <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                    <label className="block font-semibold text-slate-700 dark:text-slate-300">
                       Border Radius Scale
                     </label>
-                    <div className="grid grid-cols-4 gap-1.5 text-center">
-                      {(["none", "sm", "md", "lg"] as const).map((rad) => (
+                    <div className="grid grid-cols-5 gap-1 text-center">
+                      {(["none", "sm", "md", "lg", "full"] as const).map((rad) => (
                         <button
                           key={rad}
                           type="button"
                           onClick={() => updateTheme({ borderRadius: rad })}
-                          className={`py-1.5 rounded-lg border text-xs font-semibold capitalize ${
+                          className={`py-1 rounded-lg border text-[11px] font-semibold capitalize ${
                             borderRadius === rad
                               ? "bg-blue-600 text-white border-blue-600"
                               : "border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -1370,6 +1773,90 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                         >
                           {rad}
                         </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Custom CSS Variables & Design Tokens Manager */}
+                  <div className="space-y-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <Code className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Custom CSS Variables</span>
+                      </h3>
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        {Object.keys(customVariables || {}).length} variables
+                      </span>
+                    </div>
+
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Define custom CSS tokens (e.g. <code className="font-mono text-blue-600">--brand-glow</code>) injected live across the canvas.
+                    </p>
+
+                    {/* Add New Variable Form */}
+                    <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
+                      <span className="font-bold text-[10px] text-slate-600 dark:text-slate-300 uppercase block">
+                        + Add Custom Variable
+                      </span>
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          type="text"
+                          value={newVarKey}
+                          onChange={(e) => setNewVarKey(e.target.value)}
+                          placeholder="--hero-glow"
+                          className="px-2 py-1 text-xs rounded bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-mono"
+                        />
+                        <input
+                          type="text"
+                          value={newVarVal}
+                          onChange={(e) => setNewVarVal(e.target.value)}
+                          placeholder="#3b82f640 or 20px"
+                          className="px-2 py-1 text-xs rounded bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-mono"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (newVarKey.trim() && newVarVal.trim()) {
+                            let key = newVarKey.trim();
+                            if (!key.startsWith("--")) key = `--${key}`;
+                            addCustomVariable(key, newVarVal.trim());
+                            setNewVarKey("");
+                            setNewVarVal("");
+                          }
+                        }}
+                        disabled={!newVarKey.trim() || !newVarVal.trim()}
+                        className="w-full py-1 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs flex items-center justify-center gap-1 cursor-pointer disabled:opacity-40"
+                      >
+                        <Plus className="w-3 h-3" />
+                        <span>Add Token</span>
+                      </button>
+                    </div>
+
+                    {/* Existing Variables List */}
+                    <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                      {Object.entries(customVariables || {}).map(([key, val]) => (
+                        <div
+                          key={key}
+                          className="p-2 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <span className="font-mono font-bold text-[11px] text-blue-600 dark:text-blue-400 block truncate">
+                              {key}
+                            </span>
+                            <span className="font-mono text-[10px] text-slate-500 truncate block">
+                              {val}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeCustomVariable(key)}
+                            title="Remove variable"
+                            className="p-1 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -1423,7 +1910,10 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
 
         {/* Central Visual Canvas Area */}
         <div className="flex-1 min-h-0 h-full bg-slate-100/70 dark:bg-slate-950 p-2 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex justify-center overflow-y-auto overflow-x-hidden transition-all">
-          <div className={`transition-all duration-300 ${computeDeviceContainerWidth()}`}>
+          <div
+            className={deviceContainerConfig.className}
+            style={{ ...deviceContainerConfig.style, ...canvasCustomStyles }}
+          >
             <Preview rootId={activePageConfig?.rootElementId} isPreview={isPreview} />
           </div>
         </div>
@@ -1784,6 +2274,293 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                         />
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* HeroSection Pro Design Controls */}
+                {elementConfig.elementType === "HeroSection" && (
+                  <div className="space-y-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+                    <h4 className="font-extrabold text-[11px] uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Hero Layout &amp; Atmosphere</span>
+                    </h4>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Hero Layout Variant
+                      </label>
+                      <select
+                        value={String(elementConfig.layoutVariant || "centered")}
+                        onChange={(e) => handlePropertyChange("layoutVariant", e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="centered">Centered Display (High-Impact Lead)</option>
+                        <option value="split-image-right">Split Right (Showcase Image on Right)</option>
+                        <option value="split-image-left">Split Left (Showcase Image on Left)</option>
+                        <option value="minimal-lead">Minimalist Lead (Clean Typographic)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Atmospheric Background
+                      </label>
+                      <select
+                        value={String(elementConfig.bgVariant || "radial-glow")}
+                        onChange={(e) => handlePropertyChange("bgVariant", e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="radial-glow">Radial Blue Glow Effect</option>
+                        <option value="mesh-gradient">Vibrant Mesh Gradient</option>
+                        <option value="dark-glass">Dark Glassmorphism Backdrop</option>
+                        <option value="pattern-grid">Engineering Tech Grid</option>
+                        <option value="solid">Clean Solid Background</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Hero Height Mode
+                      </label>
+                      <select
+                        value={String(elementConfig.heroHeight || "large")}
+                        onChange={(e) => handlePropertyChange("heroHeight", e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="screen">Full Screen Viewport (100vh)</option>
+                        <option value="large">Spacious (Min 80vh)</option>
+                        <option value="medium">Balanced (Min 65vh)</option>
+                        <option value="compact">Compact Banner (Min 45vh)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Showcase Media Image URL
+                      </label>
+                      <input
+                        type="text"
+                        value={String(elementConfig.heroImage || "")}
+                        onChange={(e) => handlePropertyChange("heroImage", e.target.value)}
+                        placeholder="https://images.unsplash.com/..."
+                        className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                      <span className="font-semibold text-xs text-slate-700 dark:text-slate-300">
+                        Social Proof Avatar Cluster
+                      </span>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(elementConfig.showSocialProof ?? true)}
+                        onChange={(e) => handlePropertyChange("showSocialProof", e.target.checked)}
+                        className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    {Boolean(elementConfig.showSocialProof ?? true) && (
+                      <div>
+                        <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                          Social Proof Label
+                        </label>
+                        <input
+                          type="text"
+                          value={String(elementConfig.socialProofCount || "4,200+ founders")}
+                          onChange={(e) => handlePropertyChange("socialProofCount", e.target.value)}
+                          placeholder="e.g. 4,200+ founders"
+                          className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* NavbarSection Pro Controls */}
+                {elementConfig.elementType === "NavbarSection" && (
+                  <div className="space-y-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+                    <h4 className="font-extrabold text-[11px] uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
+                      <PanelBottom className="w-3.5 h-3.5" />
+                      <span>Navbar Design &amp; Behavior</span>
+                    </h4>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Navbar Style Layout
+                      </label>
+                      <select
+                        value={String(elementConfig.layoutVariant || "standard")}
+                        onChange={(e) => handlePropertyChange("layoutVariant", e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="standard">Standard Full-Width Header</option>
+                        <option value="floating-pill">Modern Floating Glass Pill</option>
+                        <option value="split-minimal">Split Minimalist Header</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Brand Logo Image URL (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={String(elementConfig.logoUrl || "")}
+                        onChange={(e) => handlePropertyChange("logoUrl", e.target.value)}
+                        placeholder="https://... logo.png (Leave blank for text logo)"
+                        className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                        <span className="font-semibold text-xs text-slate-700 dark:text-slate-300">Sticky</span>
+                        <input
+                          type="checkbox"
+                          checked={Boolean(elementConfig.isSticky ?? true)}
+                          onChange={(e) => handlePropertyChange("isSticky", e.target.checked)}
+                          className="w-4 h-4 rounded text-blue-600"
+                        />
+                      </div>
+                      <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                        <span className="font-semibold text-xs text-slate-700 dark:text-slate-300">Glass Blur</span>
+                        <input
+                          type="checkbox"
+                          checked={Boolean(elementConfig.transparent ?? true)}
+                          onChange={(e) => handlePropertyChange("transparent", e.target.checked)}
+                          className="w-4 h-4 rounded text-blue-600"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* DynamicCardsGridSection Controls */}
+                {(elementConfig.elementType === "DynamicCardsGridSection" ||
+                  elementConfig.elementType === "DynamicCardsGrid" ||
+                  elementConfig.elementType === "DynamicCollectionGrid") && (
+                  <div className="space-y-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+                    <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-[11px] text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
+                      <Database className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Connected directly to live database records with zero static hardcoding.</span>
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Database Data Source
+                      </label>
+                      <select
+                        value={String(elementConfig.dataSource || "posts")}
+                        onChange={(e) => handlePropertyChange("dataSource", e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:ring-2 focus:ring-emerald-500"
+                      >
+                        <option value="posts">Live Nexoraft Blog Posts ({posts.length} records)</option>
+                        <option value="team">Live Nexoraft Team Members</option>
+                        <option value="leads">Live Captured Inquiries ({submissions.length} records)</option>
+                        <option value="api">External REST API Endpoint (Custom JSON)</option>
+                      </select>
+                    </div>
+
+                    {elementConfig.dataSource === "api" && (
+                      <div className="space-y-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
+                        <div>
+                          <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                            API Endpoint URL
+                          </label>
+                          <input
+                            type="text"
+                            value={String(elementConfig.apiUrl || "")}
+                            onChange={(e) => handlePropertyChange("apiUrl", e.target.value)}
+                            placeholder="https://api.example.com/v1/items"
+                            className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-mono"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                            Data Array JSON Key Path
+                          </label>
+                          <input
+                            type="text"
+                            value={String(elementConfig.apiDataPath || "")}
+                            onChange={(e) => handlePropertyChange("apiDataPath", e.target.value)}
+                            placeholder="e.g. data or results (empty for root array)"
+                            className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-mono"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                          Grid Columns
+                        </label>
+                        <select
+                          value={Number(elementConfig.columns || 3)}
+                          onChange={(e) => handlePropertyChange("columns", Number(e.target.value))}
+                          className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
+                        >
+                          <option value={1}>1 Single Column</option>
+                          <option value={2}>2 Columns</option>
+                          <option value={3}>3 Columns (Standard)</option>
+                          <option value={4}>4 Columns (Dense)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                          Max Item Limit
+                        </label>
+                        <input
+                          type="number"
+                          min={1}
+                          max={48}
+                          value={Number(elementConfig.count || 6)}
+                          onChange={(e) => handlePropertyChange("count", Number(e.target.value))}
+                          className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Card Presentation Style
+                      </label>
+                      <select
+                        value={String(elementConfig.cardStyle || "modern")}
+                        onChange={(e) => handlePropertyChange("cardStyle", e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
+                      >
+                        <option value="modern">Modern Glass Card with Subtle Border</option>
+                        <option value="minimal">Clean Minimalist Outline</option>
+                        <option value="elevated">Elevated Floating Card (Deep Shadow)</option>
+                        <option value="compact">Compact Row View</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Filter by Category (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={String(elementConfig.filterCategory || "")}
+                        onChange={(e) => handlePropertyChange("filterCategory", e.target.value)}
+                        placeholder="e.g. Design, Engineering, Product..."
+                        className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                      <span className="font-semibold text-xs text-slate-700 dark:text-slate-300">
+                        Interactive Search Bar
+                      </span>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(elementConfig.enableSearch ?? false)}
+                        onChange={(e) => handlePropertyChange("enableSearch", e.target.checked)}
+                        className="w-4 h-4 rounded text-emerald-600"
+                      />
+                    </div>
                   </div>
                 )}
 
@@ -2218,6 +2995,51 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
             {/* Inspector Tab 2: Style */}
             {inspectorTab === "style" && (
               <div className="space-y-3.5 text-xs">
+                {/* Responsive Container Max-Width */}
+                <div className="p-2.5 rounded-xl bg-blue-50/50 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-900/60 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block font-bold text-slate-800 dark:text-slate-200 text-xs">
+                      Container Max-Width (Sizing)
+                    </label>
+                    <span className="text-[10px] font-mono text-blue-600 font-semibold">
+                      {String(elementConfig.containerWidth || "7xl")}
+                    </span>
+                  </div>
+                  <select
+                    value={String(elementConfig.containerWidth || "7xl")}
+                    onChange={(e) => handlePropertyChange("containerWidth", e.target.value)}
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-medium"
+                  >
+                    <option value="full">Full Bleed (100% Edge-to-Edge)</option>
+                    <option value="7xl">Standard Layout (7xl / 80rem / 1280px)</option>
+                    <option value="5xl">Medium Content (5xl / 64rem / 1024px)</option>
+                    <option value="3xl">Narrow Focus (3xl / 48rem / 768px)</option>
+                    <option value="xl">Compact Card Island (xl / 36rem / 576px)</option>
+                  </select>
+                </div>
+
+                {/* Section Grid Columns */}
+                <div>
+                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Grid Columns
+                  </label>
+                  <div className="grid grid-cols-4 gap-1.5 text-center">
+                    {[1, 2, 3, 4].map((col) => (
+                      <button
+                        key={col}
+                        type="button"
+                        onClick={() => handlePropertyChange("columns", col)}
+                        className={`py-1.5 rounded-lg border text-xs font-semibold ${
+                          Number(elementConfig.columns || 3) === col
+                            ? "bg-blue-600 text-white border-blue-600"
+                            : "border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+                        }`}
+                      >
+                        {col} Col
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 {/* Background Color */}
                 <div>
                   <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">

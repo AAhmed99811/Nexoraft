@@ -1,9 +1,10 @@
 "use client";
 
-import React, { ComponentType, useState } from "react";
+import React, { ComponentType, useState, useEffect } from "react";
 import Container from "./Container";
 import withDrop from "./hoc/withDragAndDrop";
 import withEditable from "./hoc/withEditable";
+import { useFormBuilderState } from "./context/FormBuilderContext";
 import {
   Sparkles,
   ArrowRight,
@@ -28,6 +29,7 @@ import {
   ListCollapse,
   RefreshCw,
   X,
+  Database,
 } from "lucide-react";
 
 export interface BaseElementProps {
@@ -149,17 +151,29 @@ const ImageComponent: React.FC<
 );
 
 // 6. Navbar Section
-const NavbarSectionComponent: React.FC<
-  BaseElementProps & {
-    title?: string;
-    subtitle?: string;
-    buttonText?: string;
-    items?: Array<{ label?: string; href?: string }>;
-  }
-> = ({
+export interface NavbarSectionProps extends BaseElementProps {
+  title?: string;
+  subtitle?: string;
+  buttonText?: string;
+  buttonHref?: string;
+  brandType?: "text" | "logo" | "both";
+  logoUrl?: string;
+  navbarLayout?: "standard" | "floating-pill" | "split-minimal" | "stacked-center";
+  isSticky?: boolean;
+  isTransparent?: boolean;
+  items?: Array<{ label?: string; href?: string; target?: string }>;
+}
+
+const NavbarSectionComponent: React.FC<NavbarSectionProps> = ({
   title = "Nexoraft",
   subtitle,
   buttonText = "Get Started",
+  buttonHref = "#contact",
+  brandType = "both",
+  logoUrl,
+  navbarLayout = "standard",
+  isSticky = true,
+  isTransparent = false,
   items = [
     { label: "Features", href: "#features" },
     { label: "Pricing", href: "#pricing" },
@@ -168,109 +182,322 @@ const NavbarSectionComponent: React.FC<
   ],
   style,
   className = "",
-}) => (
-  <header
-    style={style}
-    className={`w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 py-3.5 px-4 sm:px-8 transition-colors ${className}`}
-  >
-    <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-      <div className="flex items-center gap-2.5">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-base shadow-sm">
-          {title.charAt(0) || "N"}
+}) => {
+  const stickyClass = isSticky ? "sticky top-0 z-40" : "relative";
+  const bgClass = isTransparent
+    ? "bg-transparent backdrop-blur-md"
+    : "bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800";
+
+  // Floating Pill Layout Variant
+  if (navbarLayout === "floating-pill") {
+    return (
+      <header
+        style={style}
+        className={`w-full py-3 px-4 ${stickyClass} ${className}`}
+      >
+        <div className="max-w-5xl mx-auto px-5 py-2.5 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-900/5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5">
+            {logoUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={logoUrl}
+                alt={title}
+                className="h-7 w-auto object-contain rounded-lg"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-xs">
+                {title.charAt(0) || "N"}
+              </div>
+            )}
+            {brandType !== "logo" && (
+              <span className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">
+                {title}
+              </span>
+            )}
+          </div>
+
+          <nav className="hidden md:flex items-center gap-5 text-xs font-semibold text-slate-600 dark:text-slate-300">
+            {items.map((it, idx) => (
+              <a
+                key={idx}
+                href={it.href || "#"}
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              >
+                {it.label || "Link"}
+              </a>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-2">
+            {buttonText && (
+              <a
+                href={buttonHref || "#"}
+                className="px-4 py-1.5 rounded-full text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-all"
+              >
+                {buttonText}
+              </a>
+            )}
+          </div>
         </div>
-        <div>
-          <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-            {title}
-          </span>
-          {subtitle && (
-            <span className="hidden sm:inline-block text-xs text-slate-400 dark:text-slate-500 ml-2 font-normal">
-              {subtitle}
-            </span>
+      </header>
+    );
+  }
+
+  // Standard Header Layout Variant
+  return (
+    <header
+      style={style}
+      className={`w-full ${bgClass} py-3.5 px-4 sm:px-8 transition-colors ${stickyClass} ${className}`}
+    >
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2.5">
+          {logoUrl ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={logoUrl}
+              alt={title}
+              className="h-8 w-auto object-contain rounded-lg"
+            />
+          ) : (
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-base shadow-sm">
+              {title.charAt(0) || "N"}
+            </div>
+          )}
+          {brandType !== "logo" && (
+            <div>
+              <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                {title}
+              </span>
+              {subtitle && (
+                <span className="hidden sm:inline-block text-xs text-slate-400 dark:text-slate-500 ml-2 font-normal">
+                  {subtitle}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+
+        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
+          {items.map((it, idx) => (
+            <a
+              key={idx}
+              href={it.href || "#"}
+              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >
+              {it.label || "Link"}
+            </a>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-3">
+          {buttonText && (
+            <a
+              href={buttonHref || "#"}
+              className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all"
+            >
+              {buttonText}
+            </a>
           )}
         </div>
       </div>
-
-      <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
-        {items.map((it, idx) => (
-          <span
-            key={idx}
-            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
-          >
-            {it.label || "Link"}
-          </span>
-        ))}
-      </nav>
-
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all cursor-pointer"
-        >
-          {buttonText}
-        </button>
-      </div>
-    </div>
-  </header>
-);
+    </header>
+  );
+};
 
 // 7. Hero Section
-const HeroSectionComponent: React.FC<
-  BaseElementProps & {
-    badge?: string;
-    title?: string;
-    subtitle?: string;
-    buttonText?: string;
-    buttonSecondaryText?: string;
-  }
-> = ({
+export interface HeroSectionProps extends BaseElementProps {
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  buttonText?: string;
+  buttonSecondaryText?: string;
+  heroLayout?: "centered" | "split-image-right" | "split-image-left" | "minimal-lead" | "video-showcase";
+  bgVariant?: "radial-glow" | "mesh-gradient" | "dark-glass" | "solid" | "pattern-grid";
+  heroHeight?: "screen" | "large" | "medium" | "compact";
+  containerWidth?: "full" | "7xl" | "5xl" | "3xl" | "custom";
+  showSocialProof?: boolean;
+  socialProofText?: string;
+  src?: string;
+  alt?: string;
+}
+
+const HeroSectionComponent: React.FC<HeroSectionProps> = ({
   badge = "✨ NEXORAFT PRO VISUAL CRAFT",
   title = "Design Visually. Own Your Code. Ship Anywhere.",
   subtitle = "The modern visual website canvas engineered for high conversion, responsive fidelity, and instant Next.js & React project export with zero lock-in.",
   buttonText = "Start Free Project",
   buttonSecondaryText = "Explore Docs",
+  heroLayout = "centered",
+  bgVariant = "solid",
+  heroHeight = "compact",
+  containerWidth = "7xl",
+  showSocialProof = true,
+  socialProofText = "Joined by 10,000+ engineers & design teams",
+  src = "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80",
+  alt = "App dashboard preview",
   style,
   className = "",
-}) => (
-  <section
-    style={style}
-    className={`relative py-16 sm:py-24 px-4 sm:px-8 bg-gradient-to-b from-blue-50/60 via-white to-white dark:from-slate-900 dark:via-slate-950 dark:to-slate-950 border-b border-slate-100 dark:border-slate-800/80 ${className}`}
-  >
-    <div className="max-w-5xl mx-auto text-center flex flex-col items-center">
-      {badge && (
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 mb-6 border border-blue-200 dark:border-blue-800">
-          <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-          <span>{badge}</span>
+}) => {
+  // Height classes
+  const heightClass = {
+    screen: "min-h-[calc(100vh-80px)] flex flex-col justify-center",
+    large: "min-h-[720px] flex flex-col justify-center",
+    medium: "min-h-[540px] flex flex-col justify-center",
+    compact: "py-16 sm:py-24",
+  }[heroHeight || "compact"];
+
+  // Background classes
+  const bgClass = {
+    "radial-glow": "bg-slate-950 text-white [background:radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(59,130,246,0.3),rgba(255,255,255,0))]",
+    "mesh-gradient": "bg-gradient-to-tr from-slate-950 via-indigo-950 to-slate-900 text-white",
+    "dark-glass": "bg-slate-950 text-white border-b border-slate-800",
+    "pattern-grid": "bg-slate-950 text-white bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:24px_24px]",
+    solid: "bg-gradient-to-b from-blue-50/60 via-white to-white dark:from-slate-900 dark:via-slate-950 dark:to-slate-950 border-b border-slate-100 dark:border-slate-800/80",
+  }[bgVariant || "solid"];
+
+  // Max width container classes
+  const maxWClass = {
+    full: "w-full",
+    "7xl": "max-w-7xl mx-auto",
+    "5xl": "max-w-5xl mx-auto",
+    "3xl": "max-w-3xl mx-auto",
+    custom: "max-w-7xl mx-auto",
+  }[containerWidth || "7xl"];
+
+  const socialProofBlock = showSocialProof && (
+    <div className="mt-8 flex items-center gap-3">
+      <div className="flex -space-x-2">
+        {["M", "S", "E", "A"].map((char, i) => (
+          <div
+            key={i}
+            className="w-7 h-7 rounded-full bg-blue-600 text-white border-2 border-white dark:border-slate-900 flex items-center justify-center text-[10px] font-bold shadow-xs"
+          >
+            {char}
+          </div>
+        ))}
+      </div>
+      <div className="flex items-center gap-1 text-amber-400">
+        {[...Array(5)].map((_, i) => (
+          <Star key={i} className="w-3.5 h-3.5 fill-amber-400" />
+        ))}
+      </div>
+      <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+        {socialProofText}
+      </span>
+    </div>
+  );
+
+  // Split Image Layout (Right or Left)
+  if (heroLayout === "split-image-right" || heroLayout === "split-image-left") {
+    const isImageLeft = heroLayout === "split-image-left";
+    return (
+      <section style={style} className={`relative px-4 sm:px-8 ${bgClass} ${heightClass} ${className}`}>
+        <div className={`${maxWClass} grid grid-cols-1 lg:grid-cols-12 gap-12 items-center`}>
+          {/* Content Column */}
+          <div className={`lg:col-span-7 flex flex-col items-start ${isImageLeft ? "lg:order-2" : "lg:order-1"}`}>
+            {badge && (
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 mb-6 border border-blue-200 dark:border-blue-800">
+                <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                <span>{badge}</span>
+              </div>
+            )}
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.15]">
+              {title}
+            </h1>
+            <p className="mt-5 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-xl leading-relaxed">
+              {subtitle}
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-3.5">
+              <button
+                type="button"
+                className="px-7 py-3.5 rounded-xl font-bold text-sm bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25 transition-all inline-flex items-center gap-2 cursor-pointer"
+              >
+                <span>{buttonText}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              {buttonSecondaryText && (
+                <button
+                  type="button"
+                  className="px-7 py-3.5 rounded-xl font-bold text-sm bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 transition-all cursor-pointer"
+                >
+                  {buttonSecondaryText}
+                </button>
+              )}
+            </div>
+            {socialProofBlock}
+          </div>
+
+          {/* Image Mockup Column */}
+          <div className={`lg:col-span-5 relative ${isImageLeft ? "lg:order-1" : "lg:order-2"}`}>
+            <div className="relative rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-2xl group">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={src}
+                alt={alt}
+                className="w-full h-auto object-cover max-h-[460px] group-hover:scale-102 transition-transform duration-700"
+              />
+              <div className="absolute bottom-4 left-4 right-4 p-4 rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 shadow-lg flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest block">Architecture</span>
+                  <span className="text-xs font-bold text-slate-900 dark:text-white">Next.js 15 App Router</span>
+                </div>
+                <div className="px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 text-xs font-bold flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>100/100 Core Vitals</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
+      </section>
+    );
+  }
 
-      <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.15] max-w-4xl">
-        {title}
-      </h1>
+  // Centered Layout
+  return (
+    <section
+      style={style}
+      className={`relative px-4 sm:px-8 ${bgClass} ${heightClass} ${className}`}
+    >
+      <div className={`${maxWClass} text-center flex flex-col items-center`}>
+        {badge && (
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 mb-6 border border-blue-200 dark:border-blue-800">
+            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+            <span>{badge}</span>
+          </div>
+        )}
 
-      <p className="mt-6 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
-        {subtitle}
-      </p>
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.15] max-w-4xl">
+          {title}
+        </h1>
 
-      <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5">
-        <button
-          type="button"
-          className="px-6 sm:px-8 py-3 rounded-xl font-semibold text-sm bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25 transition-all inline-flex items-center gap-2 cursor-pointer"
-        >
-          <span>{buttonText}</span>
-          <ArrowRight className="w-4 h-4" />
-        </button>
-        {buttonSecondaryText && (
+        <p className="mt-6 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
+          {subtitle}
+        </p>
+
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5">
           <button
             type="button"
-            className="px-6 sm:px-8 py-3 rounded-xl font-semibold text-sm bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 transition-all cursor-pointer"
+            className="px-6 sm:px-8 py-3 rounded-xl font-semibold text-sm bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25 transition-all inline-flex items-center gap-2 cursor-pointer"
           >
-            {buttonSecondaryText}
+            <span>{buttonText}</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
-        )}
+          {buttonSecondaryText && (
+            <button
+              type="button"
+              className="px-6 sm:px-8 py-3 rounded-xl font-semibold text-sm bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 transition-all cursor-pointer"
+            >
+              {buttonSecondaryText}
+            </button>
+          )}
+        </div>
+
+        {socialProofBlock}
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 // 8. Feature Grid Section
 const FeatureGridSectionComponent: React.FC<
@@ -1171,6 +1398,322 @@ const PostsGridSectionComponent: React.FC<
                 </span>
               </div>
             </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// 14c2. Nexoraft Pro Database-Driven Dynamic Collection Grid
+export interface DynamicCardsGridProps extends BaseElementProps {
+  title?: string;
+  subtitle?: string;
+  badge?: string;
+  dataSource?: "posts" | "team" | "leads" | "static" | "api";
+  dataCount?: number;
+  dataCategory?: string;
+  apiUrl?: string;
+  columns?: 1 | 2 | 3 | 4 | number;
+  cardStyle?: "elevated" | "bordered" | "glass" | "gradient-rim";
+  containerWidth?: "full" | "7xl" | "5xl" | "3xl";
+  items?: Array<Record<string, unknown>>;
+}
+
+const DynamicCardsGridSectionComponent: React.FC<DynamicCardsGridProps> = ({
+  title = "Dynamic Database Content Hub",
+  subtitle = "Live data queried directly from your site database, CMS collections, or external API.",
+  badge = "✦ DATABASE-DRIVEN CARDS",
+  dataSource = "posts",
+  dataCount = 6,
+  dataCategory = "All",
+  apiUrl = "",
+  columns = 3,
+  cardStyle = "elevated",
+  containerWidth = "7xl",
+  items,
+  style,
+  className = "",
+}) => {
+  const { posts = [], submissions = [] } = useFormBuilderState();
+  const [activeCategory] = useState(dataCategory || "All");
+  const [apiData, setApiData] = useState<Array<Record<string, unknown>>>([]);
+
+  useEffect(() => {
+    if (dataSource === "api" && apiUrl) {
+      fetch(apiUrl)
+        .then((res) => res.json())
+        .then((data) => {
+          if (Array.isArray(data)) {
+            setApiData(data.slice(0, Number(dataCount) || 6));
+          } else if (data && Array.isArray((data as { items?: unknown[] }).items)) {
+            setApiData(
+              (data as { items: Array<Record<string, unknown>> }).items.slice(
+                0,
+                Number(dataCount) || 6
+              )
+            );
+          }
+        })
+        .catch(() => {});
+    }
+  }, [dataSource, apiUrl, dataCount]);
+
+  let records: Array<Record<string, unknown>> = [];
+
+  if (dataSource === "posts") {
+    const sourcePosts =
+      posts.length > 0
+        ? posts
+        : [
+            {
+              id: "p1",
+              title: "Scaling Next.js 15 Architectures for Modern SaaS",
+              excerpt:
+                "Best practices for server actions, partial prerendering, and caching at scale.",
+              author: "Alex Morgan",
+              category: "Engineering",
+              publishedAt: 1761100000000,
+              featuredImage:
+                "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
+            },
+            {
+              id: "p2",
+              title: "Design Tokens & Portable CSS Variables in Visual Builders",
+              excerpt:
+                "How modern visual tools empower designers without sacrificing code cleanlines.",
+              author: "Sarah Chen",
+              category: "Design",
+              publishedAt: 1761013600000,
+              featuredImage:
+                "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80",
+            },
+            {
+              id: "p3",
+              title: "Zero-Lock-In Visual Engineering: The Nexoraft Paradigm",
+              excerpt:
+                "Own every line of TypeScript and Tailwind CSS with 1-click App Router export.",
+              author: "Marcus Miller",
+              category: "Product",
+              publishedAt: 1760927200000,
+              featuredImage:
+                "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
+            },
+          ];
+
+    records = sourcePosts.map((p) => ({
+      id: p.id,
+      title: p.title,
+      description: p.excerpt,
+      author: p.author,
+      category: p.category,
+      date: new Date(p.publishedAt).toLocaleDateString(),
+      image: p.featuredImage,
+      badge: p.category,
+    }));
+  } else if (dataSource === "leads") {
+    const sourceLeads =
+      submissions.length > 0
+        ? submissions
+        : [
+            {
+              id: "s1",
+              formName: "Contact Form",
+              submittedAt: 1761100000000,
+              data: {
+                name: "David Vance",
+                email: "david@vance.io",
+                message: "Excited about Nexoraft enterprise tier.",
+              },
+            },
+            {
+              id: "s2",
+              formName: "Demo Request",
+              submittedAt: 1761013600000,
+              data: {
+                name: "Lisa Wong",
+                email: "lisa@acme.corp",
+                message: "Would love to see multi-page export in action.",
+              },
+            },
+            {
+              id: "s3",
+              formName: "VIP Newsletter",
+              submittedAt: 1760927200000,
+              data: {
+                name: "Michael Scott",
+                email: "mscott@dunder.com",
+                message: "Subscribed to developer updates.",
+              },
+            },
+          ];
+
+    records = sourceLeads.map((s) => ({
+      id: s.id,
+      title: s.data.name || s.formName,
+      description: `"${s.data.message || "Customer lead inquiry"}"`,
+      author: s.data.email,
+      date: new Date(s.submittedAt).toLocaleDateString(),
+      badge: s.formName,
+    }));
+  } else if (dataSource === "team") {
+    records = [
+      {
+        id: "t1",
+        title: "Dr. Elena Rostova",
+        description: "Head of Artificial Intelligence & Systems Architecture.",
+        author: "Leadership",
+        badge: "AI Lead",
+        image:
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+      },
+      {
+        id: "t2",
+        title: "Marcus Miller",
+        description: "Principal Compiler Engineer & Next.js Core Contributor.",
+        author: "Engineering",
+        badge: "Core Eng",
+        image:
+          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+      },
+      {
+        id: "t3",
+        title: "Sarah Chen",
+        description: "VP of Product Experience & Design System Architecture.",
+        author: "Design",
+        badge: "Product",
+        image:
+          "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80",
+      },
+    ];
+  } else if (dataSource === "api" && apiData.length > 0) {
+    records = apiData.map((item, idx) => ({
+      id: (item.id as string) || `api-${idx}`,
+      title:
+        (item.title as string) || (item.name as string) || `Record #${idx + 1}`,
+      description:
+        (item.body as string) ||
+        (item.description as string) ||
+        (item.excerpt as string) ||
+        "External API item",
+      author: item.userId
+        ? `User #${item.userId}`
+        : (item.email as string) || "REST API",
+      badge: "REST API",
+      image: (item.image as string) || (item.thumbnailUrl as string),
+    }));
+  } else if (items && Array.isArray(items) && items.length > 0) {
+    records = items;
+  }
+
+  if (activeCategory !== "All") {
+    records = records.filter(
+      (r) => r.category === activeCategory || r.badge === activeCategory
+    );
+  }
+
+  records = records.slice(0, Number(dataCount) || 6);
+
+  const colClass =
+    {
+      1: "grid-cols-1",
+      2: "grid-cols-1 md:grid-cols-2",
+      3: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
+      4: "grid-cols-1 md:grid-cols-2 lg:grid-cols-4",
+    }[Number(columns) || 3] || "grid-cols-1 md:grid-cols-3";
+
+  const cardStyleClass =
+    {
+      elevated:
+        "bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-md hover:shadow-xl",
+      bordered:
+        "bg-transparent border-2 border-slate-200 dark:border-slate-800 hover:border-blue-500",
+      glass:
+        "bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/20 dark:border-slate-800 shadow-lg",
+      "gradient-rim":
+        "bg-gradient-to-b from-blue-500/10 to-transparent border border-blue-500/30",
+    }[cardStyle || "elevated"] ||
+    "bg-white dark:bg-slate-900 border border-slate-100 shadow-md";
+
+  const maxWClass =
+    {
+      full: "w-full",
+      "7xl": "max-w-7xl mx-auto",
+      "5xl": "max-w-5xl mx-auto",
+      "3xl": "max-w-3xl mx-auto",
+    }[containerWidth || "7xl"] || "max-w-7xl mx-auto";
+
+  return (
+    <section
+      style={style}
+      className={`py-16 sm:py-20 px-4 sm:px-8 bg-slate-50/70 dark:bg-slate-950/60 border-y border-slate-200/80 dark:border-slate-800 ${className}`}
+    >
+      <div className={maxWClass}>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div>
+            {badge && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800 mb-3">
+                <Database className="w-3.5 h-3.5" />
+                <span>{badge}</span>
+                <span className="ml-1 text-[10px] opacity-80 font-mono uppercase bg-blue-200 dark:bg-blue-900 px-1.5 py-0.5 rounded">
+                  {dataSource}
+                </span>
+              </div>
+            )}
+            <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              {title}
+            </h2>
+            {subtitle && (
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 max-w-2xl">
+                {subtitle}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className={`grid ${colClass} gap-6`}>
+          {records.map((rec, idx) => (
+            <div
+              key={rec.id ? String(rec.id) : idx}
+              className={`rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 group ${cardStyleClass}`}
+            >
+              <div>
+                {Boolean(rec.image) && (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={String(rec.image)}
+                    alt={String(rec.title || "")}
+                    className="w-full h-44 object-cover rounded-2xl mb-4 group-hover:scale-102 transition-transform duration-300"
+                  />
+                )}
+                {Boolean(rec.badge) && (
+                  <span className="text-[10px] font-black tracking-widest text-blue-600 dark:text-blue-400 uppercase bg-blue-50 dark:bg-blue-950/70 px-2.5 py-1 rounded-full border border-blue-200 dark:border-blue-900 block w-fit mb-3">
+                    {String(rec.badge)}
+                  </span>
+                )}
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 leading-snug group-hover:text-blue-600 transition-colors">
+                  {String(rec.title || "Untitled Card")}
+                </h3>
+                {Boolean(rec.description) && (
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed mb-4">
+                    {String(rec.description)}
+                  </p>
+                )}
+              </div>
+
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                {Boolean(rec.author) && (
+                  <span className="font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[150px]">
+                    {String(rec.author)}
+                  </span>
+                )}
+                {Boolean(rec.date) && (
+                  <span className="font-mono text-[11px]">
+                    {String(rec.date)}
+                  </span>
+                )}
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -2687,6 +3230,15 @@ export const componentTypes: Record<
   ) as unknown as ComponentType<Record<string, unknown>>,
   ContactSection: withEditable(
     ContactSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  DynamicCardsGridSection: withEditable(
+    DynamicCardsGridSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  DynamicCollectionGrid: withEditable(
+    DynamicCardsGridSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  DynamicCardsGrid: withEditable(
+    DynamicCardsGridSectionComponent
   ) as unknown as ComponentType<Record<string, unknown>>,
   FlipBoxSection: withEditable(
     FlipBoxSectionComponent

@@ -23,6 +23,7 @@ import {
   Revision,
   WebsiteTheme,
   SubmissionStatus,
+  CustomBreakpoints,
 } from "../types";
 import { TEMPLATES } from "../../lib/templates";
 
@@ -41,9 +42,16 @@ export interface FormBuilderStoreState {
   themeCode: string;
   secondaryColor: string;
   accentColor: string;
+  backgroundColor: string;
+  surfaceColor: string;
+  textColor: string;
+  textMutedColor: string;
+  borderColor: string;
   fontFamily: string;
   headingFont: string;
   borderRadius: "none" | "sm" | "md" | "lg" | "full";
+  customVariables: Record<string, string>;
+  breakpoints: CustomBreakpoints;
   variables: Record<string, unknown>;
   posts: BlogPost[];
   media: MediaAsset[];
@@ -86,6 +94,15 @@ export interface FormBuilderContextValue extends FormBuilderStoreState {
   setFontFamily: (font: string) => void;
   updateTheme: (theme: Partial<WebsiteTheme>) => void;
   eventDispatcher: (eventName: string, payload: unknown) => void;
+  // Custom Variables & Breakpoints
+  setCustomVariables: (
+    vars:
+      | Record<string, string>
+      | ((prev: Record<string, string>) => Record<string, string>)
+  ) => void;
+  addCustomVariable: (key: string, value: string) => void;
+  removeCustomVariable: (key: string) => void;
+  updateBreakpoints: (breakpoints: Partial<CustomBreakpoints>) => void;
   // History / Undo / Redo
   undo: () => void;
   redo: () => void;
@@ -127,9 +144,16 @@ export interface FormBuilderProviderProps {
   initialThemeCode?: string;
   initialSecondaryColor?: string;
   initialAccentColor?: string;
+  initialBackgroundColor?: string;
+  initialSurfaceColor?: string;
+  initialTextColor?: string;
+  initialTextMutedColor?: string;
+  initialBorderColor?: string;
   initialFontFamily?: string;
   initialHeadingFont?: string;
   initialBorderRadius?: "none" | "sm" | "md" | "lg" | "full";
+  initialCustomVariables?: Record<string, string>;
+  initialBreakpoints?: CustomBreakpoints;
   initialNavbarMode?: NavbarMode;
   initialPosts?: BlogPost[];
   initialMedia?: MediaAsset[];
@@ -149,9 +173,25 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
   initialThemeCode = defaultTemplate.theme.primaryColor,
   initialSecondaryColor = defaultTemplate.theme.secondaryColor || "#6366f1",
   initialAccentColor = defaultTemplate.theme.accentColor || "#10b981",
+  initialBackgroundColor = defaultTemplate.theme.backgroundColor || "#ffffff",
+  initialSurfaceColor = defaultTemplate.theme.surfaceColor || "#f8fafc",
+  initialTextColor = defaultTemplate.theme.textColor || "#0f172a",
+  initialTextMutedColor = defaultTemplate.theme.textMutedColor || "#64748b",
+  initialBorderColor = defaultTemplate.theme.borderColor || "#e2e8f0",
   initialFontFamily = defaultTemplate.theme.fontFamily,
   initialHeadingFont = defaultTemplate.theme.headingFont || "Inter, sans-serif",
   initialBorderRadius = defaultTemplate.theme.borderRadius || "lg",
+  initialCustomVariables = defaultTemplate.theme.customVariables || {
+    "--brand-glow": "#3b82f640",
+    "--card-surface": "#ffffff",
+    "--accent-gradient": "linear-gradient(135deg, #3b82f6, #6366f1)",
+  },
+  initialBreakpoints = defaultTemplate.theme.breakpoints || {
+    desktop: 1280,
+    laptop: 1024,
+    tablet: 768,
+    mobile: 390,
+  },
   initialNavbarMode = "horizontal",
   initialPosts = defaultTemplate.posts || [],
   initialMedia = defaultTemplate.media || [],
@@ -184,6 +224,42 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
   const [borderRadius, setBorderRadius] = useState<
     "none" | "sm" | "md" | "lg" | "full"
   >(initialBorderRadius);
+  const [backgroundColor, setBackgroundColor] = useState<string>(
+    initialBackgroundColor
+  );
+  const [surfaceColor, setSurfaceColor] = useState<string>(initialSurfaceColor);
+  const [textColor, setTextColor] = useState<string>(initialTextColor);
+  const [textMutedColor, setTextMutedColor] = useState<string>(
+    initialTextMutedColor
+  );
+  const [borderColor, setBorderColor] = useState<string>(initialBorderColor);
+  const [customVariables, setCustomVariables] = useState<Record<string, string>>(
+    initialCustomVariables
+  );
+  const [breakpoints, setBreakpoints] = useState<CustomBreakpoints>(
+    initialBreakpoints
+  );
+
+  const addCustomVariable = useCallback((key: string, value: string) => {
+    const formattedKey = key.startsWith("--") ? key : `--${key}`;
+    setCustomVariables((prev) => ({ ...prev, [formattedKey]: value }));
+  }, []);
+
+  const removeCustomVariable = useCallback((key: string) => {
+    setCustomVariables((prev) => {
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  }, []);
+
+  const updateBreakpoints = useCallback(
+    (bpChanges: Partial<CustomBreakpoints>) => {
+      setBreakpoints((prev) => ({ ...prev, ...bpChanges }));
+    },
+    []
+  );
+
   const [variables, setVariables] = useState<Record<string, unknown>>({});
   const [posts, setPosts] = useState<BlogPost[]>(initialPosts);
   const [media, setMedia] = useState<MediaAsset[]>(initialMedia);
@@ -612,9 +688,17 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
     if (themeChanges.primaryColor) setThemeCode(themeChanges.primaryColor);
     if (themeChanges.secondaryColor) setSecondaryColor(themeChanges.secondaryColor);
     if (themeChanges.accentColor) setAccentColor(themeChanges.accentColor);
+    if (themeChanges.backgroundColor) setBackgroundColor(themeChanges.backgroundColor);
+    if (themeChanges.surfaceColor) setSurfaceColor(themeChanges.surfaceColor);
+    if (themeChanges.textColor) setTextColor(themeChanges.textColor);
+    if (themeChanges.textMutedColor) setTextMutedColor(themeChanges.textMutedColor);
+    if (themeChanges.borderColor) setBorderColor(themeChanges.borderColor);
     if (themeChanges.fontFamily) setFontFamily(themeChanges.fontFamily);
     if (themeChanges.headingFont) setHeadingFont(themeChanges.headingFont);
     if (themeChanges.borderRadius) setBorderRadius(themeChanges.borderRadius);
+    if (themeChanges.customVariables) setCustomVariables(themeChanges.customVariables);
+    if (themeChanges.breakpoints)
+      setBreakpoints((prev) => ({ ...prev, ...themeChanges.breakpoints }));
   }, []);
 
   const contextValue: FormBuilderContextValue = useMemo(
@@ -633,9 +717,16 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
       themeCode,
       secondaryColor,
       accentColor,
+      backgroundColor,
+      surfaceColor,
+      textColor,
+      textMutedColor,
+      borderColor,
       fontFamily,
       headingFont,
       borderRadius,
+      customVariables,
+      breakpoints,
       variables,
       posts,
       media,
@@ -653,6 +744,10 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
       setThemeCode,
       setFontFamily,
       updateTheme,
+      setCustomVariables,
+      addCustomVariable,
+      removeCustomVariable,
+      updateBreakpoints,
       eventDispatcher,
       undo,
       redo,
@@ -685,9 +780,16 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
       themeCode,
       secondaryColor,
       accentColor,
+      backgroundColor,
+      surfaceColor,
+      textColor,
+      textMutedColor,
+      borderColor,
       fontFamily,
       headingFont,
       borderRadius,
+      customVariables,
+      breakpoints,
       variables,
       posts,
       media,
@@ -698,6 +800,10 @@ export const FormBuilderProvider: React.FC<FormBuilderProviderProps> = ({
       canRedo,
       dispatch,
       updateTheme,
+      setCustomVariables,
+      addCustomVariable,
+      removeCustomVariable,
+      updateBreakpoints,
       eventDispatcher,
       undo,
       redo,
@@ -744,9 +850,24 @@ export function useFormBuilderState(): FormBuilderContextValue {
       themeCode: defaultTemplate.theme.primaryColor,
       secondaryColor: "#6366f1",
       accentColor: "#10b981",
+      backgroundColor: "#ffffff",
+      surfaceColor: "#f8fafc",
+      textColor: "#0f172a",
+      textMutedColor: "#64748b",
+      borderColor: "#e2e8f0",
       fontFamily: defaultTemplate.theme.fontFamily,
       headingFont: "Inter, sans-serif",
       borderRadius: "lg",
+      customVariables: {
+        "--brand-glow": "#3b82f640",
+        "--card-surface": "#ffffff",
+      },
+      breakpoints: {
+        desktop: 1280,
+        laptop: 1024,
+        tablet: 768,
+        mobile: 390,
+      },
       variables: {},
       posts: [],
       media: [],
@@ -764,6 +885,10 @@ export function useFormBuilderState(): FormBuilderContextValue {
       setThemeCode: () => {},
       setFontFamily: () => {},
       updateTheme: () => {},
+      setCustomVariables: () => {},
+      addCustomVariable: () => {},
+      removeCustomVariable: () => {},
+      updateBreakpoints: () => {},
       eventDispatcher: () => {},
       undo: () => {},
       redo: () => {},

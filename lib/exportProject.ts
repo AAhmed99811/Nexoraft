@@ -27,6 +27,20 @@ export function generateElementJsx(
         ? `<span className="text-xs text-slate-400 font-normal"> | ${escapeJsx(String(node.subtitle))}</span>`
         : "";
       const buttonText = node.buttonText || "Get Started";
+      const layoutVariant = String(node.layoutVariant || "standard");
+      const isSticky = node.isSticky !== false;
+      const transparent = Boolean(node.transparent ?? true);
+      const logoUrl = node.logoUrl ? String(node.logoUrl) : null;
+      const containerWidth = String(node.containerWidth || "7xl");
+      const maxWClass =
+        containerWidth === "full"
+          ? "w-full"
+          : containerWidth === "5xl"
+          ? "max-w-5xl"
+          : containerWidth === "3xl"
+          ? "max-w-3xl"
+          : "max-w-7xl";
+
       const items = Array.isArray(node.items)
         ? (node.items as ItemRecord[])
         : [
@@ -36,18 +50,40 @@ export function generateElementJsx(
             { label: "Contact", href: "/contact" },
           ];
 
-      return `${pad}<header className="w-full bg-white/95 backdrop-blur-md sticky top-0 z-50 border-b border-slate-100">
-${pad}  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      const stickyClass = isSticky ? "sticky top-0 z-50" : "relative";
+      const bgClass = transparent
+        ? "bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50"
+        : "bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800";
+
+      const brandJsx = logoUrl
+        ? `<img src="${logoUrl}" alt="${escapeJsx(String(title))}" className="h-8 w-auto object-contain" />`
+        : `<div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-md">${escapeJsx(String(title)).charAt(0)}</div>`;
+
+      if (layoutVariant === "floating-pill") {
+        return `${pad}<header className="w-full ${stickyClass} py-4 px-4 sm:px-6">
+${pad}  <div className="${maxWClass} mx-auto px-6 py-2.5 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-lg flex items-center justify-between">
 ${pad}    <div className="flex items-center gap-2.5">
-${pad}      <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">
-${pad}        ${escapeJsx(String(title)).charAt(0)}
-${pad}      </div>
+${pad}      ${brandJsx}
+${pad}      <span className="text-base font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">${escapeJsx(String(title))}</span>
+${pad}    </div>
+${pad}    <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-600 dark:text-slate-300">
+${items.map((it) => `${pad}      <a href="${String(it.href || "#")}" className="hover:text-blue-600 transition-colors">${escapeJsx(String(it.label || "Link"))}</a>`).join("\n")}
+${pad}    </nav>
+${pad}    <a href="#contact" className="px-4 py-1.5 rounded-full text-xs font-bold bg-blue-600 text-white shadow-sm hover:bg-blue-700 transition-all">${escapeJsx(String(buttonText))}</a>
+${pad}  </div>
+${pad}</header>`;
+      }
+
+      return `${pad}<header className="w-full ${bgClass} ${stickyClass}">
+${pad}  <div className="${maxWClass} mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+${pad}    <div className="flex items-center gap-2.5">
+${pad}      ${brandJsx}
 ${pad}      <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
 ${pad}        ${escapeJsx(String(title))}
 ${pad}      </span>
 ${pad}      ${subtitle}
 ${pad}    </div>
-${pad}    <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+${pad}    <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600 dark:text-slate-300">
 ${items
   .map(
     (it) =>
@@ -65,30 +101,65 @@ ${pad}</header>`;
     }
 
     case "HeroSection": {
-      const badge = node.badge || "✨ NEXT-GEN EXPERIENCE";
+      const badge = node.badge || "✨ NEXT-GEN ARCHITECTURE";
       const title = node.title || "Build Stunning Websites in Minutes";
       const subtitle =
         node.subtitle ||
-        "The modern platform engineered for speed, flexibility, and instant production export.";
+        "The modern visual platform engineered for speed, flexibility, and instant production Next.js 15 export.";
       const btnPrimary = node.buttonText || "Get Started Free";
       const btnSecondary = node.buttonSecondaryText || "Learn More";
+      const layoutVariant = String(node.layoutVariant || "centered");
+      const heroImage = node.heroImage
+        ? String(node.heroImage)
+        : "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80";
+      const containerWidth = String(node.containerWidth || "7xl");
+      const maxWClass =
+        containerWidth === "full"
+          ? "w-full"
+          : containerWidth === "5xl"
+          ? "max-w-5xl"
+          : containerWidth === "3xl"
+          ? "max-w-3xl"
+          : "max-w-7xl";
 
-      return `${pad}<section className="relative overflow-hidden py-20 lg:py-32 bg-gradient-to-b from-blue-50/50 via-white to-white">
-${pad}  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-${pad}    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 mb-6">
+      if (layoutVariant === "split-image-right" || layoutVariant === "split-image-left") {
+        const isLeft = layoutVariant === "split-image-left";
+        return `${pad}<section className="relative overflow-hidden py-16 lg:py-28 bg-gradient-to-b from-blue-50/40 via-white to-white dark:from-slate-950 dark:via-slate-900 dark:to-slate-900">
+${pad}  <div className="${maxWClass} mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+${pad}    <div className="${isLeft ? "lg:order-2" : "lg:order-1"} text-left">
+${pad}      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 mb-6">${escapeJsx(String(badge))}</div>
+${pad}      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">${escapeJsx(String(title))}</h1>
+${pad}      <p className="mt-6 text-lg text-slate-600 dark:text-slate-300 leading-relaxed">${escapeJsx(String(subtitle))}</p>
+${pad}      <div className="mt-8 flex flex-wrap gap-4">
+${pad}        <a href="#contact" className="px-7 py-3 rounded-xl font-semibold bg-blue-600 text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700 transition-all">${escapeJsx(String(btnPrimary))}</a>
+${pad}        <a href="#features" className="px-7 py-3 rounded-xl font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 transition-all">${escapeJsx(String(btnSecondary))}</a>
+${pad}      </div>
+${pad}    </div>
+${pad}    <div className="${isLeft ? "lg:order-1" : "lg:order-2"}">
+${pad}      <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xl">
+${pad}        <img src="${heroImage}" alt="${escapeJsx(String(title))}" className="w-full h-auto object-cover" />
+${pad}      </div>
+${pad}    </div>
+${pad}  </div>
+${pad}</section>`;
+      }
+
+      return `${pad}<section className="relative overflow-hidden py-20 lg:py-32 bg-gradient-to-b from-blue-50/50 via-white to-white dark:from-slate-950 dark:via-slate-900 dark:to-slate-900">
+${pad}  <div className="${maxWClass} mx-auto px-4 sm:px-6 lg:px-8 text-center">
+${pad}    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 mb-6">
 ${pad}      ${escapeJsx(String(badge))}
 ${pad}    </div>
-${pad}    <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 max-w-4xl mx-auto leading-tight">
+${pad}    <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-4xl mx-auto leading-tight">
 ${pad}      ${escapeJsx(String(title))}
 ${pad}    </h1>
-${pad}    <p className="mt-6 text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+${pad}    <p className="mt-6 text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
 ${pad}      ${escapeJsx(String(subtitle))}
 ${pad}    </p>
 ${pad}    <div className="mt-10 flex flex-wrap justify-center gap-4">
 ${pad}      <a href="#contact" className="px-8 py-3.5 rounded-xl font-semibold bg-blue-600 text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700 transition-all">
 ${pad}        ${escapeJsx(String(btnPrimary))}
 ${pad}      </a>
-${pad}      <a href="#features" className="px-8 py-3.5 rounded-xl font-semibold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 transition-all">
+${pad}      <a href="#features" className="px-8 py-3.5 rounded-xl font-semibold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 transition-all">
 ${pad}        ${escapeJsx(String(btnSecondary))}
 ${pad}      </a>
 ${pad}    </div>
@@ -592,6 +663,87 @@ ${pad}    <h2 className="text-3xl font-extrabold text-slate-900">${escapeJsx(Str
 ${pad}    <p className="mt-3 text-slate-600 text-sm max-w-2xl mx-auto mb-10">${escapeJsx(String(subtitle))}</p>
 ${pad}    <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200 aspect-video bg-slate-900 flex items-center justify-center">
 ${pad}      <div className="w-20 h-20 rounded-full bg-blue-600 text-white flex items-center justify-center text-2xl font-bold shadow-xl cursor-pointer hover:scale-105 transition-all">▶</div>
+${pad}    </div>
+${pad}  </div>
+${pad}</section>`;
+    }
+
+    case "DynamicCardsGridSection":
+    case "DynamicCardsGrid":
+    case "DynamicCollectionGrid": {
+      const title = node.title || "Dynamic Content Grid";
+      const subtitle = node.subtitle || "Connected directly to live database collections.";
+      const badge = node.badge || "⚡ LIVE DATABASE FEED";
+      const columns = Number(node.columns || 3);
+      const containerWidth = String(node.containerWidth || "7xl");
+      const maxWClass =
+        containerWidth === "full"
+          ? "w-full"
+          : containerWidth === "5xl"
+          ? "max-w-5xl"
+          : containerWidth === "3xl"
+          ? "max-w-3xl"
+          : "max-w-7xl";
+
+      const gridColsClass =
+        columns === 1
+          ? "grid-cols-1"
+          : columns === 2
+          ? "grid-cols-1 md:grid-cols-2"
+          : columns === 4
+          ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+          : "grid-cols-1 md:grid-cols-3";
+
+      return `${pad}<section className="py-20 bg-slate-50 dark:bg-slate-950">
+${pad}  <div className="${maxWClass} mx-auto px-4 sm:px-6 lg:px-8">
+${pad}    <div className="text-center max-w-3xl mx-auto mb-16">
+${pad}      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 mb-3">${escapeJsx(String(badge))}</span>
+${pad}      <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">${escapeJsx(String(title))}</h2>
+${pad}      <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">${escapeJsx(String(subtitle))}</p>
+${pad}    </div>
+${pad}    <div className="grid ${gridColsClass} gap-6">
+${pad}      <article className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden p-6 flex flex-col justify-between hover:border-emerald-500/50 transition-all group">
+${pad}        <div>
+${pad}          <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
+${pad}            <span className="px-2 py-0.5 rounded-full font-bold uppercase text-[10px] bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">Engineering</span>
+${pad}            <span>Live DB Record #1</span>
+${pad}          </div>
+${pad}          <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 transition-colors">High-Velocity Visual Component Pipeline</h3>
+${pad}          <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">Dynamic records fetched at runtime from database collections with full responsive layouts.</p>
+${pad}        </div>
+${pad}        <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
+${pad}          <span>Nexoraft CMS</span>
+${pad}          <span className="text-emerald-600 font-semibold group-hover:translate-x-0.5 transition-transform">Read Details →</span>
+${pad}        </div>
+${pad}      </article>
+${pad}      <article className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden p-6 flex flex-col justify-between hover:border-emerald-500/50 transition-all group">
+${pad}        <div>
+${pad}          <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
+${pad}            <span className="px-2 py-0.5 rounded-full font-bold uppercase text-[10px] bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">Architecture</span>
+${pad}            <span>Live DB Record #2</span>
+${pad}          </div>
+${pad}          <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 transition-colors">Zero-Runtime Lock-In Next.js 15 App Exporter</h3>
+${pad}          <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">Generated clean semantic code with zero dependencies on runtime proprietary engines.</p>
+${pad}        </div>
+${pad}        <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
+${pad}          <span>Nexoraft CMS</span>
+${pad}          <span className="text-emerald-600 font-semibold group-hover:translate-x-0.5 transition-transform">Read Details →</span>
+${pad}        </div>
+${pad}      </article>
+${pad}      <article className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden p-6 flex flex-col justify-between hover:border-emerald-500/50 transition-all group">
+${pad}        <div>
+${pad}          <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
+${pad}            <span className="px-2 py-0.5 rounded-full font-bold uppercase text-[10px] bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300">Design Systems</span>
+${pad}            <span>Live DB Record #3</span>
+${pad}          </div>
+${pad}          <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 transition-colors">Custom Breakpoints &amp; Reactive CSS Tokens</h3>
+${pad}          <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">Full user control over desktop, laptop, tablet, mobile widths and custom CSS variables.</p>
+${pad}        </div>
+${pad}        <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
+${pad}          <span>Nexoraft CMS</span>
+${pad}          <span className="text-emerald-600 font-semibold group-hover:translate-x-0.5 transition-transform">Read Details →</span>
+${pad}        </div>
+${pad}      </article>
 ${pad}    </div>
 ${pad}  </div>
 ${pad}</section>`;

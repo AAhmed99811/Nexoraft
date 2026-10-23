@@ -1,6 +1,6 @@
 import React from "react";
 
-export type DeviceType = "desktop" | "tablet" | "mobile" | string;
+export type DeviceType = "desktop" | "laptop" | "tablet" | "mobile" | "custom" | string;
 export type NavbarMode = "vertical" | "horizontal";
 export type SiteStatus = "draft" | "published" | "archived";
 export type PageStatus = "draft" | "published";
@@ -73,14 +73,29 @@ export interface ElementState {
   hoveredElement?: string | null;
 }
 
+export interface CustomBreakpoints {
+  desktop: number;
+  laptop: number;
+  tablet: number;
+  mobile: number;
+  custom?: number;
+}
+
 export interface WebsiteTheme {
   primaryColor: string;
   secondaryColor?: string;
   accentColor?: string;
+  backgroundColor?: string;
+  surfaceColor?: string;
+  textColor?: string;
+  textMutedColor?: string;
+  borderColor?: string;
   fontFamily: string;
   headingFont?: string;
   borderRadius?: "none" | "sm" | "md" | "lg" | "full";
   mode?: "light" | "dark" | "system";
+  customVariables?: Record<string, string>;
+  breakpoints?: CustomBreakpoints;
 }
 
 export interface BlogPost {
