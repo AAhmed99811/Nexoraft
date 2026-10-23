@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useEffect, useMemo, useRef } from "react";
+import React, { Suspense, useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   FormBuilderProvider,
@@ -13,13 +13,29 @@ import { TEMPLATES } from "../../lib/templates";
 import { Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
+const emptySubscribe = () => () => {};
+
 function BuilderContent() {
   const searchParams = useSearchParams();
   const siteId = searchParams.get("siteId") || "site-saas-launch";
+  const pageIdParam = searchParams.get("pageId");
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
   const site = useMemo(() => {
     return getWebsite(siteId) || TEMPLATES["saas-landing"];
   }, [siteId]);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+      </div>
+    );
+  }
 
   if (!site) {
     return (
@@ -43,6 +59,11 @@ function BuilderContent() {
     );
   }
 
+  const initialActivePage =
+    pageIdParam && site.pages && site.pages[pageIdParam]
+      ? pageIdParam
+      : site.activePage || Object.keys(site.pages || {})[0] || "page-home";
+
   return (
     <FormBuilderProvider
       initialWebsiteId={site.id}
@@ -50,7 +71,7 @@ function BuilderContent() {
       initialWebsiteDescription={site.description}
       initialElements={site.elements}
       initialPages={site.pages}
-      initialActivePage={site.activePage}
+      initialActivePage={initialActivePage}
       initialThemeCode={site.theme?.primaryColor || "#3b82f6"}
       initialSecondaryColor={site.theme?.secondaryColor || "#6366f1"}
       initialAccentColor={site.theme?.accentColor || "#10b981"}

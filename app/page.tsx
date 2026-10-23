@@ -25,7 +25,6 @@ import {
   Sparkles,
   RotateCcw,
   Clock,
-  ArrowRight,
   Archive,
   ArchiveRestore,
   FileText,
@@ -340,7 +339,7 @@ export default function Home() {
               return (
                 <div
                   key={site.id}
-                  onClick={() => router.push(`/builder?siteId=${site.id}`)}
+                  onClick={() => router.push(`/project/${site.id}`)}
                   className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 hover:border-blue-500/50 hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between"
                 >
                   <div>
@@ -435,17 +434,31 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Card Footer */}
-                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs">
-                    <span className="text-[11px] text-slate-400 flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      <span>{formatRelativeTime(site.updatedAt)}</span>
+                  {/* Card Footer: WP Dashboard and Elementor Actions */}
+                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs gap-2">
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                      <span className="w-4 h-4 rounded-full bg-[#1d2327] text-white flex items-center justify-center text-[9px] font-bold">
+                        W
+                      </span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-200">WP Dashboard</span>
+                      <span className="text-slate-300 dark:text-slate-700">•</span>
+                      <span className="text-[10px] text-slate-400 flex items-center gap-0.5">
+                        <Clock className="w-3 h-3" />
+                        <span>{formatRelativeTime(site.updatedAt)}</span>
+                      </span>
                     </span>
 
-                    <span className="font-semibold text-blue-600 dark:text-blue-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-1 text-[11px]">
-                      <span>Open in Studio</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/builder?siteId=${site.id}`);
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-[#92003b] hover:bg-[#a60043] text-white font-bold text-[10px] inline-flex items-center gap-1 shadow-xs transition-colors cursor-pointer"
+                    >
+                      <Sparkles className="w-2.5 h-2.5" />
+                      <span>Elementor</span>
+                    </button>
                   </div>
                 </div>
               );

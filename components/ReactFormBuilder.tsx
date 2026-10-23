@@ -44,6 +44,9 @@ import {
   HelpCircle,
   BarChart3,
   Building,
+  Clock,
+  Play,
+  Users,
 } from "lucide-react";
 
 const { removeElement, updateElement, addElement } = elementSlice;
@@ -267,6 +270,33 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
         extraProps = {
           title: "Get in Touch with Our Team",
           subtitle: "Fill out the form below. Leads are instantly saved to your site inbox.",
+        };
+        break;
+      case "CountdownSection":
+        extraProps = {
+          title: "Limited Time Offer: Launch Special",
+          subtitle: "Lock in lifetime early-access pricing before the countdown runs out.",
+          buttonText: "Claim 50% Off Now",
+        };
+        break;
+      case "PostsGridSection":
+        extraProps = {
+          title: "From the Nexoraft Publication",
+          subtitle: "Tutorials, design system playbooks, and architectural deep-dives from our engineering team.",
+        };
+        break;
+      case "TeamSection":
+        extraProps = {
+          title: "Meet the Minds Behind the Vision",
+          subtitle: "Designers, builders, and engineers united by an obsession with visual craft and developer freedom.",
+        };
+        break;
+      case "VideoSection":
+        extraProps = {
+          title: "Watch How Nexoraft Ships in Minutes",
+          subtitle: "A complete walkthrough of the WordPress-grade CMS, Elementor Pro visual canvas, and Next.js 15 App Router export.",
+          thumbnail: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80",
+          badge: "✦ FEATURE SHOWCASE",
         };
         break;
       case "FooterSection":
@@ -563,6 +593,10 @@ export const ReactFormBuilder: React.FC<ReactFormBuilderProps> = (props) => {
                         { type: "TestimonialsSection", label: "Testimonials", icon: Star },
                         { type: "PricingSection", label: "Pricing Table", icon: Layout },
                         { type: "FAQSection", label: "FAQ Accordion", icon: HelpCircle },
+                        { type: "CountdownSection", label: "Countdown Timer", icon: Clock },
+                        { type: "PostsGridSection", label: "Posts Loop", icon: BookOpen },
+                        { type: "TeamSection", label: "Team Grid", icon: Users },
+                        { type: "VideoSection", label: "Video Showcase", icon: Play },
                         { type: "LogoStripSection", label: "Logo Strip", icon: Building },
                         { type: "CallToActionSection", label: "Call to Action", icon: MousePointer },
                         { type: "ContactSection", label: "Contact Form", icon: Mail },

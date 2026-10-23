@@ -1,4 +1,13 @@
-import { WebsiteSite, Revision, FormSubmission } from "../components/types";
+import {
+  WebsiteSite,
+  Revision,
+  FormSubmission,
+  SubmissionStatus,
+  PageConfig,
+  BlogPost,
+  MediaAsset,
+  NavMenu,
+} from "../components/types";
 import { TEMPLATES } from "./templates";
 
 const STORAGE_KEY = "nexoraft_websites_v2";
@@ -48,8 +57,10 @@ export function getWebsitesSnapshot(): WebsiteSite[] {
   }
 }
 
+const SERVER_SNAPSHOT: WebsiteSite[] = Object.values(TEMPLATES);
+
 export function getWebsitesServerSnapshot(): WebsiteSite[] {
-  return Object.values(TEMPLATES);
+  return SERVER_SNAPSHOT;
 }
 
 export function getAllWebsites(): WebsiteSite[] {
@@ -277,6 +288,215 @@ export function addWebsiteSubmission(siteId: string, submission: Omit<FormSubmis
   });
 }
 
+export function updateWebsite(id: string, updates: Partial<WebsiteSite>): WebsiteSite | null {
+  const site = getWebsite(id);
+  if (!site) return null;
+
+  const updated: WebsiteSite = {
+    ...site,
+    ...updates,
+    updatedAt: Date.now(),
+  };
+
+  saveWebsite(updated);
+  return updated;
+}
+
+export function addWebsitePage(
+  siteId: string,
+  pageData: { name: string; slug: string; title?: string }
+): PageConfig | null {
+  const site = getWebsite(siteId);
+  if (!site) return null;
+
+  const pageId = `page-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 5)}`;
+  const rootElementId = `root-${pageId}`;
+  const slug = pageData.slug.startsWith("/") ? pageData.slug : `/${pageData.slug}`;
+
+  const newPage: PageConfig = {
+    id: pageId,
+    name: pageData.name,
+    slug,
+    title: pageData.title || `${pageData.name} | ${site.name}`,
+    metaDescription: `${pageData.name} page for ${site.name}`,
+    rootElementId,
+    order: Object.keys(site.pages || {}).length,
+    status: "published",
+    updatedAt: Date.now(),
+  };
+
+  const nextPages = { ...site.pages, [pageId]: newPage };
+  const nextElements = {
+    ...site.elements,
+    [rootElementId]: {
+      id: rootElementId,
+      elementType: "Container",
+      label: `${pageData.name} Canvas`,
+      children: [],
+      style: { minHeight: "100vh", backgroundColor: "#ffffff" },
+    },
+  };
+
+  saveWebsite({
+    ...site,
+    pages: nextPages,
+    elements: nextElements,
+  });
+
+  return newPage;
+}
+
+export function updateWebsitePage(
+  siteId: string,
+  pageId: string,
+  pageData: Partial<PageConfig>
+): PageConfig | null {
+  const site = getWebsite(siteId);
+  if (!site || !site.pages[pageId]) return null;
+
+  const updatedPage: PageConfig = {
+    ...site.pages[pageId],
+    ...pageData,
+    updatedAt: Date.now(),
+  };
+
+  saveWebsite({
+    ...site,
+    pages: {
+      ...site.pages,
+      [pageId]: updatedPage,
+    },
+  });
+
+  return updatedPage;
+}
+
+export function deleteWebsitePage(siteId: string, pageId: string): boolean {
+  const site = getWebsite(siteId);
+  if (!site || !site.pages[pageId]) return false;
+
+  // Don't delete if it's the only page or the active page without fallback
+  const remainingPages = { ...site.pages };
+  delete remainingPages[pageId];
+
+  const keys = Object.keys(remainingPages);
+  if (keys.length === 0) return false;
+
+  const nextActive = site.activePage === pageId ? keys[0] : site.activePage;
+
+  saveWebsite({
+    ...site,
+    pages: remainingPages,
+    activePage: nextActive,
+  });
+
+  return true;
+}
+
+export function saveWebsitePost(siteId: string, post: BlogPost): BlogPost | null {
+  const site = getWebsite(siteId);
+  if (!site) return null;
+
+  const existingPosts = site.posts || [];
+  const idx = existingPosts.findIndex((p) => p.id === post.id);
+
+  let nextPosts: BlogPost[];
+  if (idx >= 0) {
+    nextPosts = [...existingPosts];
+    nextPosts[idx] = post;
+  } else {
+    nextPosts = [post, ...existingPosts];
+  }
+
+  saveWebsite({
+    ...site,
+    posts: nextPosts,
+  });
+
+  return post;
+}
+
+export function deleteWebsitePost(siteId: string, postId: string): boolean {
+  const site = getWebsite(siteId);
+  if (!site || !site.posts) return false;
+
+  const nextPosts = site.posts.filter((p) => p.id !== postId);
+  saveWebsite({
+    ...site,
+    posts: nextPosts,
+  });
+
+  return true;
+}
+
+export function saveWebsiteMedia(siteId: string, mediaItem: MediaAsset): MediaAsset | null {
+  const site = getWebsite(siteId);
+  if (!site) return null;
+
+  const existingMedia = site.media || [];
+  const nextMedia = [mediaItem, ...existingMedia.filter((m) => m.id !== mediaItem.id)];
+
+  saveWebsite({
+    ...site,
+    media: nextMedia,
+  });
+
+  return mediaItem;
+}
+
+export function deleteWebsiteMedia(siteId: string, mediaId: string): boolean {
+  const site = getWebsite(siteId);
+  if (!site || !site.media) return false;
+
+  const nextMedia = site.media.filter((m) => m.id !== mediaId);
+  saveWebsite({
+    ...site,
+    media: nextMedia,
+  });
+
+  return true;
+}
+
+export function updateWebsiteMenus(siteId: string, menus: NavMenu[]): void {
+  const site = getWebsite(siteId);
+  if (!site) return;
+
+  saveWebsite({
+    ...site,
+    menus,
+  });
+}
+
+export function updateSubmissionStatus(
+  siteId: string,
+  subId: string,
+  status: SubmissionStatus
+): void {
+  const site = getWebsite(siteId);
+  if (!site || !site.submissions) return;
+
+  const updatedSubmissions = site.submissions.map((sub) =>
+    sub.id === subId ? { ...sub, status } : sub
+  );
+
+  saveWebsite({
+    ...site,
+    submissions: updatedSubmissions,
+  });
+}
+
+export function deleteWebsiteSubmission(siteId: string, subId: string): void {
+  const site = getWebsite(siteId);
+  if (!site || !site.submissions) return;
+
+  const updatedSubmissions = site.submissions.filter((sub) => sub.id !== subId);
+
+  saveWebsite({
+    ...site,
+    submissions: updatedSubmissions,
+  });
+}
+
 export function resetToDefaults(): WebsiteSite[] {
   if (!isClient()) return Object.values(TEMPLATES);
   const defaults = Object.values(TEMPLATES);
@@ -289,3 +509,4 @@ export function resetToDefaults(): WebsiteSite[] {
   }
   return defaults;
 }
+

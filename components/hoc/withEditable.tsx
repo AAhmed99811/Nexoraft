@@ -1,7 +1,8 @@
 "use client";
 
 import React, { ComponentType, useState } from "react";
-import { useFormBuilderState } from "../context/FormBuilderContext";
+import { useFormBuilderState, elementSlice } from "../context/FormBuilderContext";
+import { Edit2, Copy, Trash2, GripVertical, Plus } from "lucide-react";
 
 export interface WithEditableProps {
   id?: string;
@@ -11,6 +12,8 @@ export interface WithEditableProps {
   elementType?: string;
   [key: string]: unknown;
 }
+
+const { addElement, removeElement } = elementSlice;
 
 export function withEditable<P extends object>(
   WrappedComponent: ComponentType<P>
@@ -26,6 +29,9 @@ export function withEditable<P extends object>(
     const [isHovered, setIsHovered] = useState(false);
     const context = useFormBuilderState();
     const isSelected = id && context?.focusedElement === id;
+    const isSection =
+      elementType === "Container" ||
+      (elementType && elementType.toLowerCase().includes("section"));
 
     if (isPreview || !isEditable) {
       return (
@@ -45,6 +51,24 @@ export function withEditable<P extends object>(
       context?.setSelectedElement?.(id);
     };
 
+    const handleDuplicate = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!id || !context?.elements[id]) return;
+      const target = context.elements[id];
+      const newId = `elem-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 5)}`;
+      const cloned = JSON.parse(JSON.stringify(target));
+      cloned.id = newId;
+      cloned.label = `${target.label || target.elementType || "Element"} (Copy)`;
+      const parentId = context.pages[context.activePage]?.rootElementId || "root";
+      context.dispatch(addElement(parentId, cloned));
+    };
+
+    const handleDelete = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!id) return;
+      context.dispatch(removeElement({ id }));
+    };
+
     return (
       <div
         onClick={handleClick}
@@ -58,19 +82,73 @@ export function withEditable<P extends object>(
         }}
         className={`group/editable relative transition-all duration-150 rounded-md cursor-pointer ${
           isSelected
-            ? "ring-2 ring-blue-600 ring-offset-1 shadow-xs"
+            ? "ring-2 ring-blue-600 ring-offset-2 shadow-xs"
             : isHovered
-            ? "ring-1 ring-blue-400/70"
+            ? "ring-1 ring-blue-400/80 ring-offset-1"
             : ""
         }`}
         data-editable="true"
         data-element-id={id}
       >
-        {/* Floating Tag/Badge for Builder */}
-        {(isSelected || isHovered) && (
-          <div className="absolute -top-3 left-2 z-30 pointer-events-none flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider uppercase bg-blue-600 text-white shadow-xs">
-            <span>{label || elementType || "Element"}</span>
-            {id && <span className="opacity-75 font-mono text-[9px]">#{id.slice(-4)}</span>}
+        {/* Elementor Pro Section Top Handle [ + | ::: | X ] */}
+        {isSection && (isSelected || isHovered) && (
+          <div
+            className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-40 flex items-center bg-blue-600 text-white rounded-full px-2 py-0.5 shadow-md text-[10px] font-bold gap-1 animate-in fade-in duration-100"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={handleDuplicate}
+              title="Duplicate Section"
+              className="hover:text-blue-200 p-0.5"
+            >
+              <Plus className="w-3 h-3" />
+            </button>
+            <div className="flex items-center gap-0.5 cursor-grab">
+              <GripVertical className="w-3 h-3" />
+              <span className="text-[9px] uppercase tracking-wider">
+                {label || elementType || "Section"}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleDelete}
+              title="Delete Section"
+              className="hover:text-red-200 p-0.5"
+            >
+              <Trash2 className="w-3 h-3" />
+            </button>
+          </div>
+        )}
+
+        {/* Elementor Widget Action Pill [ Name | Duplicate | Delete ] */}
+        {!isSection && (isSelected || isHovered) && (
+          <div
+            className="absolute -top-3.5 right-2 z-40 flex items-center bg-blue-600 text-white rounded-lg px-2 py-0.5 shadow-md text-[10px] font-bold gap-1.5 animate-in fade-in duration-100"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-1 font-semibold">
+              <Edit2 className="w-2.5 h-2.5" />
+              <span className="text-[10px] max-w-[90px] truncate">
+                {label || elementType || "Widget"}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleDuplicate}
+              title="Duplicate"
+              className="hover:text-blue-200 p-0.5"
+            >
+              <Copy className="w-2.5 h-2.5" />
+            </button>
+            <button
+              type="button"
+              onClick={handleDelete}
+              title="Delete"
+              className="hover:text-red-200 p-0.5"
+            >
+              <Trash2 className="w-2.5 h-2.5" />
+            </button>
           </div>
         )}
 

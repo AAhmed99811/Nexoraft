@@ -12,6 +12,13 @@ import {
   Star,
   ChevronDown,
   CheckCircle2,
+  Clock,
+  Play,
+  Search,
+  Calendar,
+  User,
+  Mail,
+  Zap,
 } from "lucide-react";
 
 export interface BaseElementProps {
@@ -461,7 +468,7 @@ const TestimonialsSectionComponent: React.FC<
   </section>
 );
 
-// 11. FAQ Section (PRD 8.4)
+// 11. FAQ Section (Elementor Pro Accordion)
 const FAQSectionComponent: React.FC<
   BaseElementProps & {
     title?: string;
@@ -470,7 +477,7 @@ const FAQSectionComponent: React.FC<
   }
 > = ({
   title = "Frequently Asked Questions",
-  subtitle = "Have questions about exporting, code ownership, or hosting? We've got answers.",
+  subtitle = "Everything you need to know about exporting, code ownership, and deployment.",
   items = [
     {
       question: "Is the exported code really 100% independent?",
@@ -497,6 +504,13 @@ const FAQSectionComponent: React.FC<
   className = "",
 }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredItems = items.filter(
+    (item) =>
+      item.question?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.answer?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <section
@@ -504,45 +518,79 @@ const FAQSectionComponent: React.FC<
       className={`py-16 sm:py-24 px-4 sm:px-8 bg-white dark:bg-slate-950 ${className}`}
     >
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60 mb-3">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>KNOWLEDGE BASE</span>
+          </div>
           <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
             {title}
           </h2>
           {subtitle && (
-            <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
+            <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
               {subtitle}
             </p>
           )}
+
+          {/* Interactive Live Search for FAQ */}
+          <div className="mt-6 max-w-md mx-auto relative">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Filter questions..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white"
+            />
+          </div>
         </div>
 
         <div className="space-y-3">
-          {items.map((faq, idx) => {
-            const isOpen = openIndex === idx;
-            return (
-              <div
-                key={idx}
-                className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden bg-slate-50/50 dark:bg-slate-900/50 transition-all"
-              >
-                <button
-                  type="button"
-                  onClick={() => setOpenIndex(isOpen ? null : idx)}
-                  className="w-full p-5 text-left flex items-center justify-between font-semibold text-sm sm:text-base text-slate-900 dark:text-white hover:text-blue-600 transition-colors cursor-pointer"
+          {filteredItems.length === 0 ? (
+            <div className="text-center py-8 text-xs text-slate-400">
+              No questions matching &quot;{searchQuery}&quot;
+            </div>
+          ) : (
+            filteredItems.map((faq, idx) => {
+              const isOpen = openIndex === idx;
+              return (
+                <div
+                  key={idx}
+                  className={`border rounded-2xl overflow-hidden transition-all duration-200 ${
+                    isOpen
+                      ? "border-blue-500/50 bg-blue-50/20 dark:bg-blue-950/20 shadow-sm"
+                      : "border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 hover:border-slate-300 dark:hover:border-slate-700"
+                  }`}
                 >
-                  <span>{faq.question || "Question"}</span>
-                  <ChevronDown
-                    className={`w-4 h-4 text-slate-400 transition-transform ${
-                      isOpen ? "rotate-180 text-blue-600" : ""
-                    }`}
-                  />
-                </button>
-                {isOpen && (
-                  <div className="px-5 pb-5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-3">
-                    {faq.answer || "Answer text."}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                  <button
+                    type="button"
+                    onClick={() => setOpenIndex(isOpen ? null : idx)}
+                    className="w-full p-5 text-left flex items-center justify-between font-semibold text-sm sm:text-base text-slate-900 dark:text-white hover:text-blue-600 transition-colors cursor-pointer"
+                  >
+                    <span>{faq.question || "Question"}</span>
+                    <div
+                      className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
+                        isOpen
+                          ? "bg-blue-600 text-white"
+                          : "bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                      }`}
+                    >
+                      <ChevronDown
+                        className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                          isOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    </div>
+                  </button>
+                  {isOpen && (
+                    <div className="px-5 pb-5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-800/80 pt-3 animate-in fade-in duration-150">
+                      {faq.answer || "Answer text."}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
     </section>
@@ -592,7 +640,7 @@ const LogoStripSectionComponent: React.FC<
   </section>
 );
 
-// 13. Pricing Section
+// 13. Pricing Section (Elementor Pro with Monthly/Annual Toggle)
 const PricingSectionComponent: React.FC<
   BaseElementProps & {
     title?: string;
@@ -609,7 +657,7 @@ const PricingSectionComponent: React.FC<
   }
 > = ({
   title = "Transparent, Predictable Pricing",
-  subtitle = "Choose the plan that fits your growth stage. Upgrade or cancel anytime.",
+  subtitle = "Choose the plan that fits your growth stage. Switch between monthly and annual billing to save 20%.",
   items = [
     {
       title: "Starter",
@@ -655,120 +703,639 @@ const PricingSectionComponent: React.FC<
   ],
   style,
   className = "",
-}) => (
-  <section
-    style={style}
-    className={`py-16 sm:py-24 px-4 sm:px-8 bg-slate-50 dark:bg-slate-900/60 border-y border-slate-200 dark:border-slate-800 ${className}`}
-  >
-    <div className="max-w-7xl mx-auto">
-      <div className="text-center max-w-3xl mx-auto mb-14">
-        <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-          {title}
-        </h2>
-        {subtitle && (
-          <p className="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-400">
-            {subtitle}
-          </p>
-        )}
-      </div>
+}) => {
+  const [isAnnual, setIsAnnual] = useState(false);
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-stretch">
-        {items.map((plan, idx) => {
-          const isHigh = Boolean(plan.highlighted);
-          return (
-            <div
-              key={idx}
-              className={`rounded-2xl p-7 flex flex-col justify-between transition-all ${
-                isHigh
-                  ? "bg-white dark:bg-slate-900 border-2 border-blue-600 shadow-xl relative"
-                  : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs"
+  return (
+    <section
+      style={style}
+      className={`py-16 sm:py-24 px-4 sm:px-8 bg-slate-50 dark:bg-slate-900/60 border-y border-slate-200 dark:border-slate-800 ${className}`}
+    >
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center max-w-3xl mx-auto mb-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60 mb-3">
+            <Zap className="w-3.5 h-3.5" />
+            <span>FLEXIBLE PLANS</span>
+          </div>
+          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            {title}
+          </h2>
+          {subtitle && (
+            <p className="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-400">
+              {subtitle}
+            </p>
+          )}
+
+          {/* Elementor Pro Billing Period Switcher */}
+          <div className="mt-8 inline-flex items-center gap-3 bg-white dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+            <button
+              type="button"
+              onClick={() => setIsAnnual(false)}
+              className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                !isAnnual
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900"
               }`}
             >
-              {isHigh && (
-                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[11px] font-bold bg-blue-600 text-white uppercase tracking-wider shadow-sm">
-                  Most Popular
-                </span>
-              )}
-              <div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                  {plan.title || "Plan"}
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  {plan.description}
-                </p>
-                <div className="mt-4 flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-slate-900 dark:text-white">
-                    {plan.price || "$0"}
-                  </span>
-                  <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    {plan.period || "/month"}
-                  </span>
-                </div>
-                <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 space-y-3">
-                  {(plan.features || ["Feature 1", "Feature 2"]).map(
-                    (feat, fIdx) => (
-                      <div
-                        key={fIdx}
-                        className="flex items-center gap-2.5 text-xs text-slate-700 dark:text-slate-300"
-                      >
-                        <div className="w-4 h-4 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-600 flex items-center justify-center shrink-0">
-                          <Check className="w-2.5 h-2.5" />
-                        </div>
-                        <span>{feat}</span>
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
+              Monthly Billing
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsAnnual(true)}
+              className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                isAnnual
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900"
+              }`}
+            >
+              <span>Annual Billing</span>
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-emerald-500 text-white font-black animate-pulse">
+                Save 20%
+              </span>
+            </button>
+          </div>
+        </div>
 
-              <button
-                type="button"
-                className={`mt-8 w-full py-2.5 rounded-xl font-semibold text-xs transition-all cursor-pointer ${
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-stretch">
+          {items.map((plan, idx) => {
+            const isHigh = Boolean(plan.highlighted);
+            const displayPrice = isAnnual && plan.price && !isNaN(parseInt(plan.price.replace(/[^0-9]/g, ""), 10)) && parseInt(plan.price.replace(/[^0-9]/g, ""), 10) > 0
+              ? `$${Math.round(parseInt(plan.price.replace(/[^0-9]/g, ""), 10) * 0.8)}`
+              : (plan.price || "$0");
+            const displayPeriod = isAnnual ? "/mo (billed annually)" : (plan.period || "/month");
+
+            return (
+              <div
+                key={idx}
+                className={`rounded-3xl p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 ${
                   isHigh
-                    ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20"
-                    : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200"
+                    ? "bg-white dark:bg-slate-900 border-2 border-blue-600 shadow-xl shadow-blue-500/10 relative"
+                    : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-lg"
                 }`}
               >
-                {plan.buttonText || "Choose Plan"}
-              </button>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  </section>
-);
+                {isHigh && (
+                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[11px] font-bold bg-blue-600 text-white uppercase tracking-wider shadow-sm">
+                    Most Popular
+                  </span>
+                )}
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                    {plan.title || "Plan"}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 min-h-[32px]">
+                    {plan.description}
+                  </p>
+                  <div className="mt-4 flex items-baseline gap-1.5">
+                    <span className="text-4xl font-black text-slate-900 dark:text-white transition-all">
+                      {displayPrice}
+                    </span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                      {displayPeriod}
+                    </span>
+                  </div>
+                  <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                    {(plan.features || ["Feature 1", "Feature 2"]).map(
+                      (feat, fIdx) => (
+                        <div
+                          key={fIdx}
+                          className="flex items-center gap-2.5 text-xs text-slate-700 dark:text-slate-300"
+                        >
+                          <div className="w-4 h-4 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                            <Check className="w-2.5 h-2.5" />
+                          </div>
+                          <span>{feat}</span>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
 
-// 14. Call to Action Section
+                <button
+                  type="button"
+                  className={`mt-8 w-full py-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                    isHigh
+                      ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/25"
+                      : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200"
+                  }`}
+                >
+                  {plan.buttonText || "Choose Plan"}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// 14. Call to Action Section (Elementor Pro with Live Newsletter Form)
 const CallToActionSectionComponent: React.FC<
   BaseElementProps & { title?: string; subtitle?: string; buttonText?: string }
 > = ({
   title = "Ready to launch your next big idea?",
   subtitle = "Join over 10,000+ creators building fast, modern websites with complete code ownership today.",
-  buttonText = "Build Your Website Now",
+  buttonText = "Get Instant Access",
+  style,
+  className = "",
+}) => {
+  const [email, setEmail] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("website-event:lead-submitted", {
+          detail: {
+            formName: "Newsletter CTA",
+            name: "Subscriber",
+            email,
+            message: "Subscribed via Elementor CTA Banner",
+            submittedAt: Date.now(),
+          },
+        })
+      );
+    }
+
+    setIsSubmitted(true);
+    setTimeout(() => {
+      setIsSubmitted(false);
+      setEmail("");
+    }, 4000);
+  };
+
+  return (
+    <section
+      style={style}
+      className={`py-16 sm:py-20 px-4 sm:px-8 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white text-center shadow-xl ${className}`}
+    >
+      <div className="max-w-4xl mx-auto flex flex-col items-center">
+        <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/20 backdrop-blur-md text-white mb-4 border border-white/20">
+          ⚡ BOOST YOUR VELOCITY
+        </span>
+        <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-3">
+          {title}
+        </h2>
+        <p className="text-blue-100 text-sm sm:text-base max-w-xl mb-8 leading-relaxed">
+          {subtitle}
+        </p>
+
+        {isSubmitted ? (
+          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 text-white text-sm font-bold animate-in zoom-in-95 duration-200">
+            <CheckCircle2 className="w-5 h-5 text-emerald-300" />
+            <span>You&apos;re subscribed! Check your inbox for access details.</span>
+          </div>
+        ) : (
+          <form
+            onSubmit={handleSubscribe}
+            className="w-full max-w-md flex flex-col sm:flex-row items-center gap-2 bg-white/10 backdrop-blur-md p-1.5 rounded-2xl border border-white/25 shadow-lg"
+          >
+            <div className="relative w-full">
+              <Mail className="w-4 h-4 text-blue-200 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email address..."
+                className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm bg-transparent text-white placeholder-blue-200/80 focus:outline-none"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-white text-blue-700 hover:bg-blue-50 transition-all shadow-md shrink-0 cursor-pointer"
+            >
+              {buttonText}
+            </button>
+          </form>
+        )}
+      </div>
+    </section>
+  );
+};
+
+// 14b. Elementor Pro Countdown Timer Section
+const CountdownSectionComponent: React.FC<
+  BaseElementProps & {
+    title?: string;
+    subtitle?: string;
+    targetDays?: number;
+    buttonText?: string;
+  }
+> = ({
+  title = "Limited Time Offer: Launch Special",
+  subtitle = "Lock in lifetime early-access pricing before the countdown runs out.",
+  buttonText = "Claim 50% Off Now",
+  style,
+  className = "",
+}) => {
+  const [timeLeft, setTimeLeft] = useState({
+    days: 4,
+    hours: 18,
+    minutes: 42,
+    seconds: 15,
+  });
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
+        if (prev.minutes > 0) return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
+        if (prev.hours > 0) return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
+        if (prev.days > 0) return { ...prev, days: prev.days - 1, hours: 23, minutes: 59, seconds: 59 };
+        return prev;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <section
+      style={style}
+      className={`py-14 px-4 sm:px-8 bg-slate-900 text-white border-y border-slate-800 ${className}`}
+    >
+      <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/30 mb-4 animate-pulse">
+          <Clock className="w-3.5 h-3.5" />
+          <span>URGENT • OFFER CLOSING SOON</span>
+        </div>
+
+        <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">
+          {title}
+        </h2>
+        <p className="text-slate-400 text-xs sm:text-sm max-w-md mb-8">
+          {subtitle}
+        </p>
+
+        {/* Live Digital Flip Clocks */}
+        <div className="grid grid-cols-4 gap-3 sm:gap-6 mb-8 max-w-md w-full">
+          {[
+            { label: "DAYS", val: timeLeft.days },
+            { label: "HOURS", val: timeLeft.hours },
+            { label: "MINS", val: timeLeft.minutes },
+            { label: "SECS", val: timeLeft.seconds },
+          ].map((item, i) => (
+            <div
+              key={i}
+              className="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-3 sm:p-4 flex flex-col items-center shadow-lg"
+            >
+              <span className="text-2xl sm:text-4xl font-black text-blue-400 font-mono tracking-tight">
+                {String(item.val).padStart(2, "0")}
+              </span>
+              <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                {item.label}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          className="px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-xl shadow-blue-500/20 transition-all inline-flex items-center gap-2 cursor-pointer"
+        >
+          <span>{buttonText}</span>
+          <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
+    </section>
+  );
+};
+
+// 14c. Elementor Pro Dynamic Posts Grid (Blog Loop)
+const PostsGridSectionComponent: React.FC<
+  BaseElementProps & {
+    title?: string;
+    subtitle?: string;
+    items?: Array<{
+      title?: string;
+      category?: string;
+      excerpt?: string;
+      author?: string;
+      date?: string;
+      readTime?: string;
+      image?: string;
+    }>;
+  }
+> = ({
+  title = "From the Nexoraft Publication",
+  subtitle = "Tutorials, design system playbooks, and architectural deep-dives from our engineering team.",
+  items = [
+    {
+      title: "Building High-Conversion Landing Pages with Elementor-Grade Precision",
+      category: "Design",
+      excerpt: "Master responsive layout tokens, visual hierarchy, and CTA placement for maximum engagement.",
+      author: "Sarah Chen",
+      date: "Oct 20, 2026",
+      readTime: "4 min read",
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      title: "Zero-Lock-In Web Architecture: Exporting Clean Next.js 15 App Router Code",
+      category: "Engineering",
+      excerpt: "How our compiler outputs idiomatic React components, dynamic routes, and Tailwind classes without bloat.",
+      author: "Marcus Miller",
+      date: "Oct 18, 2026",
+      readTime: "6 min read",
+      image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      title: "The WordPress Paradigm in 2026: Why Modular CMS Dashboards Still Win",
+      category: "Product",
+      excerpt: "Why organizing pages, blog posts, media assets, and form leads under a unified dashboard beats fragmented tools.",
+      author: "Elena Rostova",
+      date: "Oct 14, 2026",
+      readTime: "5 min read",
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
+    },
+  ],
+  style,
+  className = "",
+}) => {
+  const [activeCategory, setActiveCategory] = useState("All");
+  const categories = ["All", "Design", "Engineering", "Product"];
+
+  const filtered = activeCategory === "All"
+    ? items
+    : items.filter((p) => p.category === activeCategory);
+
+  return (
+    <section
+      style={style}
+      className={`py-16 sm:py-24 px-4 sm:px-8 bg-white dark:bg-slate-950 ${className}`}
+    >
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border border-purple-200/60 dark:border-purple-800/60 mb-3">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>DYNAMIC POSTS LOOP</span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              {title}
+            </h2>
+            {subtitle && (
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 max-w-xl">
+                {subtitle}
+              </p>
+            )}
+          </div>
+
+          {/* Category Filter Tabs */}
+          <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setActiveCategory(cat)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  activeCategory === cat
+                    ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-xs"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 3-Column Posts Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {filtered.map((post, idx) => (
+            <article
+              key={idx}
+              className="group rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-xs hover:shadow-xl hover:border-purple-500/40 transition-all duration-300 flex flex-col justify-between"
+            >
+              <div>
+                <div className="relative h-48 overflow-hidden bg-slate-100 dark:bg-slate-800">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={post.image}
+                    alt={post.title || "Post thumbnail"}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-black/60 backdrop-blur-md text-white border border-white/20">
+                    {post.category || "General"}
+                  </span>
+                </div>
+
+                <div className="p-6">
+                  <div className="flex items-center gap-3 text-[11px] text-slate-400 mb-2.5">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      <span>{post.date}</span>
+                    </span>
+                    <span>•</span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      <span>{post.readTime}</span>
+                    </span>
+                  </div>
+
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-purple-600 transition-colors line-clamp-2 leading-snug">
+                    {post.title}
+                  </h3>
+
+                  <p className="mt-2 text-xs text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed">
+                    {post.excerpt}
+                  </p>
+                </div>
+              </div>
+
+              <div className="px-6 pb-6 pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800/80 text-xs">
+                <span className="flex items-center gap-1.5 font-medium text-slate-600 dark:text-slate-300">
+                  <User className="w-3.5 h-3.5 text-slate-400" />
+                  <span>{post.author}</span>
+                </span>
+                <span className="font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                  <span>Read</span>
+                  <ArrowRight className="w-3 h-3" />
+                </span>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// 14d. Elementor Pro Team Showcase Section
+const TeamSectionComponent: React.FC<
+  BaseElementProps & {
+    title?: string;
+    subtitle?: string;
+    items?: Array<{
+      name?: string;
+      role?: string;
+      avatar?: string;
+      bio?: string;
+    }>;
+  }
+> = ({
+  title = "Meet the Minds Behind the Vision",
+  subtitle = "Designers, builders, and engineers united by a obsession with visual craft and developer freedom.",
+  items = [
+    {
+      name: "Arham Ahmed",
+      role: "Lead Systems Architect & Founder",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+      bio: "Pioneering visual CMS architecture with zero runtime lock-in.",
+    },
+    {
+      name: "Sophia Zhang",
+      role: "Head of Product Design",
+      avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80",
+      bio: "Crafting Elementor-grade visual drag & drop primitives.",
+    },
+    {
+      name: "Liam O'Connor",
+      role: "Next.js Compiler Specialist",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+      bio: "Optimizing 1-click multi-page AST exporters and type generators.",
+    },
+  ],
   style,
   className = "",
 }) => (
   <section
     style={style}
-    className={`py-16 px-4 sm:px-8 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-center ${className}`}
+    className={`py-16 sm:py-24 px-4 sm:px-8 bg-slate-50 dark:bg-slate-900/40 border-y border-slate-200/80 dark:border-slate-800 ${className}`}
   >
-    <div className="max-w-4xl mx-auto flex flex-col items-center">
-      <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-3">
-        {title}
-      </h2>
-      <p className="text-blue-100 text-sm sm:text-base max-w-xl mb-7">
-        {subtitle}
-      </p>
-      <button
-        type="button"
-        className="px-7 py-3 rounded-xl font-bold text-sm bg-white text-blue-700 shadow-xl hover:bg-blue-50 transition-all cursor-pointer"
-      >
-        {buttonText}
-      </button>
+    <div className="max-w-7xl mx-auto">
+      <div className="text-center max-w-3xl mx-auto mb-14">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60 mb-3">
+          <User className="w-3.5 h-3.5" />
+          <span>LEADERSHIP</span>
+        </div>
+        <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          {title}
+        </h2>
+        {subtitle && (
+          <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
+            {subtitle}
+          </p>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {items.map((member, idx) => (
+          <div
+            key={idx}
+            className="group p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center flex flex-col items-center"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={member.avatar}
+              alt={member.name || "Team Member"}
+              className="w-24 h-24 rounded-full object-cover ring-4 ring-blue-500/20 group-hover:ring-blue-500 transition-all mb-4 shadow-md"
+            />
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">
+              {member.name}
+            </h3>
+            <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-0.5">
+              {member.role}
+            </span>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-3 leading-relaxed">
+              {member.bio}
+            </p>
+
+            <div className="flex items-center gap-3 mt-5 pt-4 border-t border-slate-100 dark:border-slate-800/80 text-slate-400">
+              <span className="hover:text-blue-500 cursor-pointer p-1 transition-colors" title="Twitter / X">
+                <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              </span>
+              <span className="hover:text-blue-600 cursor-pointer p-1 transition-colors" title="LinkedIn">
+                <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+              </span>
+              <span className="hover:text-slate-900 dark:hover:text-white cursor-pointer p-1 transition-colors" title="GitHub">
+                <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   </section>
 );
+
+// 14e. Elementor Pro Video Showcase Section
+const VideoSectionComponent: React.FC<
+  BaseElementProps & {
+    title?: string;
+    subtitle?: string;
+    thumbnail?: string;
+    badge?: string;
+  }
+> = ({
+  title = "Watch How Nexoraft Ships in Minutes",
+  subtitle = "A complete walkthrough of the WordPress-grade CMS, Elementor Pro visual canvas, and Next.js 15 App Router export.",
+  thumbnail = "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80",
+  badge = "✦ FEATURE SHOWCASE",
+  style,
+  className = "",
+}) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  return (
+    <section
+      style={style}
+      className={`py-16 sm:py-24 px-4 sm:px-8 bg-white dark:bg-slate-950 ${className}`}
+    >
+      <div className="max-w-5xl mx-auto text-center">
+        <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 mb-3 inline-block">
+          {badge}
+        </span>
+        <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          {title}
+        </h2>
+        <p className="mt-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-xl mx-auto mb-10">
+          {subtitle}
+        </p>
+
+        <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 bg-slate-900 aspect-video flex items-center justify-center group">
+          {isPlaying ? (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-white p-6">
+              <Sparkles className="w-12 h-12 text-blue-400 mb-3 animate-spin" />
+              <p className="text-sm font-semibold">Interactive Video Preview Playing</p>
+              <button
+                type="button"
+                onClick={() => setIsPlaying(false)}
+                className="mt-4 px-4 py-1.5 rounded-lg text-xs bg-slate-800 hover:bg-slate-700 text-white"
+              >
+                Close Video
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={thumbnail}
+                alt="Video showcase thumbnail"
+                className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700 opacity-90"
+              />
+              <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[1px]" />
+              <button
+                type="button"
+                onClick={() => setIsPlaying(true)}
+                title="Play Demo Video"
+                className="absolute z-10 w-20 h-20 rounded-full bg-blue-600/95 hover:bg-blue-500 text-white flex items-center justify-center shadow-2xl shadow-blue-500/50 group-hover:scale-110 transition-all cursor-pointer ring-8 ring-white/20 animate-pulse"
+              >
+                <Play className="w-8 h-8 fill-white translate-x-0.5" />
+              </button>
+              <span className="absolute bottom-4 left-4 z-10 text-[11px] font-bold text-white/90 bg-black/60 px-3 py-1 rounded-full backdrop-blur-md">
+                1080p HD • 3:45 Walkthrough
+              </span>
+            </>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 
 // 15. Contact Section with Lead Capture
 const ContactSectionComponent: React.FC<
@@ -1143,6 +1710,27 @@ export const componentTypes: Record<
   ) as unknown as ComponentType<Record<string, unknown>>,
   CallToActionSection: withEditable(
     CallToActionSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  CountdownSection: withEditable(
+    CountdownSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  CountdownTimer: withEditable(
+    CountdownSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  PostsGridSection: withEditable(
+    PostsGridSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  PostsGrid: withEditable(
+    PostsGridSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  TeamSection: withEditable(
+    TeamSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  TeamGrid: withEditable(
+    TeamSectionComponent
+  ) as unknown as ComponentType<Record<string, unknown>>,
+  VideoSection: withEditable(
+    VideoSectionComponent
   ) as unknown as ComponentType<Record<string, unknown>>,
   ContactSection: withEditable(
     ContactSectionComponent

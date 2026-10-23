@@ -24,6 +24,7 @@ import {
   Check,
   Loader2,
   FileText,
+  Home,
 } from "lucide-react";
 
 export interface NavbarComponentWrapperProps {
@@ -157,18 +158,27 @@ export const NavbarComponentWrapper: React.FC<NavbarComponentWrapperProps> = ({
       >
         {/* Left Section: Back to Dashboard, Brand, Website Title & Page Switcher */}
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+          {/* Back to WordPress Dedicated Dashboard */}
+          <Link
+            href={websiteId ? `/project/${websiteId}` : "/"}
+            title="Return to WordPress Dashboard"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#1d2327] hover:bg-[#2c3338] text-white text-xs font-semibold shadow-xs transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4 text-[#72aee6]" />
+            <div className="w-4 h-4 rounded-full bg-[#2271b1] text-white flex items-center justify-center text-[10px] font-bold">
+              W
+            </div>
+            <span className="hidden sm:inline font-semibold">WP Admin</span>
+          </Link>
+
+          {/* Return to All Sites Hub */}
           <Link
             href="/"
-            title="Return to Dashboard"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold transition-colors"
+            title="All Website Projects"
+            className="flex items-center gap-1 px-2 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 text-xs font-medium transition-colors"
           >
-            <ChevronLeft className="w-4 h-4" />
-            <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-[11px] font-black shadow-xs">
-              N
-            </div>
-            <span className="hidden sm:inline font-bold text-slate-900 dark:text-white">
-              Nexoraft
-            </span>
+            <Home className="w-3.5 h-3.5" />
+            <span className="hidden md:inline">Hub</span>
           </Link>
 
           <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />

@@ -4,7 +4,7 @@ export type DeviceType = "desktop" | "tablet" | "mobile" | string;
 export type NavbarMode = "vertical" | "horizontal";
 export type SiteStatus = "draft" | "published" | "archived";
 export type PageStatus = "draft" | "published";
-export type SubmissionStatus = "new" | "read" | "archived";
+export type SubmissionStatus = "new" | "read" | "reviewed" | "contacted" | "archived";
 
 export interface ElementNode {
   id: string;
@@ -58,6 +58,7 @@ export interface PageConfig {
   seo?: PageSeoConfig;
   order?: number;
   templateId?: string;
+  updatedAt?: number;
   [key: string]: unknown;
 }
 
